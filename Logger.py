@@ -163,7 +163,7 @@ class Log_info:
         if errNum == 36:
             message_temp = f"""{dict_of_err_types.get(4)}: Can't concatenate <int>"""
 
-        self.logger.error(t.substitute(num=errNum,message=message_temp))
+        self.logger.error(t.substitute(num=errNum, message=message_temp))
         raise SystemExit(1)
 
 
