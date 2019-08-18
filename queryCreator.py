@@ -115,6 +115,12 @@ class Query:
             self.take_df_of_dicDb()
 
         for row in self.DF.iterrows():
+
+            for each in arrOfSourceColumns:  # прохожу по столбцам в источнике и собираю словарь значений и колонок
+                # с именами ключей в виде названия колонки в приемнике
+                dicOfColVals[each["colNameDb"]] = []  # список потому что может быть несколько полей
+                dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
+
             for columnProperty in self.dic["dbColumns"]:      # прохожу по колонкам в базе данных
 
                 if columnProperty["isAutoInc"] == 'true':
@@ -122,15 +128,15 @@ class Query:
 
                 curColumnExcelEqualsDbColumn = list(filter(lambda x: x["colNameDb"] == columnProperty["colName"], self.dic["excelColumns"]))
 
-                for each in arrOfSourceColumns:
-                    dicOfColVals[each["colNameDb"]] = row[1][each["colName"]]
-
+                # надо пройтись по значениям dicOfColVals и развернуть список
+                
                 if dicOfColVals.get(columnProperty["colName"]) != None:  # беру имя колонки в базе и
                                                                  # смотрю есть ли оно в списке источника
                     if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"]) != 'null': #
                         dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], dicOfColVals.get(columnProperty["colName"])))
                     else:
                         dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"]))
+
                 elif columnProperty['defaultValue_mode'] == 'true':
                     # если нет такой колонки в файле беру из дефолтного поля
                     if columnProperty.get("colType") == 'str':
