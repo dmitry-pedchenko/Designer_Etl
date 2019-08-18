@@ -20,8 +20,6 @@
                 <colNameDb></colNameDb> <!-- colum name in db -->
                 <colType></colType> <!-- str / int / float -->
                 <isPK></isPK> <!-- true/ false -->
-                <valueLength mode="false"></valueLength> <!-- <valueLength mode="true/ false">value</valueLength> -->
-                <transformation mode="false"></transformation> <!-- <transformation mode="true/ false">value</transformation> -->
                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                 <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
@@ -73,8 +71,6 @@
                     <colNameDb></colNameDb> <!-- colum name in db -->
                     <colType></colType> <!-- str / int / float -->
                     <isPK></isPK> <!-- true/ false -->
-                    <valueLength mode="false"></valueLength> <!-- <valueLength mode="true/ false">value</valueLength> -->
-                    <transformation mode="false"></transformation> <!-- <transformation mode="true/ false">value</transformation> -->
                     <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                     <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                     <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->

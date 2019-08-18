@@ -209,7 +209,7 @@ class Log_info:
         t = Template("Debug <$number> - $message")
 
         if debug_num == 0:
-            message_temp = f"""Message - \n{message[0]}"""
+            message_temp = f""" - {message[0]}"""
         if debug_num == 1:
             message_temp = f"""Error in database while commiting query:\nRow number:<{message[0]}>\nQuery: 
                             <{message[1]}>\nMessage - \n<{message[2]}>\n"""

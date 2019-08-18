@@ -119,26 +119,6 @@ def do_XML_parse(pathToFile, log, opts):
             isPK = child.find("isPK").text
         except:
             log.raiseError(5, "isPK",column_block_number)
-            
-        try:
-            valueLength = child.find("valueLength").text
-        except:
-            log.raiseError(5, "valueLength", column_block_number)
-            
-        try:
-            valueLength_mode = child.find("valueLength").get("mode")
-        except:
-            log.raiseError(6, "valueLength",column_block_number)
-
-        try:
-            transformation = child.find("transformation").text
-        except:
-            log.raiseError(5, "transformation",column_block_number )
-
-        try:
-            transformation_mode = child.find("transformation").get("mode")
-        except:
-            log.raiseError(6, "transformation", column_block_number)
 
         try:
             cropEnd = child.find("cropEnd").text
@@ -231,10 +211,6 @@ def do_XML_parse(pathToFile, log, opts):
         columnDict['colNameDb'] = colNameDb
         columnDict['colType'] = colType
         columnDict['isPK'] = isPK
-        columnDict['valueLength'] = valueLength
-        columnDict['valueLength_mode'] = valueLength_mode
-        columnDict['transformation'] = transformation
-        columnDict['transformation_mode'] = transformation_mode
         columnDict['cropEnd'] = cropEnd
         columnDict['cropEnd_mode'] = cropEnd_mode
         columnDict['addValueEnd'] = addValueEnd
@@ -337,26 +313,6 @@ def do_XML_parse(pathToFile, log, opts):
                 log.raiseError(11, "isPK", column_block_number)
 
             try:
-                valueLength = child.find("valueLength").text
-            except:
-                log.raiseError(11, "valueLength", column_block_number)
-
-            try:
-                valueLength_mode = child.find("valueLength").get("mode")
-            except:
-                log.raiseError(12, "valueLength", column_block_number)
-
-            try:
-                transformation = child.find("transformation").text
-            except:
-                log.raiseError(11, "transformation", column_block_number)
-
-            try:
-                transformation_mode = child.find("transformation").get("mode")
-            except:
-                log.raiseError(12, "transformation", column_block_number)
-
-            try:
                 cropEnd = child.find("cropEnd").text
             except:
                 log.raiseError(11, "cropEnd", column_block_number)
@@ -446,10 +402,6 @@ def do_XML_parse(pathToFile, log, opts):
             arrOfDictColumns['colNameDb'] = colNameDb
             arrOfDictColumns['colType'] = colType
             arrOfDictColumns['isPK'] = isPK
-            arrOfDictColumns['valueLength'] = valueLength
-            arrOfDictColumns['valueLength_mode'] = valueLength_mode
-            arrOfDictColumns['transformation'] = transformation
-            arrOfDictColumns['transformation_mode'] = transformation_mode
             arrOfDictColumns['cropEnd'] = cropEnd
             arrOfDictColumns['cropEnd_mode'] = cropEnd_mode
             arrOfDictColumns['addValueEnd'] = addValueEnd
