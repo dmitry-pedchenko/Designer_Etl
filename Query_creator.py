@@ -186,7 +186,7 @@ class Query:
             if self.rowCounter == len(self.DF):
                 self.log.raiseInfo(10, arrOfLoadPercents[0])
 
-            fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert,dicOfValsUpdateCondition)
+            fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert, dicOfValsUpdateCondition)
             self.execQuery(fullQuery)
 
             dicOfColVals = {}  # очищаю словарь чтобы на следующей итерации снова начал заполняться
