@@ -2,7 +2,7 @@ import xml.etree.ElementTree as et
 import os
 
 
-def xmlParse(pathToFile, log, opts):
+def do_XML_parse(pathToFile, log, opts):
     colArrayExcel = []  # массив включающий в себя все колонки из источника
     importDict = {}  # словарь для каждой колонки
     colArrayDB = []  # массив с колонками в базе

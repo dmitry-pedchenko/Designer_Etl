@@ -1,17 +1,17 @@
-import queryCreator as qc
-import XmlParserClass as xpc
-import logger
-import validateRes
-from OptParser import Opts
+import Query_creator as qc
+import XML_DB_DAO as xpc
+import Logger
+import Validate_res
+from Opt_parser import Opts
 
 opts = Opts()
 
 for pathToConfigXML in opts.args.config:
-    loggerInst = logger.logInfo.getInstance(pathToConfigXML)
+    loggerInst = Logger.Log_info.getInstance(pathToConfigXML)
     loggerInst.raiseInfo(4)
     dbService = xpc.XmlParser(pathToConfigXML, loggerInst, opts)
     dbService.connectToTheDB(loggerInst)
-    validator = validateRes.Validate(dbService, loggerInst, opts)
+    validator = Validate_res.Validate(dbService, loggerInst, opts)
     validator.validate()
 
     if opts.args.check_mode == 'true':

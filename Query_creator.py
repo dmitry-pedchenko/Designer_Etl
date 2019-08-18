@@ -1,4 +1,4 @@
-import rowTransformationHelper as helper
+import Row_transformation_helper as helper
 import os
 import pandas as pd
 
@@ -105,7 +105,7 @@ class Query:
         dicOfValsUpdateCondition = {}
         arrOfLoadPercents = [25, 50, 75, 100]
 
-        hp = helper.transformHelper()
+        hp = helper.Transformation_helper()
 
         for each in self.dic["excelColumns"]:
 
@@ -118,8 +118,12 @@ class Query:
 
             for each in arrOfSourceColumns:  # прохожу по столбцам в источнике и собираю словарь значений и колонок
                 # с именами ключей в виде названия колонки в приемнике
-                dicOfColVals[each["colNameDb"]] = []  # список потому что может быть несколько полей
-                dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
+                # список потому что может быть несколько полей
+                if dicOfColVals.get(each["colNameDb"]) == None:
+                    dicOfColVals[each["colNameDb"]] = []
+                    dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
+                else:
+                    dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
 
             for columnProperty in self.dic["dbColumns"]:      # прохожу по колонкам в базе данных
 
@@ -129,13 +133,24 @@ class Query:
                 curColumnExcelEqualsDbColumn = list(filter(lambda x: x["colNameDb"] == columnProperty["colName"], self.dic["excelColumns"]))
 
                 # надо пройтись по значениям dicOfColVals и развернуть список
-                
+
                 if dicOfColVals.get(columnProperty["colName"]) != None:  # беру имя колонки в базе и
                                                                  # смотрю есть ли оно в списке источника
-                    if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"]) != 'null': #
-                        dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], dicOfColVals.get(columnProperty["colName"])))
+
+                    if len(dicOfColVals.get(columnProperty["colName"])) == 1:
+                        if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"])[0] != 'null': #
+                            dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], dicOfColVals.get(columnProperty["colName"])[0]))
+                        else:
+                            dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0])
                     else:
-                        dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"]))
+                        if columnProperty.get("colType") == 'str':  #
+                            string = ''
+                            for col in dicOfColVals.get(columnProperty["colName"]):
+                                string += "{}".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], col))
+                            string = f"'{string}'"
+                            dicOfValsToInsert[columnProperty["colName"]] = string
+                        else:
+                            self.log.raiseError(36)
 
                 elif columnProperty['defaultValue_mode'] == 'true':
                     # если нет такой колонки в файле беру из дефолтного поля
@@ -173,6 +188,8 @@ class Query:
 
             fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert,dicOfValsUpdateCondition)
             self.execQuery(fullQuery)
+
+            dicOfColVals = {}  # очищаю словарь чтобы на следующей итерации снова начал заполняться
 
         if self.dic["testRunMode_value"] == 'true':
             self.log.raiseInfo(11, self.rowCounter)

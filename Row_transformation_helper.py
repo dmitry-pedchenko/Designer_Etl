@@ -1,6 +1,6 @@
 
 
-class transformHelper:
+class Transformation_helper:
 
     def cropEnd(self, value, valueToCrop):
         return str(value)[:-int(valueToCrop)]

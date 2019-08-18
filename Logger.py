@@ -4,13 +4,13 @@ import os
 from string import Template
 
 
-class logInfo:
+class Log_info:
     __instance = None
 
     @classmethod
     def getInstance(cls, pathToConfigXML):
         if not cls.__instance:
-            cls.__instance = logInfo(pathToConfigXML)
+            cls.__instance = Log_info(pathToConfigXML)
         return cls.__instance
 
     def __init__(self, pathToConfigXML):
@@ -61,97 +61,108 @@ class logInfo:
 
     def raiseError(self, errNum, *message):
         message_temp = "default_error"
-        t = Template('Error $num - $message')
+        t = Template('Error <$num> - $message')
+
+        dict_of_err_types = {
+            0: "Unknown error",
+            1: "Error at parsing XML",
+            2: "Error at DB connection",
+            3: "Validate error",
+            4: "Query creating error"
+        }
+
         if errNum == 0:
-            message_temp = f"""Unknown error\nError message:\n{message[0]}"""
+            message_temp = f"""{dict_of_err_types.get(0)}: Message - \n<{message[0]}>"""
         if errNum == 1:
-            message_temp = f"""Error at parsing XML configuration file - <{message[0]}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Message - \n<{message[0]}>"""
         if errNum == 2:
-            message_temp = f"""Error at parsing XML: Cant find file XML <{message[0]}>\n{message[1]}"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Cant find file XML <{message[0]}>\nMessage - \n{message[1]}"""
         if errNum == 3:
-            message_temp = f"""Error at parsing XML: Can't find tag <{message[0]}> in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <{self.config}>"""
         if errNum == 4:
-            message_temp = f"""Error at parsing XML: Can't find option <--{message[0]}> in command line"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find option <--{message[0]}> in command line"""
         if errNum == 5:
-            message_temp = f"""Error at parsing XML: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
                       in <importXml/columns> block in <{self.config}>"""
         if errNum == 6:
-            message_temp = f"""Error at parsing XML: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
                        in <importXml/columns> block in <{self.config}>"""
         if errNum == 7:
-            message_temp = f"""Error at parsing XML: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> 
                        in <importXml/columns> block in <{self.config}>"""
         if errNum == 8:
-            message_temp = f"""Error at parsing XML: Can't find property mode in tag <{message[0]}> in <{self.config}>""",
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <{self.config}>""",
         if errNum == 9:
-            message_temp = f"""Error at parsing XML: <--check_mode true>. if you want to check source file you must to set <linkedColumns mode="true">"""
+            message_temp = f"""{dict_of_err_types.get(1)}: <--check_mode true>. if you want to check source file you must to set <linkedColumns mode="true">"""
         if errNum == 10:
-            message_temp = f"""Error at parsing XML: Can't find tag <{message[0]}> in <importXml/linkedColumns> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <importXml/linkedColumns> tag at block number <{message[1]}> 
                        in <{self.config}>"""
         if errNum == 11:
-            message_temp = f"""Error at parsing XML: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
                        in <importXml/withDict> block in <{self.config}>"""
         if errNum == 12:
-            message_temp = f"""Error at parsing XML: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
                        in <importXml/withDict> block in <{self.config}>"""
         if errNum == 13:
-            message_temp = f"""Error at parsing XML: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> 
                       in <importXml/withDict> block in <{self.config}>"""
         if errNum == 14:
-            message_temp = f"""Error at parsing XML: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
                        in <exportTable/columns> block in <{self.config}>"""
         if errNum == 15:
-            message_temp = f"""Error at parsing XML: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
                       in <exportTable/columns> block in <{self.config}>"""
         if errNum == 16:
-            message_temp = f"""Error at parsing XML: Can't open excel file on path: <{message[0]}> on page: <{message[1]}> - 
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't open excel file on path: <{message[0]}> on page: <{message[1]}> - 
                             \nSystem message: <{message[2]}>"""
         if errNum == 17:
-            message_temp = f"""Error at parsing XML: Can't find tag <colName> for tag <colNameInSource> from tag <linkedColumns>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <colName> for tag <colNameInSource> from tag <linkedColumns>"""
         if errNum == 18:
-            message_temp = f"""Fail to connect to <{message[0]}> <{message[1]}> <{message[2]}> <{message[3]}>"""
+            message_temp = f"""{dict_of_err_types.get(2)}: Fail to connect to <{message[0]}> <{message[1]}> <{message[2]}> <{message[3]}>"""
         if errNum == 19:
-            message_temp = f"""Fail to close connection"""
+            message_temp = f"""{dict_of_err_types.get(2)}: Fail to close connection"""
         if errNum == 20:
-            message_temp = f"""Error in exec query in validate operation\nSystem message:<{message[0]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Error in exec query in validate operation\nSystem message:<{message[0]}>"""
         if errNum == 21:
-            message_temp = f"""Validate error: in table <{message[0]}> value <{message[1]}> in column <{message[2]}> 
+            message_temp = f"""{dict_of_err_types.get(3)}: In table <{message[0]}> value <{message[1]}> in column <{message[2]}> 
                             is not exists in column <{message[3]}> in table <{message[4]}> at list <{message[5]}>"""
         if errNum == 22:
-            message_temp = f"""Validate error: In tag <exportTable> in column number <{message[0]}> 
+            message_temp = f"""{dict_of_err_types.get(3)}: In tag <exportTable> in column number <{message[0]}> 
             column property <fromDb>true</fromDb> but <withDict mode="false">"""
         if errNum == 23:
-            message_temp = f"""Validate error: Mode <dict>true<dict> but in tag <dbColumns> no column property <fromDb>true</fromDb>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Mode <dict>true<dict> but in tag <dbColumns> no column property <fromDb>true</fromDb>"""
         if errNum == 24:
-            message_temp = f"""Validate error: In tag <withDict> in column number <{message[0]}> tag <colNameDb> == <None>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: In tag <withDict> in column number <{message[0]}> tag <colNameDb> == <None>"""
         if errNum == 25:
-            message_temp = f"""Validate error: In tag <withDict> in column number <{message[0]}> tag <colName> == <None>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: In tag <withDict> in column number <{message[0]}> tag <colName> == <None>"""
         if errNum == 26:
-            message_temp = f"""Validate error: Column <{message[0]}> in file <{message[1]}> at list <{message[2]}> 
+            message_temp = f"""{dict_of_err_types.get(3)}: Column <{message[0]}> in file <{message[1]}> at list <{message[2]}> 
             contains <Null> but column not <Null>"""
         if errNum == 27:
-            message_temp = f"""Validate error: Value <{message[0]}> in column <{message[1]}> in file <{message[2]}> 
+            message_temp = f"""{dict_of_err_types.get(3)}: Value <{message[0]}> in column <{message[1]}> in file <{message[2]}> 
             at list <{message[3]}> is not unique"""
         if errNum == 28:
-            message_temp = f"""Validate error: Column: <{message[0]}> not exists in <{message[1]}> on list <{message[2]}>.
+            message_temp = f"""{dict_of_err_types.get(3)}: Column: <{message[0]}> not exists in <{message[1]}> on list <{message[2]}>.
              You must chose from this names: <{message[3]}>"""
         if errNum == 29:
-            message_temp = f"""Validate error: Columns: <{message[0]}> not exists in exportTable/columns list in config"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in exportTable/columns list in config"""
         if errNum == 30:
-            message_temp = f"""Validate error: Columns: <{message[0]}> not exists in table <{message[1]}>; In DB: <{message[2]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in table <{message[1]}>; In DB: <{message[2]}>"""
         if errNum == 31:
-            message_temp = f"""Validate error: Columns: <{message[0]}> not exists in importXml/columns/column/colNameDb tag in the 
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in importXml/columns/column/colNameDb tag in the 
                             <{message[1]}> file configuration.\nList of exists columns in that tag: <{message[2]}>"""
         if errNum == 32:
-            message_temp = f"""Validate error: Columns: <{message[0]}> not exists in linked table.List of 
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in linked table.List of 
             exists columns in that tag: <{message[1]}>"""
         if errNum == 33:
-            message_temp = f"""Validate error: Columns: <{message[0]}> not exists in source table.List of 
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in source table.List of 
             exists columns in that tag: <{message[1]}>"""
         if errNum == 34:
-            message_temp = f"""Option <--test_mode> don't selected"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Option <--test_mode> don't selected"""
         if errNum == 35:
-            message_temp = f"""Parse xml file error: <{message[0]}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Message - \n<{message[0]}>"""
+        if errNum == 36:
+            message_temp = f"""{dict_of_err_types.get(4)}: Can't concatenate <int>"""
 
         self.logger.error(t.substitute(num=errNum,message=message_temp))
         raise SystemExit(1)
@@ -160,6 +171,7 @@ class logInfo:
     def raiseInfo(self, info_num, *message):
         message_temp = "default_info"
         t = Template("$message")
+
 
         if info_num == 0:
             message_temp = f"Success"
@@ -194,13 +206,13 @@ class logInfo:
 
     def raiseDebug(self,debug_num, *message):
         message_temp = "default_debug"
-        t = Template("Debug $number - $message")
+        t = Template("Debug <$number> - $message")
 
         if debug_num == 0:
-            message_temp = f"""{message[0]}""",
+            message_temp = f"""Message - \n{message[0]}"""
         if debug_num == 1:
             message_temp = f"""Error in database while commiting query:\nRow number:<{message[0]}>\nQuery: 
-                            <{message[1]}>\nResponse from DB: <{message[2]}>\n"""
+                            <{message[1]}>\nMessage - \n<{message[2]}>\n"""
 
         self.logger.debug(t.substitute(number=debug_num, message=message_temp))
 

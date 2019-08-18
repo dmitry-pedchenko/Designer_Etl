@@ -1,6 +1,6 @@
 import pymssql as p
-import xmlParser
-import DAO
+import XML_parser
+import DAO_DataFrame
 import os
 
 
@@ -10,7 +10,7 @@ class XmlParser:
 
     def __init__(self, pathToConfig, log, opts):
         try:
-            self.dictionary = xmlParser.xmlParse(pathToConfig, log, opts)
+            self.dictionary = XML_parser.do_XML_parse(pathToConfig, log, opts)
         except Exception as e:
             log.raiseError(1, e.args[0])
 
@@ -24,7 +24,7 @@ class XmlParser:
 
 
         try:
-            dao = DAO.ExcelSelect(pathToExcel, self.dictionary["sheetNumber_value"], log, arrOfColTypesInExcel)
+            dao = DAO_DataFrame.ExcelSelect(pathToExcel, self.dictionary["sheetNumber_value"], log, arrOfColTypesInExcel)
             self.dataFrame = dao.newDf
 
             log.raiseInfo(1, self.dictionary["importXml_path_value"],dao.sheet_name,self.dictionary["sheetNumber_value"] + 1)
@@ -43,7 +43,7 @@ class XmlParser:
 
         try:
             if opts.args.check_mode == 'true':
-                dao_link = DAO.ExcelSelect(pathToExcel_link, self.dictionary["linkedFileSheetNumber"], log, arrOfColTypesInExcelLinked)
+                dao_link = DAO_DataFrame.ExcelSelect(pathToExcel_link, self.dictionary["linkedFileSheetNumber"], log, arrOfColTypesInExcelLinked)
                 self.dataFrame_link = dao_link.newDf
         except Exception as e:
             log.raiseError(16, self.dictionary["pathToLinkFile"],int(self.dictionary["linkedFileSheetNumber"]) + 1, e.args[0])
