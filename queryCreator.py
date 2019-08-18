@@ -174,15 +174,16 @@ class Query:
                     dicOfValsUpdateCondition[key] = dicOfValsToInsert.get(key)
                     dicOfValsToInsert.pop(key)
 
-
-            fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert, dicOfValsUpdateCondition)
-            self.execQuery(fullQuery)
-
+            if self.rowCounter == 0:
+                self.log.raiseInfo(10, 0)
             if ((100 * self.rowCounter) / len(self.DF)) > arrOfLoadPercents[0]:
                 self.log.raiseInfo(10, arrOfLoadPercents[0])
                 arrOfLoadPercents.pop(0)
             if self.rowCounter == len(self.DF):
                 self.log.raiseInfo(10, arrOfLoadPercents[0])
+
+            fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert,dicOfValsUpdateCondition)
+            self.execQuery(fullQuery)
 
 
 
