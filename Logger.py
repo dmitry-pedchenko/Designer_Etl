@@ -136,8 +136,7 @@ class Log_info:
         if errNum == 25:
             message_temp = f"""{dict_of_err_types.get(3)}: In tag <withDict> in column number <{message[0]}> tag <colName> == <None>"""
         if errNum == 26:
-            message_temp = f"""{dict_of_err_types.get(3)}: Column <{message[0]}> in file <{message[1]}> at list <{message[2]}> 
-            contains <Null> but column not <Null>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Column <{message[0]}> in file <{message[1]}> at list <{message[2]}> contains <Null> but column not <Null>"""
         if errNum == 27:
             message_temp = f"""{dict_of_err_types.get(3)}: Value <{message[0]}> in column <{message[1]}> in file <{message[2]}> 
             at list <{message[3]}> is not unique"""
