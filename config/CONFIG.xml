@@ -24,9 +24,18 @@
                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                 <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
                 <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
-                <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
+                <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value,value</addValueBegin> -->
                 <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
-                <replace mode="false"></replace> <!-- <replace mode="true/ false">value</replace> -->
+                <replace mode="false">                    <!-- <replace mode="true/ false">value</replace> -->
+
+                    <replaceVal>
+                        <value></value>                     <!--value-->
+                        <toValue></toValue>                 <!--value-->
+                    </replaceVal>
+
+                    <!--...-->
+
+                </replace>
             </column>
 
         <!--<column>-->
@@ -70,14 +79,22 @@
                     <colName></colName> <!-- column name in excel -->
                     <colNameDb></colNameDb> <!-- colum name in db -->
                     <colType></colType> <!-- str / int / float -->
-                    <isPK></isPK> <!-- true/ false -->
                     <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                     <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                     <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
                     <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
                     <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
                     <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
-                    <replace mode="false"></replace> <!-- <replace mode="true/ false">value</replace> -->
+                    <replace mode="false">                    <!-- <replace mode="true/ false">value</replace> -->
+
+                    <replaceVal>
+                        <value></value>                     <!--value-->
+                        <toValue></toValue>                 <!--value-->
+                    </replaceVal>
+
+                    <!--...-->
+
+                </replace>
                 </column>
 
             <!--<column>-->

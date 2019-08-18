@@ -308,11 +308,6 @@ def do_XML_parse(pathToFile, log, opts):
                 log.raiseError(11, "colType", column_block_number)
 
             try:
-                isPK = child.find("isPK").text
-            except:
-                log.raiseError(11, "isPK", column_block_number)
-
-            try:
                 cropEnd = child.find("cropEnd").text
             except:
                 log.raiseError(11, "cropEnd", column_block_number)
@@ -401,7 +396,6 @@ def do_XML_parse(pathToFile, log, opts):
             arrOfDictColumns['colName'] = colName
             arrOfDictColumns['colNameDb'] = colNameDb
             arrOfDictColumns['colType'] = colType
-            arrOfDictColumns['isPK'] = isPK
             arrOfDictColumns['cropEnd'] = cropEnd
             arrOfDictColumns['cropEnd_mode'] = cropEnd_mode
             arrOfDictColumns['addValueEnd'] = addValueEnd

@@ -41,12 +41,13 @@ class Validate:
             listOfNotExistInLinkedTable = []
             listOfNotExistInSourceTable = []
 
-            for col in self.dbService.dictionary['linkedColumns']:  # нахожу все колонки которых нет в эксле линковом
+            # нахожу все колонки которых нет в эксле линковом
+            for col in self.dbService.dictionary['linkedColumns']:
                 if col['linkedColName'] not in self.dbService.dataFrame_link.columns.values:
                     listOfNotExistInLinkedTable.append(col['linkedColName'])
 
-            for col in self.dbService.dictionary['linkedColumns']:  # нахожу все колонки которые прописаны в линке
-                # но их нет в сорсе
+            # нахожу все колонки которые прописаны в линке но их нет в сорсе
+            for col in self.dbService.dictionary['linkedColumns']:
                 if col['colNameInSource'] not in self.dbService.dataFrame.columns.values:
                     listOfNotExistInSourceTable.append(col['colNameInSource'])
 
