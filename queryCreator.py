@@ -6,6 +6,7 @@ class Query:
 
     def __init__(self, dbService, log, opts):
         self.log = log
+        self.pathToLog = log.pathToNewFolder
         self.dic = dbService.dictionary
         self.DF = dbService.dataFrame
         self.cur = dbService.cursor
@@ -80,7 +81,7 @@ class Query:
 
     def execQuery(self, query):
         if self.dic["testRunMode_value"] == 'true':
-            self.log.logger.debug("Test Row: " + query)
+            self.log.raiseDebug(0, query)
             self.rowCounter += 1
         elif self.dic["testRunMode_value"] == 'false':
             try:
@@ -88,18 +89,19 @@ class Query:
                 self.conn.commit()
                 self.counter += 1
             except Exception as e:
-                self.log.logger.debug("Exception 1 - Exception while commiting query: row number:<{}>\nQuery: <{}>\nResponse from DB: <{}>\n".format(self.rowCounter + 2, query, e.args[1]))
+                self.log.raiseDebug(1, self.rowCounter + 2, query, e.args[1])
                 # не прерываем идем дальше если выкинуло исключение только логиним
             finally:
                 self.rowCounter += 1
         else:
-            self.log.logger.debug("Error 15 - Run mode don't selected")
             self.dbService.closeConnect(self.log)
-            raise SystemExit(1)
+            self.log.raiseError(34)
+            
+
 
     def execAllQueries(self):
-        self.log.logger.info("Loading begin...")
-        self.log.logger.info("Test mode: <{}>".format(self.dic["testRunMode_value"]))
+        self.log.raiseInfo(8)
+        self.log.raiseInfo(9,self.dic["testRunMode_value"])
         self.counter = 0    # при каждом запуске скрипта обнуляем счетчик
         self.rowCounter = 0 # при каждом запуске скрипта обнуляем счетчик
         arrOfSourceColumns = []
@@ -134,8 +136,7 @@ class Query:
                         try:
                             dicOfColVals[each["colNameDb"]] = round(int(row[1][each["colName"]]))
                         except Exception as e:
-                            self.log.logger.debug("Error 16 - Can't round number <{}> - <{}>".format(row[1][each["colName"]], e.args[0]))
-                            raise SystemExit(1)
+                            self.log.raiseError(35,row[1][each["colName"]], e.args[0])
                     else:
                         dicOfColVals[each["colNameDb"]] = '{}'.format(row[1][each["colName"]])
 
@@ -178,15 +179,16 @@ class Query:
             self.execQuery(fullQuery)
 
             if ((100 * self.rowCounter) / len(self.DF)) > arrOfLoadPercents[0]:
-                self.log.logger.info("Rows readed: {}%".format(arrOfLoadPercents[0]))
+                self.log.raiseInfo(10, arrOfLoadPercents[0])
                 arrOfLoadPercents.pop(0)
             if self.rowCounter == len(self.DF):
-                self.log.logger.info("Rows readed: {}%".format(arrOfLoadPercents[0]))
+                self.log.raiseInfo(10, arrOfLoadPercents[0])
 
 
 
         if self.dic["testRunMode_value"] == 'true':
-            self.log.logger.info("Created <{}> test queries in <{}>".format(self.rowCounter, self.log.pathToNewFolder))
+            self.log.raiseInfo(11, self.rowCounter)
+            self.log.raiseInfo(13, self.pathToLog)
         else:
-            self.log.logger.info("Inserted: <{}>; Rows lost: <{}>".format(self.counter, self.rowCounter - self.counter))
-            self.log.logger.info("Log files created in: <{}>".format(self.log.pathToNewFolder))
+            self.log.raiseInfo(12, self.counter, self.rowCounter - self.counter)
+            self.log.raiseInfo(13, self.pathToLog)

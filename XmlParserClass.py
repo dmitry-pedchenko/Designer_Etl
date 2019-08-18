@@ -12,8 +12,8 @@ class XmlParser:
         try:
             self.dictionary = xmlParser.xmlParse(pathToConfig, log, opts)
         except Exception as e:
-            log.logger.error("Error 1 - Error at parsing XML configuration file", e)
-            raise SystemExit(1)
+            log.raiseError(1, e.args[0])
+
         pathToExcel = os.path.join(os.path.join(os.getcwd(), 'source'), self.dictionary["importXml_path_value"])
         if opts.args.check_mode == 'true':
             pathToExcel_link = os.path.join(os.path.join(os.getcwd(), 'source'), self.dictionary["pathToLinkFile"])
@@ -27,12 +27,9 @@ class XmlParser:
             dao = DAO.ExcelSelect(pathToExcel, self.dictionary["sheetNumber_value"], log, arrOfColTypesInExcel)
             self.dataFrame = dao.newDf
 
-            log.logger.info("Success excel file: <{}> opened on page name: <{}>, list number: <{}>".format(self.dictionary["importXml_path_value"],
-                                                                                                     dao.sheet_name, self.dictionary["sheetNumber_value"] + 1))
+            log.raiseInfo(1, self.dictionary["importXml_path_value"],dao.sheet_name,self.dictionary["sheetNumber_value"] + 1)
         except Exception as e:
-            log.logger.error("Error 8 - Can't open Excel path: <{}> on page: <{}> - <{}>".format(self.dictionary["importXml_path_value"],
-                                                                                      int(self.dictionary["sheetNumber_value"]) + 1, e.args[0]))
-            raise SystemExit(1)
+            log.raiseError(16, self.dictionary["importXml_path_value"], int(self.dictionary["sheetNumber_value"]) + 1, e.args[0])
 
         if opts.args.check_mode == 'true':  # собираю массив свйоств и имен клонок для связанной таблицы --check_mode
             arrOfColTypesInExcelLinked = {}
@@ -42,18 +39,14 @@ class XmlParser:
                                                                                               prop['colNameInSource'],
                                                                                     self.dictionary['excelColumns']))[0]['colType']
                 except:
-                    log.logger.error("Error - Can't find <colName> for <colNameInSource> ")
-                    raise SystemExit(1)
+                    log.raiseError(17)
 
         try:
             if opts.args.check_mode == 'true':
                 dao_link = DAO.ExcelSelect(pathToExcel_link, self.dictionary["linkedFileSheetNumber"], log, arrOfColTypesInExcelLinked)
                 self.dataFrame_link = dao_link.newDf
         except Exception as e:
-            log.logger.error(
-                "Error 8 - Can't open Excel path: <{}> on page: <{}> - <{}>".format(self.dictionary["pathToLinkFile"],
-                                                                         int(self.dictionary["linkedFileSheetNumber"]) + 1, e.args[0]))
-            raise SystemExit(1)
+            log.raiseError(16, self.dictionary["pathToLinkFile"],int(self.dictionary["linkedFileSheetNumber"]) + 1, e.args[0])
 
     def connectToTheDB(self, log):
         host = self.dictionary["dbHost"]
@@ -66,17 +59,14 @@ class XmlParser:
             self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
             self.cursor = self.conn.cursor()
         except Exception as e:
-            log.logger.error("Error 9 - Fail to connect to <{}> <{}> <{}> <{}>".format(host, dbname, user, port))
-            raise SystemExit(1)
-        log.logger.info("Success connection to host: {0}, port: {2}, database name: {1}".format(host, dbname,
-                                                                                             port))
-
+            log.raiseError(18, host, dbname, user, port)
+        log.raiseInfo(2, host, port, dbname)
     def closeConnect(self, log):
         try:
             self.conn.close()
-            log.logger.info("Connection to DB closed")
-        except Exception as e:
-            log.logger.error("Fail to close connection")
+            log.raiseInfo(3)
+        except:
+            log.raiseError(19)
 
 
 
