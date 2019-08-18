@@ -3,7 +3,6 @@ import os
 import pandas as pd
 
 class Query:
-
     def __init__(self, dbService, log, opts):
         self.log = log
         self.pathToLog = log.pathToNewFolder
@@ -35,7 +34,6 @@ class Query:
         query = f""" SELECT {select_columns_string} FROM {db_table}"""
         self.cur.execute(query)
         res = self.cur.fetchall()
-
 
         df_res = []
         for row in res:
@@ -78,7 +76,6 @@ class Query:
 
         return query
 
-
     def execQuery(self, query):
         if self.dic["testRunMode_value"] == 'true':
             self.log.raiseDebug(0, query)
@@ -96,8 +93,6 @@ class Query:
         else:
             self.dbService.closeConnect(self.log)
             self.log.raiseError(34)
-            
-
 
     def execAllQueries(self):
         self.log.raiseInfo(8)
@@ -125,27 +120,17 @@ class Query:
                 if columnProperty["isAutoInc"] == 'true':
                     continue # поля с автоинкрементом не берем а идем дальше и не вносим их в список
 
-                curColumnInDb = list(filter(lambda x: x["colNameDb"] == columnProperty["colName"], self.dic["excelColumns"]))
-
+                curColumnExcelEqualsDbColumn = list(filter(lambda x: x["colNameDb"] == columnProperty["colName"], self.dic["excelColumns"]))
 
                 for each in arrOfSourceColumns:
-
-                    curColDataType_inExcel = list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]["colType"]
-
-                    if curColDataType_inExcel == "int" and row[1][each["colName"]] != 'null': # to int and to str
-                        try:
-                            dicOfColVals[each["colNameDb"]] = round(int(row[1][each["colName"]]))
-                        except Exception as e:
-                            self.log.raiseError(35,row[1][each["colName"]], e.args[0])
-                    else:
-                        dicOfColVals[each["colNameDb"]] = '{}'.format(row[1][each["colName"]])
+                    dicOfColVals[each["colNameDb"]] = row[1][each["colName"]]
 
                 if dicOfColVals.get(columnProperty["colName"]) != None:  # беру имя колонки в базе и
                                                                  # смотрю есть ли оно в списке источника
                     if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"]) != 'null': #
-                        dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnInDb[0], dicOfColVals.get(columnProperty["colName"])))
+                        dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], dicOfColVals.get(columnProperty["colName"])))
                     else:
-                        dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnInDb[0],dicOfColVals.get(columnProperty["colName"]))
+                        dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"]))
                 elif columnProperty['defaultValue_mode'] == 'true':
                     # если нет такой колонки в файле беру из дефолтного поля
                     if columnProperty.get("colType") == 'str':
@@ -166,8 +151,6 @@ class Query:
                         index = i[1][FK]
                     dicOfValsToInsert[columnProperty["colName"]] = index
 
-
-
             if self.dbService.dictionary['loadMode'] == 'update':
                 arrOfUpdatedCondionInDbColumns = [i['colName'] for i in list(filter(lambda x: x['isUpdateCondition'] == 'true', self.dbService.dictionary['dbColumns']))]
                 for key in arrOfUpdatedCondionInDbColumns:
@@ -184,8 +167,6 @@ class Query:
 
             fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert,dicOfValsUpdateCondition)
             self.execQuery(fullQuery)
-
-
 
         if self.dic["testRunMode_value"] == 'true':
             self.log.raiseInfo(11, self.rowCounter)

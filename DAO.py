@@ -24,6 +24,6 @@ class ExcelSelect:
             sheet = df.parse(listNumber, converters=arrConverters)
             self.sheet_name = df.sheet_names[listNumber]
             self.newDf = sheet.fillna("null")
-        except Exception:
-            log.error("Can't parse excel file")
+        except Exception as e:
+            log.raiseError(35, e.args[0])
             raise SystemExit(1)

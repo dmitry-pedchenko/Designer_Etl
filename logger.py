@@ -151,7 +151,7 @@ class logInfo:
         if errNum == 34:
             message_temp = f"""Option <--test_mode> don't selected"""
         if errNum == 35:
-            message_temp = f"""Query creating error: Can't round number <{message[0]}> - <{message[1]}>"""
+            message_temp = f"""Parse xml file error: <{message[0]}>"""
 
         self.logger.error(t.substitute(num=errNum,message=message_temp))
         raise SystemExit(1)

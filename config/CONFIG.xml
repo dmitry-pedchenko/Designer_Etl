@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+
+<main>
+    <dbHost></dbHost> <!-- host ip / name-->
+    <dbUser></dbUser>          <!-- user -->
+    <dbPass></dbPass> <!-- password -->
+    <dbBase></dbBase> <!-- database name -->
+    <dbPort></dbPort> <!-- port -->
+    <loadMode></loadMode> <!-- insert / update -->
+    <dict></dict> <!-- true/ false -->
+
+    <importXml> <!-- configure source excel file -->
+        <path></path> <!-- Excel file name.xlsx -->
+        <sheetNumber></sheetNumber> <!-- List number in excel [1... ] -->
+
+        <columns>
+
+            <column>
+                <colName></colName> <!-- column name in excel -->
+                <colNameDb></colNameDb> <!-- colum name in db -->
+                <colType></colType> <!-- str / int / float -->
+                <isPK></isPK> <!-- true/ false -->
+                <valueLength mode="false"></valueLength> <!-- <valueLength mode="true/ false">value</valueLength> -->
+                <transformation mode="false"></transformation> <!-- <transformation mode="true/ false">value</transformation> -->
+                <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+                <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+                <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+                <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+                <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
+                <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+                <replace mode="false"></replace> <!-- <replace mode="true/ false">value</replace> -->
+            </column>
+
+        <!--<column>-->
+            <!--...-->
+        <!--</column>-->
+        <!--...-->
+        <!--<column>-->
+            <!--...-->
+        <!--</column>-->
+
+
+        </columns>
+
+
+        <linkedColumns mode="false"> <!-- <linkedColumns mode="true / false"> -->
+        <!--only for check mode-->
+            <pathToLinkFile></pathToLinkFile> <!-- excel file name.xlsx -->
+            <linkedFileSheetNumber></linkedFileSheetNumber> <!-- List number in excel [1... ] -->
+
+            <column>
+                <linkedColName></linkedColName> <!-- column name in excel file to compare -->
+                <colNameInSource></colNameInSource> <!-- column name in source excel -->
+            </column>
+
+        <!--<column>-->
+            <!--...-->
+        <!--</column>-->
+        <!--...-->
+        <!--<column>-->
+            <!--...-->
+        <!--</column>-->
+
+        </linkedColumns>
+
+        <withDict mode="false"> <!-- true/ false" -->
+            <dictTableName></dictTableName> <!-- table name in data base -->
+
+            <columns>
+
+                <column>
+                    <colName></colName> <!-- column name in excel -->
+                    <colNameDb></colNameDb> <!-- colum name in db -->
+                    <colType></colType> <!-- str / int / float -->
+                    <isPK></isPK> <!-- true/ false -->
+                    <valueLength mode="false"></valueLength> <!-- <valueLength mode="true/ false">value</valueLength> -->
+                    <transformation mode="false"></transformation> <!-- <transformation mode="true/ false">value</transformation> -->
+                    <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+                    <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+                    <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+                    <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+                    <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
+                    <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+                    <replace mode="false"></replace> <!-- <replace mode="true/ false">value</replace> -->
+                </column>
+
+            <!--<column>-->
+            <!--...-->
+            <!--</column>-->
+            <!--...-->
+            <!--<column>-->
+            <!--...-->
+            <!--</column>-->
+
+            </columns>
+        </withDict>
+
+    </importXml>
+
+    <exportTable> <!-- configure receiver data base columns -->
+        <path></path>            <!-- receiver data base table name [dbo].[name] -->
+
+        <columns>
+
+            <column>
+                <name></name>                                <!-- column name in database -->
+                <fromExcel></fromExcel>                  <!-- true/ false -->
+                <fromDb></fromDb>                       <!-- true/ false -->
+                <isAutoInc></isAutoInc>                 <!-- true/ false -->
+                <isConc></isConc>                       <!-- true/ false -->
+                <defaultValue mode="false"></defaultValue>   <!-- <defaultValue mode="false/tue">value</defaultValue> -->
+                <colType></colType>                       <!-- str / int -->
+                <isUpdateCondition></isUpdateCondition> <!-- true/ false -->
+                <ifNull mode="false"></ifNull>               <!-- mode =  true/ false -->
+            </column>
+
+        <!--<column>-->
+        <!--...-->
+        <!--</column>-->
+        <!--...-->
+        <!--<column>-->
+        <!--...-->
+        <!--</column>-->
+
+        </columns>
+    </exportTable>
+</main>
+
+<!-- -->
