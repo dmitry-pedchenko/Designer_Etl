@@ -102,7 +102,7 @@ class Validate:
 
         for col in self.dic['excelColumns']:
             if col['isPK'] == 'true':
-                for row in self.df[col['colName']].value_counts().to_frame().reset_index().rename(columns={'index': 'values', col['colName']:'count'}).iterrows():
+                for row in self.df[col['colName']].value_counts().to_frame().reset_index().rename(columns={'index':'values', col['colName']:'count'}).iterrows():
                     if row[1]['count'] > 1:
                         self.log.raiseError(27, row[1]['values'], col['colName'], self.dbService.dictionary['importXml_path_value']
                                                                 , self.dbService.dictionary['sheetNumber_value'] + 1)
