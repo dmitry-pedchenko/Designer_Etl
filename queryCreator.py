@@ -102,8 +102,8 @@ class Query:
     def execAllQueries(self):
         self.log.raiseInfo(8)
         self.log.raiseInfo(9,self.dic["testRunMode_value"])
-        self.counter = 0    # при каждом запуске скрипта обнуляем счетчик
-        self.rowCounter = 0 # при каждом запуске скрипта обнуляем счетчик
+        self.counter = 0    # при каждом запуске скрипта обнуляем счетчик успешно всятавленных строк
+        self.rowCounter = 0 # при каждом запуске скрипта обнуляем счетчик общего количества строк
         arrOfSourceColumns = []
         dicOfColVals = {}
         dicOfValsToInsert = {}

@@ -83,7 +83,6 @@ def xmlParse(pathToFile, log, opts):
         exportTable_block = root.find("exportTable")
     except:
         log.raiseError(3, "exportTable")
-        
 
     importDict['testRunMode_value'] = testRunMode_value
     importDict['checkMode_value'] = checkMode_value
@@ -98,8 +97,7 @@ def xmlParse(pathToFile, log, opts):
     importDict["loadMode"] = loadMode
     importDict["dictMode"] = dictMode
 
-    column_block_number = 1
-    for child in importXml_block.iter("column"):
+    for column_block_number, child in enumerate(importXml_block.iter("column")):
         columnDict = {}
 
         try:
@@ -254,8 +252,6 @@ def xmlParse(pathToFile, log, opts):
 
         colArrayExcel.append(columnDict)
 
-        column_block_number += 1
-
     try:
         linkedColumns_mode = root.find("importXml/linkedColumns").get("mode")
     except:
@@ -277,8 +273,7 @@ def xmlParse(pathToFile, log, opts):
         except:
             log.raiseError(3, "importXml/linkedColumns/linkedFileSheetNumber")
 
-        counter = 1
-        for child in root.find("importXml/linkedColumns").iter("column"):
+        for counter, child in enumerate(root.find("importXml/linkedColumns").iter("column"), 1):
             dictColumn = {}
             try:
                 linkedColName = child.find("linkedColName").text
@@ -293,7 +288,7 @@ def xmlParse(pathToFile, log, opts):
             dictColumn['linkedColName'] = linkedColName
             dictColumn['colNameInSource'] = colNameInSource
             arrOfLinkedColumns.append(dictColumn)
-            counter += 1
+
 
         importDict['linkedColumns'] = arrOfLinkedColumns
         importDict['pathToLinkFile'] = pathToLinkFile
@@ -308,8 +303,6 @@ def xmlParse(pathToFile, log, opts):
 
     if root.find("dict").text == 'true' and withDict_mode == 'false':
         log.raiseError('Error - <--dict true> but if you want to load with dict you must to set <withDict mode="true">')
-        
-
 
     if root.find("dict").text == 'true':
         dict = []
@@ -321,8 +314,7 @@ def xmlParse(pathToFile, log, opts):
 
         importDict['dictTableName'] = dictTableName
 
-        counter = 1
-        for child in root.find("importXml/withDict").iter("column"):
+        for column_block_number, child in enumerate(root.find("importXml/withDict").iter("column"), 1):
             arrOfDictColumns = {}
             try:
                 colName = child.find("colName").text
@@ -475,13 +467,11 @@ def xmlParse(pathToFile, log, opts):
 
             dict.append(arrOfDictColumns)
 
-            counter += 1
     # ---------------
         importDict['withDict'] = dict
     importDict["excelColumns"] = colArrayExcel
 
-    column_block_number = 1
-    for child in exportTable_block.iter("column"):
+    for column_block_number, child in enumerate(exportTable_block.iter("column"), 1):
         columnDict = {}
 
         try:
@@ -554,7 +544,6 @@ def xmlParse(pathToFile, log, opts):
 
         colArrayDB.append(columnDict)
 
-        column_block_number += 1
 
     importDict["dbColumns"] = colArrayDB
 

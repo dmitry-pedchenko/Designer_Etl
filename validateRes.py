@@ -72,27 +72,25 @@ class Validate:
                                                self.dbService.dictionary['sheetNumber_value'] + 1)
 
         if self.dbService.dictionary['dictMode'] == 'true':
-            counter = 1
-            for col_prop in self.dbService.dictionary['dbColumns']:
+
+            for counter, col_prop in enumerate(self.dbService.dictionary['dbColumns'], 1):
                 if col_prop['fromDb'] == 'true' and self.dbService.dictionary['withDict_mode'] == 'false':
                     self.log.raiseError(22, counter)
-                    
-                counter += 1
-            counter = 0
+            counter_fromDb = 0
             for col in self.dbService.dictionary['dbColumns']:
                 if col['fromDb'] == 'true':
-                    counter += 1
+                    counter_fromDb += 1
                     break
-            if counter == 0:
+            if counter_fromDb == 0:
                 self.log.raiseError(23)
-            counter = 1
-            for col_in_withDict in self.dbService.dictionary['withDict']:
+
+            for counter, col_in_withDict in enumerate(self.dbService.dictionary['withDict'], 1):
                 if col_in_withDict['colNameDb'] == None :
                     self.log.raiseError(24, counter)
                     
                 if col_in_withDict['colName'] == None:
                     self.log.raiseError(25, counter)
-                counter += 1
+
 
         for colums_in in self.dbService.dictionary['dbColumns']:
             if colums_in['ifNull_mode'] == 'false' and colums_in['fromExcel'] == 'true':
