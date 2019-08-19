@@ -131,7 +131,7 @@ class Log_info:
         if errNum == 28:
             message_temp = f"""{dict_of_err_types.get(3)}: Column: <{message[0]}> not exists in <{message[1]}> on list <{message[2]}>. You must chose from this names: <{message[3]}>"""
         if errNum == 29:
-            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in exportTable/columns list in config"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in <exportTable/columns> list in config"""
         if errNum == 30:
             message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in table <{message[1]}>; In DB: <{message[2]}>"""
         if errNum == 31:
