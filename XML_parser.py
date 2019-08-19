@@ -84,6 +84,7 @@ def do_XML_parse(pathToFile, log, opts):
     except:
         log.raiseError(3, "exportTable")
 
+
     importDict['testRunMode_value'] = testRunMode_value
     importDict['checkMode_value'] = checkMode_value
     importDict['importXml_path_value'] = importXml_path_value
@@ -183,7 +184,7 @@ def do_XML_parse(pathToFile, log, opts):
         try:
             replace_mode = child.find("replace").get("mode")
         except:
-            log.raiseError(5, "replace",column_block_number)
+            log.raiseError(5, "replace", column_block_number)
             
 
         replaceValArr = []
@@ -206,6 +207,13 @@ def do_XML_parse(pathToFile, log, opts):
                 replaceValArr.append(replaceDict)
         else:
             replaceValArr = []
+
+        if cropEnd_mode == 'true' and type(cropEnd) != int:
+            log.raiseError(40, 'importXml/columns', cropEnd, column_block_number)
+        if takeFromBegin_mode == 'true' and type(takeFromBegin) != int:
+            log.raiseError(40,  'importXml/columns', takeFromBegin, column_block_number)
+        if cropBegin_mode == 'true' and type(cropBegin) != int:
+            log.raiseError(40, 'importXml/columns', cropBegin, column_block_number)
 
         columnDict['colName'] = colName
         columnDict['colNameDb'] = colNameDb
@@ -392,6 +400,13 @@ def do_XML_parse(pathToFile, log, opts):
                     replaceValArr.append(replaceDict)
             else:
                 replaceValArr = []
+
+            if cropEnd_mode == 'true' and type(cropEnd) != int:
+                log.raiseError(40, 'withDict/columns', cropEnd, column_block_number)
+            if takeFromBegin_mode == 'true' and type(takeFromBegin) != int:
+                log.raiseError(40, 'withDict/columns', takeFromBegin, column_block_number)
+            if cropBegin_mode == 'true' and type(cropBegin) != int:
+                log.raiseError(40, 'withDict/columns', cropBegin, column_block_number)
 
             arrOfDictColumns['colName'] = colName
             arrOfDictColumns['colNameDb'] = colNameDb
