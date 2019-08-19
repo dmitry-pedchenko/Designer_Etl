@@ -74,7 +74,7 @@ class Log_info:
         if errNum == 0:
             message_temp = f"""{dict_of_err_types.get(0)}: Message - <{message[0]}>"""
         if errNum == 1:
-            message_temp = f"""{dict_of_err_types.get(1)}: Message - \n<{message[0]}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Message - <{message[0]}>"""
         if errNum == 2:
             message_temp = f"""{dict_of_err_types.get(1)}: Cant find file XML <{message[0]}>\nMessage - \n{message[1]}"""
         if errNum == 3:
@@ -151,6 +151,8 @@ class Log_info:
             message_temp = f"""{dict_of_err_types.get(2)}: Message - \n<{message[0]}>"""
         if errNum == 39:
             message_temp = f"""{dict_of_err_types.get(0)}: Can't create dictionary data frame. Message - <{message[0]}>"""
+        if errNum == 40:
+            message_temp = f"""{dict_of_err_types.get(1)}: In tag <{message[0]}>. Value <{message[1]}> in column number <{message[2] + 1}> not <int> type"""
 
 
         self.logger.error(t.substitute(num=errNum, message=message_temp))

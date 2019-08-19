@@ -10,7 +10,7 @@ class Transformation_helper:
         if value is not None:
             return str(value)[0:int(transformValue)]
     def cropBegin(self, value, transformValue):
-        return value[transformValue:]
+        return str(value)[int(transformValue):]
     def addValueBegin(self, value, valueToAdd):
         return "{}{}".format(valueToAdd, value)
     def addValueBoth(self, value, valToBegin, valToEnd):
