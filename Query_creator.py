@@ -14,38 +14,42 @@ class Query:
         self.opts = opts
 
     def take_df_of_dicDb(self):
-        select_columns_string = ''
-        list_of_columns_to_select = []
 
-        db_table = self.dbService.dictionary['dictTableName']
-        list_of_FK = [i['colName'] for i in
-                      list(filter(lambda x: x['fromDb'] == 'true', self.dbService.dictionary['dbColumns']))]
+        if self.df_dic is None:
+            select_columns_string = ''
+            list_of_columns_to_select = []
 
-        for columns in self.dbService.dictionary['withDict']:
-            list_of_columns_to_select.append(columns['colNameDb'])
-        for columns in list_of_FK:
-            list_of_columns_to_select.append(columns)
+            db_table = self.dbService.dictionary['dictTableName']
+            list_of_FK = [i['colName'] for i in
+                          list(filter(lambda x: x['fromDb'] == 'true', self.dbService.dictionary['dbColumns']))]
 
-        for columns in list_of_columns_to_select:
-            select_columns_string += columns + ','
+            for columns in self.dbService.dictionary['withDict']:
+                list_of_columns_to_select.append(columns['colNameDb'])
+            for columns in list_of_FK:
+                list_of_columns_to_select.append(columns)
 
-        select_columns_string = select_columns_string[:-1]
+            for columns in list_of_columns_to_select:
+                select_columns_string += columns + ','
 
-        query = f""" SELECT {select_columns_string} FROM {db_table}"""
-        self.cur.execute(query)
-        res = self.cur.fetchall()
+            select_columns_string = select_columns_string[:-1]
 
-        df_res = []
-        for row in res:
-            row_to_append = []
-            for elem in row:
-                if type(elem) == str:
-                    row_to_append.append(elem.replace('\xa0', '\xa0').strip())
-                if type(elem) == int:
-                    row_to_append.append(elem)
-            df_res.append(row_to_append)
+            query = f""" SELECT {select_columns_string} FROM {db_table}"""
+            self.cur.execute(query)
+            res = self.cur.fetchall()
 
-        return pd.DataFrame(df_res, columns=list_of_columns_to_select)
+            df_res = []
+            for row in res:
+                row_to_append = []
+                for elem in row:
+                    if type(elem) == str:
+                        row_to_append.append(elem.replace('\xa0', '\xa0').strip())
+                    if type(elem) == int:
+                        row_to_append.append(elem)
+                df_res.append(row_to_append)
+            self.df_dic = pd.DataFrame(df_res, columns=list_of_columns_to_select)
+            return self.df_dic
+        else:
+            return self.df_dic
 
 
     def createPreQuery(self, type, dicOfValsToInsert, dicOfValsUpdateCondition):
@@ -119,7 +123,7 @@ class Query:
             for each in arrOfSourceColumns:  # прохожу по столбцам в источнике и собираю словарь значений и колонок
                 # с именами ключей в виде названия колонки в приемнике
                 # список потому что может быть несколько полей
-                if dicOfColVals.get(each["colNameDb"]) == None:
+                if dicOfColVals.get(each["colNameDb"]) is None:
                     dicOfColVals[each["colNameDb"]] = []
                     dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
                 else:
@@ -134,7 +138,7 @@ class Query:
 
                 # надо пройтись по значениям dicOfColVals и развернуть список
 
-                if dicOfColVals.get(columnProperty["colName"]) != None:  # беру имя колонки в базе и
+                if dicOfColVals.get(columnProperty["colName"]) is not None:  # беру имя колонки в базе и
                                                                  # смотрю есть ли оно в списке источника
 
                     if len(dicOfColVals.get(columnProperty["colName"])) == 1:

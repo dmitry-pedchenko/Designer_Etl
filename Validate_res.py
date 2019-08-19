@@ -86,10 +86,10 @@ class Validate:
                 self.log.raiseError(23)
 
             for counter, col_in_withDict in enumerate(self.dbService.dictionary['withDict'], 1):
-                if col_in_withDict['colNameDb'] == None :
+                if col_in_withDict['colNameDb'] is None :
                     self.log.raiseError(24, counter)
                     
-                if col_in_withDict['colName'] == None:
+                if col_in_withDict['colName'] is None:
                     self.log.raiseError(25, counter)
 
 
