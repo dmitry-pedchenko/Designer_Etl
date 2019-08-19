@@ -146,6 +146,8 @@ class Log_info:
             message_temp = f"""{dict_of_err_types.get(1)}: Message - \n<{message[0]}>"""
         if errNum == 36:
             message_temp = f"""{dict_of_err_types.get(4)}: Can't concatenate <int>"""
+        if errNum == 37:
+            message_temp = f"""{dict_of_err_types.get(2)}: Can't find table <{message[0]}> in data base."""
 
         self.logger.error(t.substitute(num=errNum, message=message_temp))
         raise SystemExit(1)

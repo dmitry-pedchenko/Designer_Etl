@@ -30,6 +30,8 @@ class Validate:
         excel_columns_Db_to_source = [i["colNameDb"] for i in self.dic["excelColumns"]]
         db_columns = [i["colName"] for i in self.dic["dbColumns"]]
 
+
+
         listOfNotExistInDB = []
         listOfNotExistInConfig = []
         listOfNotExist_db_to_source = []
@@ -92,6 +94,18 @@ class Validate:
                 if col_in_withDict['colName'] is None:
                     self.log.raiseError(25, counter)
 
+        for column_name in db_columns:
+            col_db_properties = list(filter(lambda x: x["colName"] == column_name,
+                                            self.dic["dbColumns"]))  # находим свойства текущей колонки
+            if col_db_properties[0]["fromExcel"] == 'true' and col_db_properties[0][
+                "isAutoInc"] == 'false':  # берем только те которые должны идти из файла
+                if column_name not in excel_columns_Db_to_source:
+                    listOfNotExist_db_to_source.append(column_name)
+
+        if len(listOfNotExist_db_to_source) > 0:
+            self.log.raiseError(31, listOfNotExist_db_to_source, self.dic["importXml_path_value"], excel_columns_Db_to_source)
+            self.dbService.closeConnect(self.log)
+
 
         for colums_in in self.dbService.dictionary['dbColumns']:
             if colums_in['ifNull_mode'] == 'false' and colums_in['fromExcel'] == 'true':
@@ -107,11 +121,6 @@ class Validate:
                         self.log.raiseError(27, row[1]['values'], col['colName'], self.dbService.dictionary['importXml_path_value']
                                                                 , self.dbService.dictionary['sheetNumber_value'] + 1)
 
-        for column_name in db_columns:
-            col_db_properties = list(filter(lambda x: x["colName"] == column_name, self.dic["dbColumns"])) # находим свойства текущей колонки
-            if col_db_properties[0]["fromExcel"] == 'true' and col_db_properties[0]["isAutoInc"] == 'false':  # берем только те которые должны идти из файла
-                if column_name not in excel_columns_Db_to_source:
-                    listOfNotExist_db_to_source.append(column_name)
 
         for row in excel_columns:
             if row not in self.df.columns.values:
@@ -119,6 +128,11 @@ class Validate:
                 self.dbService.closeConnect(self.log)
 
         columns = self.queryForColumns()
+
+        if len(columns) == 0:
+            self.log.raiseError(37, self.dic["exportTableName_value"])
+            self.dbService.closeConnect(self.log)
+
         for col in db_columns:
             if str(col) not in [i[0] for i in columns]:  # генератор потому что хранится как [('',),('',)]
                 listOfNotExistInConfig.append(col)
@@ -131,10 +145,6 @@ class Validate:
 
         if len(listOfNotExistInConfig) > 0:
             self.log.raiseError(30, [i for i in listOfNotExistInConfig], self.dic["exportTableName_value"], self.dic["dbBase"])
-            self.dbService.closeConnect(self.log)
-
-        if len(listOfNotExist_db_to_source) > 0:
-            self.log.raiseError(31, listOfNotExist_db_to_source, self.dic["importXml_path_value"], excel_columns_Db_to_source)
             self.dbService.closeConnect(self.log)
 
         if self.opts.args.check_mode == 'true':
