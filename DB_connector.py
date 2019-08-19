@@ -61,4 +61,4 @@ class Connection:
             return self.cursor.fetchall()
         except Exception as e:
             self.log.raiseError(38, e.args[1])
-            self.closeConnect(self.log)
+            self.closeConnect()
