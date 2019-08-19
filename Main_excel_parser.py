@@ -22,5 +22,7 @@ for pathToConfigXML in opts.args.config:
     queryService = qc.Query(dbService, loggerInst, opts)
     queryService.execAllQueries()
 
-    dbService.closeConnect(loggerInst)
     loggerInst.raiseInfo(7)
+
+dbService.closeConnect(loggerInst)
+
