@@ -48,25 +48,7 @@ class XmlParser:
         except Exception as e:
             log.raiseError(16, self.dictionary["pathToLinkFile"],int(self.dictionary["linkedFileSheetNumber"]) + 1, e.args[0])
 
-    def connectToTheDB(self, log):
-        host = self.dictionary["dbHost"]
-        user = self.dictionary["dbUser"]
-        password = self.dictionary["dbPass"]
-        dbname = self.dictionary["dbBase"]
-        port = self.dictionary["dbPort"]
 
-        try:
-            self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
-            self.cursor = self.conn.cursor()
-        except Exception as e:
-            log.raiseError(18, host, dbname, user, port)
-        log.raiseInfo(2, host, port, dbname)
-    def closeConnect(self, log):
-        try:
-            self.conn.close()
-            log.raiseInfo(3)
-        except:
-            log.raiseError(19)
 
 
 

@@ -1,8 +1,9 @@
 import Query_creator as qc
-import XML_DB_DAO as xpc
+import XML_DAO as xpc
 import Logger
 import Validate_res
 from Opt_parser import Opts
+from DB_connector import Connection as con
 
 opts = Opts()
 
@@ -10,19 +11,27 @@ for pathToConfigXML in opts.args.config:
     loggerInst = Logger.Log_info.getInstance(pathToConfigXML)
     loggerInst.raiseInfo(4)
     dbService = xpc.XmlParser(pathToConfigXML, loggerInst, opts)
-    dbService.connectToTheDB(loggerInst)
-    validator = Validate_res.Validate(dbService, loggerInst, opts)
+
+
+    connector = con.get_instance(loggerInst,
+                                 dbService.dictionary["dbHost"],
+                                 dbService.dictionary["dbUser"],
+                                 dbService.dictionary["dbPass"],
+                                 dbService.dictionary["dbBase"],
+                                 dbService.dictionary["dbPort"])
+
+    validator = Validate_res.Validate(dbService, loggerInst, opts, connector)
     validator.validate()
 
     if opts.args.check_mode == 'true':
-        dbService.closeConnect(loggerInst)
+        connector.closeConnect()
         loggerInst.raiseInfo(7)
         break
 
-    queryService = qc.Query(dbService, loggerInst, opts)
+    queryService = qc.Query(dbService, loggerInst, opts, connector)
     queryService.execAllQueries()
 
     loggerInst.raiseInfo(7)
 
-dbService.closeConnect(loggerInst)
+connector.closeConnect()
 

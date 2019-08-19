@@ -1,56 +1,17 @@
 import Row_transformation_helper as helper
-import os
-import pandas as pd
+from DAO_DataFrame import Dic_DF as df
 
 class Query:
-    def __init__(self, dbService, log, opts):
+    def __init__(self, dbService, log, opts, connector):
+        self.connector = connector
         self.log = log
         self.pathToLog = log.pathToNewFolder
         self.dic = dbService.dictionary
         self.DF = dbService.dataFrame
-        self.cur = dbService.cursor
-        self.conn = dbService.conn
+        self.cur = connector.get_cur()
+        self.conn = connector.get_conn()
         self.dbService = dbService
         self.opts = opts
-
-    def take_df_of_dicDb(self):
-
-        if self.df_dic is None:
-            select_columns_string = ''
-            list_of_columns_to_select = []
-
-            db_table = self.dbService.dictionary['dictTableName']
-            list_of_FK = [i['colName'] for i in
-                          list(filter(lambda x: x['fromDb'] == 'true', self.dbService.dictionary['dbColumns']))]
-
-            for columns in self.dbService.dictionary['withDict']:
-                list_of_columns_to_select.append(columns['colNameDb'])
-            for columns in list_of_FK:
-                list_of_columns_to_select.append(columns)
-
-            for columns in list_of_columns_to_select:
-                select_columns_string += columns + ','
-
-            select_columns_string = select_columns_string[:-1]
-
-            query = f""" SELECT {select_columns_string} FROM {db_table}"""
-            self.cur.execute(query)
-            res = self.cur.fetchall()
-
-            df_res = []
-            for row in res:
-                row_to_append = []
-                for elem in row:
-                    if type(elem) == str:
-                        row_to_append.append(elem.replace('\xa0', '\xa0').strip())
-                    if type(elem) == int:
-                        row_to_append.append(elem)
-                df_res.append(row_to_append)
-            self.df_dic = pd.DataFrame(df_res, columns=list_of_columns_to_select)
-            return self.df_dic
-        else:
-            return self.df_dic
-
 
     def createPreQuery(self, type, dicOfValsToInsert, dicOfValsUpdateCondition):
         query = ''
@@ -85,6 +46,7 @@ class Query:
             self.log.raiseDebug(0, query)
             self.rowCounter += 1
         elif self.dic["testRunMode_value"] == 'false':
+            self.connector.test_conn(3)
             try:
                 self.cur.execute(query)
                 self.conn.commit()
@@ -95,7 +57,7 @@ class Query:
             finally:
                 self.rowCounter += 1
         else:
-            self.dbService.closeConnect(self.log)
+            self.connector.closeConnect()
             self.log.raiseError(34)
 
     def execAllQueries(self):
@@ -112,11 +74,10 @@ class Query:
         hp = helper.Transformation_helper()
 
         for each in self.dic["excelColumns"]:
-
             arrOfSourceColumns.append({"colNameDb":each["colNameDb"],"colName":each["colName"]})  # собираю массив из колонок которые надо брать
 
         if self.dbService.dictionary['dictMode'] == 'true':
-            self.take_df_of_dicDb()
+            df_of_dic = df.get_instance(self.log)
 
         for row in self.DF.iterrows():
 
@@ -166,10 +127,13 @@ class Query:
                 elif columnProperty['fromDb'] == 'true':
                     FK = [i['colName'] for i in
                                   list(filter(lambda x: x['fromDb'] == 'true', self.dbService.dictionary['dbColumns']))][0]
-                    df_dic = self.take_df_of_dicDb()
-                    df_start = df_dic[self.dbService.dictionary['withDict'][0]['colNameDb']] == row[1][self.dbService.dictionary['withDict'][0]['colNameDb']]
+                    df_dic = df_of_dic.take_df_of_dicDb(self.cur, self.dbService, self.connector)
+                    try:
+                        df_start = df_dic[f"""{self.dbService.dictionary['withDict'][0]['colNameDb']}"""] == row[1][self.dbService.dictionary['withDict'][0]['colName']]
+                    except Exception as e:
+                        self.log.raiseError(39, e.args[0])
                     for col in self.dbService.dictionary['withDict']:
-                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col,value=row[1][col['colNameDb']]).strip()
+                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col,value=row[1][col['colName']]).strip()
                         df_start = df_c & df_start
                     index = None
                     for i in df_dic.loc[df_start].iterrows():

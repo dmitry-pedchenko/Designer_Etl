@@ -72,7 +72,7 @@ class Log_info:
         }
 
         if errNum == 0:
-            message_temp = f"""{dict_of_err_types.get(0)}: Message - \n<{message[0]}>"""
+            message_temp = f"""{dict_of_err_types.get(0)}: Message - <{message[0]}>"""
         if errNum == 1:
             message_temp = f"""{dict_of_err_types.get(1)}: Message - \n<{message[0]}>"""
         if errNum == 2:
@@ -82,8 +82,7 @@ class Log_info:
         if errNum == 4:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find option <--{message[0]}> in command line"""
         if errNum == 5:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1] + 1}>"""\
-                      f""" in <importXml/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.config}>"""
         if errNum == 6:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.config}>"""
         if errNum == 7:
@@ -133,7 +132,7 @@ class Log_info:
         if errNum == 29:
             message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in <exportTable/columns> list in config"""
         if errNum == 30:
-            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in table <{message[1]}>; In DB: <{message[2]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in table <{message[1]}>; In DB: <{message[2]}>. Set of columns in db table:\n<{message[3]}>"""
         if errNum == 31:
             message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in <importXml/columns/column/colNameDb> tag in the <{message[1]}> file configuration.\nList of exists columns in that tag: <{message[2]}>"""
         if errNum == 32:
@@ -148,6 +147,11 @@ class Log_info:
             message_temp = f"""{dict_of_err_types.get(4)}: Can't concatenate <int>"""
         if errNum == 37:
             message_temp = f"""{dict_of_err_types.get(2)}: Can't find table <{message[0]}> in data base."""
+        if errNum == 38:
+            message_temp = f"""{dict_of_err_types.get(2)}: Message - \n<{message[0]}>"""
+        if errNum == 39:
+            message_temp = f"""{dict_of_err_types.get(0)}: Can't create dictionary data frame. Message - <{message[0]}>"""
+
 
         self.logger.error(t.substitute(num=errNum, message=message_temp))
         raise SystemExit(1)
@@ -186,6 +190,12 @@ class Log_info:
             message_temp = f"""Inserted: <{message[0]}>; Rows lost: <{message[1]}>"""
         if info_num == 13:
             message_temp = f"""Log files created in: <{message[0]}>"""
+        if info_num == 14:
+            message_temp = f"""Reconnect in: <{message[0]}> minute"""
+        if info_num == 15:
+            message_temp = f"""Connection to DB lost... Message - \n<{message[0]}>"""
+        if info_num == 16:
+            message_temp = f"""Attempt - <{message[0]}>"""
 
         self.logger.info(t.substitute(message=message_temp))
 
