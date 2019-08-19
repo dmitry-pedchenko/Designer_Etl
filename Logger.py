@@ -82,39 +82,30 @@ class Log_info:
         if errNum == 4:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find option <--{message[0]}> in command line"""
         if errNum == 5:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
-                      in <importXml/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1] + 1}>"""\
+                      f""" in <importXml/columns> block in <{self.config}>"""
         if errNum == 6:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
-                       in <importXml/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.config}>"""
         if errNum == 7:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> 
-                       in <importXml/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> in <importXml/columns> block in <{self.config}>"""
         if errNum == 8:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <{self.config}>""",
         if errNum == 9:
             message_temp = f"""{dict_of_err_types.get(1)}: <--check_mode true>. if you want to check source file you must to set <linkedColumns mode="true">"""
         if errNum == 10:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <importXml/linkedColumns> tag at block number <{message[1]}> 
-                       in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <importXml/linkedColumns> tag at block number <{message[1]}> in <{self.config}>"""
         if errNum == 11:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
-                       in <importXml/withDict> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.config}>"""
         if errNum == 12:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
-                       in <importXml/withDict> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.config}>"""
         if errNum == 13:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> 
-                      in <importXml/withDict> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.config}>"""
         if errNum == 14:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> 
-                       in <exportTable/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> in <exportTable/columns> block in <{self.config}>"""
         if errNum == 15:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> 
-                      in <exportTable/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> in <exportTable/columns> block in <{self.config}>"""
         if errNum == 16:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't open excel file on path: <{message[0]}> on page: <{message[1]}> - 
-                            \nSystem message: <{message[2]}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't open excel file on path: <{message[0]}> on page: <{message[1]}> - \nSystem message: <{message[2]}>"""
         if errNum == 17:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <colName> for tag <colNameInSource> from tag <linkedColumns>"""
         if errNum == 18:
@@ -124,11 +115,9 @@ class Log_info:
         if errNum == 20:
             message_temp = f"""{dict_of_err_types.get(3)}: Error in exec query in validate operation\nSystem message:<{message[0]}>"""
         if errNum == 21:
-            message_temp = f"""{dict_of_err_types.get(3)}: In table <{message[0]}> value <{message[1]}> in column <{message[2]}> 
-                            is not exists in column <{message[3]}> in table <{message[4]}> at list <{message[5]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: In table <{message[0]}> value <{message[1]}> in column <{message[2]}> is not exists in column <{message[3]}> in table <{message[4]}> at list <{message[5]}>"""
         if errNum == 22:
-            message_temp = f"""{dict_of_err_types.get(3)}: In tag <exportTable> in column number <{message[0]}> 
-            column property <fromDb>true</fromDb> but <withDict mode="false">"""
+            message_temp = f"""{dict_of_err_types.get(3)}: In tag <exportTable> in column number <{message[0]}> column property <fromDb>true</fromDb> but <withDict mode="false">"""
         if errNum == 23:
             message_temp = f"""{dict_of_err_types.get(3)}: Mode <dict>true<dict> but in tag <dbColumns> no column property <fromDb>true</fromDb>"""
         if errNum == 24:
@@ -138,24 +127,19 @@ class Log_info:
         if errNum == 26:
             message_temp = f"""{dict_of_err_types.get(3)}: Column <{message[0]}> in file <{message[1]}> at list <{message[2]}> contains <Null> but column not <Null>"""
         if errNum == 27:
-            message_temp = f"""{dict_of_err_types.get(3)}: Value <{message[0]}> in column <{message[1]}> in file <{message[2]}> 
-            at list <{message[3]}> is not unique"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Value <{message[0]}> in column <{message[1]}> in file <{message[2]}> at list <{message[3]}> is not unique"""
         if errNum == 28:
-            message_temp = f"""{dict_of_err_types.get(3)}: Column: <{message[0]}> not exists in <{message[1]}> on list <{message[2]}>.
-             You must chose from this names: <{message[3]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Column: <{message[0]}> not exists in <{message[1]}> on list <{message[2]}>. You must chose from this names: <{message[3]}>"""
         if errNum == 29:
             message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in exportTable/columns list in config"""
         if errNum == 30:
             message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in table <{message[1]}>; In DB: <{message[2]}>"""
         if errNum == 31:
-            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in importXml/columns/column/colNameDb tag in the 
-                            <{message[1]}> file configuration.\nList of exists columns in that tag: <{message[2]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in importXml/columns/column/colNameDb tag in the <{message[1]}> file configuration.\nList of exists columns in that tag: <{message[2]}>"""
         if errNum == 32:
-            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in linked table.List of 
-            exists columns in that tag: <{message[1]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in linked table.List of exists columns in that tag: <{message[1]}>"""
         if errNum == 33:
-            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in source table.List of 
-            exists columns in that tag: <{message[1]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in source table.List of exists columns in that tag: <{message[1]}>"""
         if errNum == 34:
             message_temp = f"""{dict_of_err_types.get(3)}: Option <--test_mode> don't selected"""
         if errNum == 35:
