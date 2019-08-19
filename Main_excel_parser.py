@@ -33,5 +33,5 @@ for pathToConfigXML in opts.args.config:
 
     loggerInst.raiseInfo(7)
 
-    connector.closeConnect()
+connector.closeConnect()
 
