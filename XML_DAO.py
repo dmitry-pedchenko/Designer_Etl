@@ -1,4 +1,3 @@
-import pymssql as p
 import XML_parser
 import DAO_DataFrame
 import os

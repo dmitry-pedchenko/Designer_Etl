@@ -208,12 +208,21 @@ def do_XML_parse(pathToFile, log, opts):
         else:
             replaceValArr = []
 
-        if cropEnd_mode == 'true' and type(cropEnd) != int:
-            log.raiseError(40, 'importXml/columns', cropEnd, column_block_number)
-        if takeFromBegin_mode == 'true' and type(takeFromBegin) != int:
-            log.raiseError(40,  'importXml/columns', takeFromBegin, column_block_number)
-        if cropBegin_mode == 'true' and type(cropBegin) != int:
-            log.raiseError(40, 'importXml/columns', cropBegin, column_block_number)
+        if cropEnd_mode == 'true':
+            try:
+                int(cropEnd)
+            except:
+                log.raiseError(40, 'importXml/columns', cropEnd, column_block_number)
+        if takeFromBegin_mode == 'true':
+            try:
+                int(takeFromBegin)
+            except:
+                log.raiseError(40,  'importXml/columns', takeFromBegin, column_block_number)
+        if cropBegin_mode == 'true':
+            try:
+                int(cropBegin)
+            except:
+                log.raiseError(40, 'importXml/columns', cropBegin, column_block_number)
 
         columnDict['colName'] = colName
         columnDict['colNameDb'] = colNameDb
@@ -401,12 +410,22 @@ def do_XML_parse(pathToFile, log, opts):
             else:
                 replaceValArr = []
 
-            if cropEnd_mode == 'true' and type(cropEnd) != int:
-                log.raiseError(40, 'withDict/columns', cropEnd, column_block_number)
-            if takeFromBegin_mode == 'true' and type(takeFromBegin) != int:
-                log.raiseError(40, 'withDict/columns', takeFromBegin, column_block_number)
-            if cropBegin_mode == 'true' and type(cropBegin) != int:
-                log.raiseError(40, 'withDict/columns', cropBegin, column_block_number)
+
+            if cropEnd_mode == 'true':
+                try:
+                    int(cropEnd)
+                except:
+                    log.raiseError(40, 'withDict/columns', cropEnd, column_block_number)
+            if takeFromBegin_mode == 'true':
+                try:
+                    int(takeFromBegin)
+                except:
+                    log.raiseError(40, 'withDict/columns', takeFromBegin, column_block_number)
+            if cropBegin_mode == 'true':
+                try:
+                    int(cropBegin)
+                except:
+                    log.raiseError(40, 'withDict/columns', cropBegin, column_block_number)
 
             arrOfDictColumns['colName'] = colName
             arrOfDictColumns['colNameDb'] = colNameDb
