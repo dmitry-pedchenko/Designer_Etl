@@ -135,7 +135,7 @@ class Log_info:
         if errNum == 30:
             message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in table <{message[1]}>; In DB: <{message[2]}>"""
         if errNum == 31:
-            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in importXml/columns/column/colNameDb tag in the <{message[1]}> file configuration.\nList of exists columns in that tag: <{message[2]}>"""
+            message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in <importXml/columns/column/colNameDb> tag in the <{message[1]}> file configuration.\nList of exists columns in that tag: <{message[2]}>"""
         if errNum == 32:
             message_temp = f"""{dict_of_err_types.get(3)}: Columns: <{message[0]}> not exists in linked table.List of exists columns in that tag: <{message[1]}>"""
         if errNum == 33:
