@@ -1,36 +1,36 @@
 
 class Validate:
-    def __init__(self, dbService, log, opts):
+    def __init__(self, dbService, log, opts, connector):
+        self.connector = connector
         self.dic = dbService.dictionary
         self.df = dbService.dataFrame
         self.log = log
-        self.cur = dbService.cursor
-        self.conn = dbService.conn
+        self.cur = connector.get_cur()
+        self.conn = connector.get_conn()
         self.dbService = dbService
         self.opts = opts
 
         if opts.args.check_mode == 'true':
             self.df_link = dbService.dataFrame_link
 
-    def execSelect(self, query):
+    def exec(self, query):
         try:
             self.cur.execute(query)
             return self.cur.fetchall()
         except Exception as e:
             self.log.raiseError(20, e.args[1])
-            self.dbService.closeConnect(self.log)
+            self.connector.closeConnect()
 
     def queryForColumns(self):
         query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{self.dic["exportTableName_value"]}'); """
-        return self.execSelect(query)
+        self.connector.test_conn(3)
+        return self.exec(query)
 
 
     def validate(self):
         excel_columns = [i["colName"] for i in self.dic["excelColumns"]]
         excel_columns_Db_to_source = [i["colNameDb"] for i in self.dic["excelColumns"]]
         db_columns = [i["colName"] for i in self.dic["dbColumns"]]
-
-
 
         listOfNotExistInDB = []
         listOfNotExistInConfig = []
@@ -104,7 +104,7 @@ class Validate:
 
         if len(listOfNotExist_db_to_source) > 0:
             self.log.raiseError(31, listOfNotExist_db_to_source, self.dic["importXml_path_value"], excel_columns_Db_to_source)
-            self.dbService.closeConnect(self.log)
+            self.connector.closeConnect()
 
 
         for colums_in in self.dbService.dictionary['dbColumns']:
@@ -125,13 +125,13 @@ class Validate:
         for row in excel_columns:
             if row not in self.df.columns.values:
                 self.log.raiseError(28, row, self.dic["importXml_path_value"], self.dic['sheetNumber_value'] + 1, self.df.columns.values)
-                self.dbService.closeConnect(self.log)
+                self.connector.closeConnect()
 
         columns = self.queryForColumns()
 
         if len(columns) == 0:
             self.log.raiseError(37, self.dic["exportTableName_value"])
-            self.dbService.closeConnect(self.log)
+            self.connector.closeConnect()
 
         for col in db_columns:
             if str(col) not in [i[0] for i in columns]:  # генератор потому что хранится как [('',),('',)]
@@ -141,20 +141,20 @@ class Validate:
                 listOfNotExistInDB.append(col)
         if len(listOfNotExistInDB) > 0:
             self.log.raiseError(29, [i for i in listOfNotExistInDB])
-            self.dbService.closeConnect(self.log)
+            self.connector.closeConnect()
 
         if len(listOfNotExistInConfig) > 0:
-            self.log.raiseError(30, [i for i in listOfNotExistInConfig], self.dic["exportTableName_value"], self.dic["dbBase"])
-            self.dbService.closeConnect(self.log)
+            self.log.raiseError(30, [i for i in listOfNotExistInConfig], self.dic["exportTableName_value"], self.dic["dbBase"], columns)
+            self.connector.closeConnect()
 
         if self.opts.args.check_mode == 'true':
             if len(listOfNotExistInLinkedTable) > 0:
                 self.log.raiseError(32, listOfNotExistInLinkedTable, self.dbService.dataFrame_link.columns.values)
-                self.dbService.closeConnect(self.log)
+                self.connector.closeConnect()
 
             if len(listOfNotExistInSourceTable) > 0:
                 self.log.raiseError(33, listOfNotExistInSourceTable, self.dbService.dataFrame.columns.values)
-                self.dbService.closeConnect(self.log)
+                self.connector.closeConnect()
 
         self.log.raiseInfo(6)
 

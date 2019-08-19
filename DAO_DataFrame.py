@@ -33,13 +33,15 @@ class Dic_DF:
     dic_of_df = {'query': None, 'data_frame': None}
 
     @classmethod
-    def get_instance(cls):
+    def get_instance(cls, log):
         if not cls.__instance:
-            cls.__instance = Dic_DF()
+            cls.__instance = Dic_DF(log)
         return cls.__instance
 
+    def __init__(self, log):
+        self.log = log
 
-    def take_df_of_dicDb(self, cur, dbService):
+    def take_df_of_dicDb(self, cur, dbService, connector):
         select_columns_string = ''
         list_of_columns_to_select = []
 
@@ -58,10 +60,15 @@ class Dic_DF:
         select_columns_string = select_columns_string[:-1]
 
         query = f""" SELECT {select_columns_string} FROM {db_table}"""
+
         if self.dic_of_df.get('query') != query or self.dic_of_df.get('query') is None:
             self.dic_of_df['query'] = query
-            cur.execute(query)
-            res = cur.fetchall()
+            connector.test_conn(3)
+            try:
+                cur.execute(query)
+                res = cur.fetchall()
+            except Exception as e:
+                self.log.raiseError(38, e.args[1])
 
             df_res = []
             for row in res:

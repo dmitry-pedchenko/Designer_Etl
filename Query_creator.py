@@ -1,16 +1,15 @@
 import Row_transformation_helper as helper
-import os
-import pandas as pd
 from DAO_DataFrame import Dic_DF as df
 
 class Query:
-    def __init__(self, dbService, log, opts):
+    def __init__(self, dbService, log, opts, connector):
+        self.connector = connector
         self.log = log
         self.pathToLog = log.pathToNewFolder
         self.dic = dbService.dictionary
         self.DF = dbService.dataFrame
-        self.cur = dbService.cursor
-        self.conn = dbService.conn
+        self.cur = connector.get_cur()
+        self.conn = connector.get_conn()
         self.dbService = dbService
         self.opts = opts
 
@@ -47,6 +46,7 @@ class Query:
             self.log.raiseDebug(0, query)
             self.rowCounter += 1
         elif self.dic["testRunMode_value"] == 'false':
+            self.connector.test_conn(3)
             try:
                 self.cur.execute(query)
                 self.conn.commit()
@@ -57,7 +57,7 @@ class Query:
             finally:
                 self.rowCounter += 1
         else:
-            self.dbService.closeConnect(self.log)
+            self.connector.closeConnect()
             self.log.raiseError(34)
 
     def execAllQueries(self):
@@ -77,7 +77,7 @@ class Query:
             arrOfSourceColumns.append({"colNameDb":each["colNameDb"],"colName":each["colName"]})  # собираю массив из колонок которые надо брать
 
         if self.dbService.dictionary['dictMode'] == 'true':
-            df_of_dic = df.get_instance()
+            df_of_dic = df.get_instance(self.log)
 
         for row in self.DF.iterrows():
 
@@ -127,10 +127,13 @@ class Query:
                 elif columnProperty['fromDb'] == 'true':
                     FK = [i['colName'] for i in
                                   list(filter(lambda x: x['fromDb'] == 'true', self.dbService.dictionary['dbColumns']))][0]
-                    df_dic = df_of_dic.take_df_of_dicDb(self.cur, self.dbService)
-                    df_start = df_dic[self.dbService.dictionary['withDict'][0]['colNameDb']] == row[1][self.dbService.dictionary['withDict'][0]['colNameDb']]
+                    df_dic = df_of_dic.take_df_of_dicDb(self.cur, self.dbService, self.connector)
+                    try:
+                        df_start = df_dic[f"""{self.dbService.dictionary['withDict'][0]['colNameDb']}"""] == row[1][self.dbService.dictionary['withDict'][0]['colName']]
+                    except Exception as e:
+                        self.log.raiseError(39, e.args[0])
                     for col in self.dbService.dictionary['withDict']:
-                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col,value=row[1][col['colNameDb']]).strip()
+                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col,value=row[1][col['colName']]).strip()
                         df_start = df_c & df_start
                     index = None
                     for i in df_dic.loc[df_start].iterrows():
