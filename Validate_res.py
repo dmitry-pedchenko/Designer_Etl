@@ -38,6 +38,24 @@ class Validate:
 
         self.log.raiseInfo(5)
 
+        for row in excel_columns:
+            if row not in self.df.columns.values:
+                self.log.raiseError(28, row, self.dic["importXml_path_value"], self.dic['sheetNumber_value'] + 1, self.df.columns.values)
+                self.connector.closeConnect()
+
+        for column_name in db_columns:
+            col_db_properties = list(filter(lambda x: x["colName"] == column_name,
+                                            self.dic["dbColumns"]))  # находим свойства текущей колонки
+            if col_db_properties[0]["fromExcel"] == 'true' and col_db_properties[0][
+                "isAutoInc"] == 'false':  # берем только те которые должны идти из файла
+                if column_name not in excel_columns_Db_to_source:
+                    listOfNotExist_db_to_source.append(column_name)
+
+        if len(listOfNotExist_db_to_source) > 0:
+            self.log.raiseError(31, listOfNotExist_db_to_source, self.dic["importXml_path_value"], excel_columns_Db_to_source)
+            self.connector.closeConnect()
+
+
         if self.opts.args.check_mode == 'true':
 
             listOfNotExistInLinkedTable = []
@@ -94,24 +112,14 @@ class Validate:
                 if col_in_withDict['colName'] is None:
                     self.log.raiseError(25, counter)
 
-        for column_name in db_columns:
-            col_db_properties = list(filter(lambda x: x["colName"] == column_name,
-                                            self.dic["dbColumns"]))  # находим свойства текущей колонки
-            if col_db_properties[0]["fromExcel"] == 'true' and col_db_properties[0][
-                "isAutoInc"] == 'false':  # берем только те которые должны идти из файла
-                if column_name not in excel_columns_Db_to_source:
-                    listOfNotExist_db_to_source.append(column_name)
 
-        if len(listOfNotExist_db_to_source) > 0:
-            self.log.raiseError(31, listOfNotExist_db_to_source, self.dic["importXml_path_value"], excel_columns_Db_to_source)
-            self.connector.closeConnect()
 
 
         for colums_in in self.dbService.dictionary['dbColumns']:
             if colums_in['ifNull_mode'] == 'false' and colums_in['fromExcel'] == 'true':
                 col_name_in_source = list(filter(lambda x: x['colNameDb'] == colums_in['colName'], self.dbService.dictionary['excelColumns']))[0]['colName']
                 if 'null' in self.dbService.dataFrame[col_name_in_source].values:
-                    self.log.raiseError(26,col_name_in_source,self.dbService.dictionary['importXml_path_value'],
+                    self.log.raiseError(26, col_name_in_source,self.dbService.dictionary['importXml_path_value'],
                                                             self.dbService.dictionary['sheetNumber_value'] + 1)
 
         for col in self.dic['excelColumns']:
@@ -121,11 +129,6 @@ class Validate:
                         self.log.raiseError(27, row[1]['values'], col['colName'], self.dbService.dictionary['importXml_path_value']
                                                                 , self.dbService.dictionary['sheetNumber_value'] + 1)
 
-
-        for row in excel_columns:
-            if row not in self.df.columns.values:
-                self.log.raiseError(28, row, self.dic["importXml_path_value"], self.dic['sheetNumber_value'] + 1, self.df.columns.values)
-                self.connector.closeConnect()
 
         columns = self.queryForColumns()
 

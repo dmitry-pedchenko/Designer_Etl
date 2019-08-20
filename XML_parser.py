@@ -12,7 +12,7 @@ def do_XML_parse(pathToFile, log, opts):
     try:
         root = et.parse(pathToFile).getroot()
     except Exception as e:
-        log.raiseError(2, pathToFile, e.args[0])
+        log.raiseError(2, pathToFile, e.args[1])
 
     try:
         sheetNumber_value = int(root.find("importXml/sheetNumber").text) - 1
