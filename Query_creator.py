@@ -151,7 +151,7 @@ class Query:
             if ((100 * self.rowCounter) / len(self.DF)) > arrOfLoadPercents[0]:
                 self.log.raiseInfo(10, arrOfLoadPercents[0])
                 arrOfLoadPercents.pop(0)
-            if self.rowCounter == len(self.DF):
+            if self.rowCounter == len(self.DF) - 1:
                 self.log.raiseInfo(10, arrOfLoadPercents[0])
 
             fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert, dicOfValsUpdateCondition)
