@@ -76,7 +76,7 @@ class Log_info:
         if errNum == 1:
             message_temp = f"""{dict_of_err_types.get(1)}: Message - <{message[0]}>"""
         if errNum == 2:
-            message_temp = f"""{dict_of_err_types.get(1)}: Cant find file XML <{message[0]}>\nMessage - \n{message[1]}"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Cant find file XML <{message[0]}>\nMessage - {message[1]}"""
         if errNum == 3:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <{self.config}>"""
         if errNum == 4:
