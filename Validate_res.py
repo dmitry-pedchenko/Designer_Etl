@@ -38,11 +38,13 @@ class Validate:
 
         self.log.raiseInfo(5)
 
+        #  проверка существования указанных колонок в экселе
         for row in excel_columns:
             if row not in self.df.columns.values:
                 self.log.raiseError(28, row, self.dic["importXml_path_value"], self.dic['sheetNumber_value'] + 1, self.df.columns.values)
                 self.connector.closeConnect()
 
+        #  проверка соответсвия указанных колонок в базе указанным колонокам в источнике
         for column_name in db_columns:
             col_db_properties = list(filter(lambda x: x["colName"] == column_name,
                                             self.dic["dbColumns"]))  # находим свойства текущей колонки
@@ -61,12 +63,13 @@ class Validate:
             listOfNotExistInLinkedTable = []
             listOfNotExistInSourceTable = []
 
-            # нахожу все колонки которых нет в эксле линковом
+            # нахожу все колонки которых нет в эксле с которым сравниваю источник
             for col in self.dbService.dictionary['linkedColumns']:
                 if col['linkedColName'] not in self.dbService.dataFrame_link.columns.values:
                     listOfNotExistInLinkedTable.append(col['linkedColName'])
 
-            # нахожу все колонки которые прописаны в линке но их нет в сорсе
+            # нахожу все колонки которые прописаны в блоке сравнения с файлом с которым сравниваю источник
+            # но их нет в источнике
             for col in self.dbService.dictionary['linkedColumns']:
                 if col['colNameInSource'] not in self.dbService.dataFrame.columns.values:
                     listOfNotExistInSourceTable.append(col['colNameInSource'])
@@ -114,8 +117,8 @@ class Validate:
 
 
 
-
-        for colums_in in self.dbService.dictionary['dbColumns']:
+        #  проверка отсутсвия налов
+        for number, colums_in in enumerate(self.dbService.dictionary['dbColumns']):
             if colums_in['ifNull_mode'] == 'false' and colums_in['fromExcel'] == 'true':
                 col_name_in_source = list(filter(lambda x: x['colNameDb'] == colums_in['colName'], self.dbService.dictionary['excelColumns']))[0]['colName']
                 if 'null' in self.dbService.dataFrame[col_name_in_source].values:
@@ -132,16 +135,19 @@ class Validate:
 
         columns = self.queryForColumns()
 
+        #  проверка на существования целевой таблице в приемнике
         if len(columns) == 0:
             self.log.raiseError(37, self.dic["exportTableName_value"])
             self.connector.closeConnect()
-
+        #  проверка на то что указаны все поля приемника в конфиге
         for col in db_columns:
             if str(col) not in [i[0] for i in columns]:  # генератор потому что хранится как [('',),('',)]
                 listOfNotExistInConfig.append(col)
+        #  проверка на то что указанные поля в конфиге есть в приемнике
         for col in [i[0] for i in columns]:
             if str(col) not in db_columns:
                 listOfNotExistInDB.append(col)
+        #  вывод ошибок
         if len(listOfNotExistInDB) > 0:
             self.log.raiseError(29, [i for i in listOfNotExistInDB])
             self.connector.closeConnect()

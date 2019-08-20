@@ -46,5 +46,4 @@ class Transformation_helper:
             if value == 'null':
                 self.value = dbProperties.get("ifNull")
 
-        return self.value
-
+        return str(self.value).replace('\n', '').strip()

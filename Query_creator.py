@@ -133,7 +133,7 @@ class Query:
                     except Exception as e:
                         self.log.raiseError(39, e.args[0])
                     for col in self.dbService.dictionary['withDict']:
-                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col, value=row[1][col['colName']]).strip()
+                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col, value=row[1][col['colName']])
                         df_start = df_c & df_start
                     index = None
                     for i in df_dic.loc[df_start].iterrows():
