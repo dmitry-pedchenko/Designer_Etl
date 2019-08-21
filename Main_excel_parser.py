@@ -8,7 +8,8 @@ from DB_connector import Connection as con
 opts = Opts()
 
 for pathToConfigXML in opts.args.config:
-    loggerInst = Logger.Log_info.getInstance(pathToConfigXML)
+    loggerInst = Logger.Log_info.getInstance(pathToConfigXML, opts.args.config)
+    loggerInst.set_config(pathToConfigXML)
     loggerInst.raiseInfo(4)
     dbService = xpc.XmlParser(pathToConfigXML, loggerInst, opts)
 

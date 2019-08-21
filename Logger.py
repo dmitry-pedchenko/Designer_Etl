@@ -3,21 +3,27 @@ import logging
 import os
 from string import Template
 
-
 class Log_info:
     __instance = None
+    __config = None
 
     @classmethod
-    def getInstance(cls, pathToConfigXML):
+    def getInstance(cls, pathToConfigXML, configs_list):
         if not cls.__instance:
-            cls.__instance = Log_info(pathToConfigXML)
+            cls.__instance = Log_info(pathToConfigXML, configs_list)
         return cls.__instance
 
-    def __init__(self, pathToConfigXML):
-        self.getLogger(pathToConfigXML)
-        self.config = pathToConfigXML
+    def set_config(self, pathToConfigXML):
+        if not self.__config:
+            self.__config = pathToConfigXML
+        elif self.__config != pathToConfigXML:
+            self.__config = pathToConfigXML
 
-    def getLogger(self, pathToConfigXML):
+    def __init__(self, pathToConfigXML, configs_list):
+        self.getLogger(configs_list)
+        self.set_config(pathToConfigXML)
+
+    def getLogger(self, configs_list):
         currentPath = os.getcwd()
         pathToLogFolder = os.path.join(currentPath, 'log')  # folder log
         if not os.path.exists(pathToLogFolder):
@@ -26,7 +32,7 @@ class Log_info:
 
         today = datetime.datetime.today()
         self.pathToNewFolder = os.path.join(pathToLogFolder,
-                                  '{}_{}'.format(today.strftime("%Y_%m_%d_%H_%M_%S"), pathToConfigXML[:-4]))
+                                  '{}_{}'.format(today.strftime("%Y_%m_%d_%H_%M_%S"), configs_list))
         os.mkdir(self.pathToNewFolder)
 
         self.logger = logging.getLogger("ETL")
@@ -78,31 +84,31 @@ class Log_info:
         if errNum == 2:
             message_temp = f"""{dict_of_err_types.get(1)}: Cant find file XML <{message[0]}>\nMessage - {message[1]}"""
         if errNum == 3:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <{self.__config}>"""
         if errNum == 4:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find option <--{message[0]}> in command line"""
         if errNum == 5:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.__config}>"""
         if errNum == 6:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.__config}>"""
         if errNum == 7:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> in <importXml/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> in <importXml/columns> block in <{self.__config}>"""
         if errNum == 8:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <{self.config}>""",
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <{self.__config}>""",
         if errNum == 9:
             message_temp = f"""{dict_of_err_types.get(1)}: <--check_mode true>. if you want to check source file you must to set <linkedColumns mode="true">"""
         if errNum == 10:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <importXml/linkedColumns> tag at block number <{message[1]}> in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <importXml/linkedColumns> tag at block number <{message[1]}> in <{self.__config}>"""
         if errNum == 11:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.__config}>"""
         if errNum == 12:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.__config}>"""
         if errNum == 13:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <replace> tag at block number <{message[1]}> in <importXml/withDict> block in <{self.__config}>"""
         if errNum == 14:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> in <exportTable/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1]}> in <exportTable/columns> block in <{self.__config}>"""
         if errNum == 15:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> in <exportTable/columns> block in <{self.config}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> in <exportTable/columns> block in <{self.__config}>"""
         if errNum == 16:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't open excel file on path: <{message[0]}> on page: <{message[1]}> - \nSystem message: <{message[2]}>"""
         if errNum == 17:
@@ -153,7 +159,8 @@ class Log_info:
             message_temp = f"""{dict_of_err_types.get(0)}: Can't create dictionary data frame. Message - <{message[0]}>"""
         if errNum == 40:
             message_temp = f"""{dict_of_err_types.get(1)}: In tag <{message[0]}>. Value <{message[1]}> in column number <{message[2] + 1}> not <int> type"""
-
+        if errNum == 41:
+            message_temp = f"""{dict_of_err_types.get(3)}: At <exportTable/columns> tag in column number <{message[0]}> in <name>{message[1]}<name> incompatible set of attributes"""
 
         self.logger.error(t.substitute(num=errNum, message=message_temp))
         raise SystemExit(1)
@@ -173,13 +180,13 @@ class Log_info:
         if info_num == 3:
             message_temp = f"""Connection to DB closed"""
         if info_num == 4:
-            message_temp = f"""Starts executing... {self.config}"""
+            message_temp = f"""Starts executing... {self.__config}"""
         if info_num == 5:
             message_temp = f"""Begin validating files..."""
         if info_num == 6:
             message_temp = f"""Validate success..."""
         if info_num == 7:
-            message_temp = f"""Ends executing... successfully completed <{self.config}>\n---"""
+            message_temp = f"""Ends executing... successfully completed <{self.__config}>\n---"""
         if info_num == 8:
             message_temp = f"""Loading in db begin..."""
         if info_num == 9:

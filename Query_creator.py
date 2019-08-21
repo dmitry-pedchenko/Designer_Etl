@@ -133,7 +133,7 @@ class Query:
                     except Exception as e:
                         self.log.raiseError(39, e.args[0])
                     for col in self.dbService.dictionary['withDict']:
-                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col, value=row[1][col['colName']]).strip()
+                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col, value=row[1][col['colName']])
                         df_start = df_c & df_start
                     index = None
                     for i in df_dic.loc[df_start].iterrows():
@@ -151,7 +151,7 @@ class Query:
             if ((100 * self.rowCounter) / len(self.DF)) > arrOfLoadPercents[0]:
                 self.log.raiseInfo(10, arrOfLoadPercents[0])
                 arrOfLoadPercents.pop(0)
-            if self.rowCounter == len(self.DF):
+            if self.rowCounter == len(self.DF) - 1:
                 self.log.raiseInfo(10, arrOfLoadPercents[0])
 
             fullQuery = self.createPreQuery(self.dbService.dictionary['loadMode'], dicOfValsToInsert, dicOfValsUpdateCondition)
