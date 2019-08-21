@@ -7,6 +7,8 @@ from DB_connector import Connection as con
 
 opts = Opts()
 
+connector = None
+
 for pathToConfigXML in opts.args.config:
     loggerInst = Logger.Log_info.getInstance(pathToConfigXML, opts.args.config)
     loggerInst.set_config(pathToConfigXML)
@@ -34,5 +36,7 @@ for pathToConfigXML in opts.args.config:
 
     loggerInst.raiseInfo(7)
 
-connector.closeConnect()
+if connector:
+    connector.closeConnect()
+
 
