@@ -292,6 +292,11 @@ def do_XML_parse(pathToFile, log, opts):
     except:
         log.raiseError(8, "importXml/withDict")
 
+    try:
+        root.find("importXml/withDict").text
+    except:
+        log.raiseError(3, "importXml/withDict")
+
     importDict["withDict_mode"] = withDict_mode
 
     if root.find("dict").text == 'true' and withDict_mode == 'false':
@@ -301,153 +306,160 @@ def do_XML_parse(pathToFile, log, opts):
         dict = []
 
         try:
-            dictTableName = root.find("importXml/withDict/dictTableName").text
+            dictTableName = root.find("importXml/withDict/tables").text
         except:
-            log.raiseError(3, "importXml/withDict/dictTableName")
+            log.raiseError(3, "importXml/withDict/tables")
 
-        importDict['dictTableName'] = dictTableName
-
-        for column_block_number, child in enumerate(root.find("importXml/withDict").iter("column"), 1):
-            arrOfDictColumns = {}
-            try:
-                colName = child.find("colName").text
-            except:
-                log.raiseError(11, "colName", column_block_number)
+        for col_tables_number, table in enumerate(dictTableName['table']):
+            table_arr = {}
 
             try:
-                colNameDb = child.find("colNameDb").text
+                table_arr['dictTableName'] = importDict['dictTableName']
             except:
-                log.raiseError(11, "colNameDb", column_block_number, )
+                log.raiseError(11, col_tables_number)
 
-            try:
-                colType = child.find("colType").text
-            except:
-                log.raiseError(11, "colType", column_block_number)
+            for column_block_number, child in enumerate(root.find("importXml/withDict").iter("column"), 1):
+                arrOfDictColumns = {}
+                try:
+                    colName = child.find("colName").text
+                except:
+                    log.raiseError(11, "colName", column_block_number)
 
-            try:
-                cropEnd = child.find("cropEnd").text
-            except:
-                log.raiseError(11, "cropEnd", column_block_number)
+                try:
+                    colNameDb = child.find("colNameDb").text
+                except:
+                    log.raiseError(11, "colNameDb", column_block_number)
 
-            try:
-                cropEnd_mode = child.find("cropEnd").get("mode")
-            except:
-                log.raiseError(12, "cropEnd", column_block_number)
+                try:
+                    colType = child.find("colType").text
+                except:
+                    log.raiseError(11, "colType", column_block_number)
 
-            try:
-                addValueEnd = child.find("addValueEnd").text
-            except:
-                log.raiseError(11, "addValueEnd", column_block_number)
+                try:
+                    cropEnd = child.find("cropEnd").text
+                except:
+                    log.raiseError(11, "cropEnd", column_block_number)
 
-            try:
-                addValueEnd_mode = child.find("addValueEnd").get("mode")
-            except:
-                log.raiseError(12, "addValueEnd", column_block_number)
+                try:
+                    cropEnd_mode = child.find("cropEnd").get("mode")
+                except:
+                    log.raiseError(12, "cropEnd", column_block_number)
 
-            try:
-                takeFromBegin = child.find("takeFromBegin").text
-            except:
-                log.raiseError(11, "takeFromBegin", column_block_number)
+                try:
+                    addValueEnd = child.find("addValueEnd").text
+                except:
+                    log.raiseError(11, "addValueEnd", column_block_number)
 
-            try:
-                takeFromBegin_mode = child.find("takeFromBegin").get("mode")
-            except:
-                log.raiseError(12, "takeFromBegin", column_block_number)
+                try:
+                    addValueEnd_mode = child.find("addValueEnd").get("mode")
+                except:
+                    log.raiseError(12, "addValueEnd", column_block_number)
 
-            try:
-                cropBegin = child.find("cropBegin").text
-            except:
-                log.raiseError(11, "cropBegin", column_block_number)
+                try:
+                    takeFromBegin = child.find("takeFromBegin").text
+                except:
+                    log.raiseError(11, "takeFromBegin", column_block_number)
 
-            try:
-                cropBegin_mode = child.find("cropBegin").get("mode")
-            except:
-                log.raiseError(12, "cropBegin", column_block_number)
+                try:
+                    takeFromBegin_mode = child.find("takeFromBegin").get("mode")
+                except:
+                    log.raiseError(12, "takeFromBegin", column_block_number)
 
-            try:
-                addValueBegin = child.find("addValueBegin").text
-            except:
-                log.raiseError(11, "addValueBegin", column_block_number)
+                try:
+                    cropBegin = child.find("cropBegin").text
+                except:
+                    log.raiseError(11, "cropBegin", column_block_number)
 
-            try:
-                addValueBegin_mode = child.find("addValueBegin").get("mode")
-            except:
-                log.raiseError(12, "addValueBegin", column_block_number)
+                try:
+                    cropBegin_mode = child.find("cropBegin").get("mode")
+                except:
+                    log.raiseError(12, "cropBegin", column_block_number)
 
-            try:
-                addValueBoth = child.find("addValueBoth").text
-            except:
-                log.raiseError(11, "addValueBoth", column_block_number)
+                try:
+                    addValueBegin = child.find("addValueBegin").text
+                except:
+                    log.raiseError(11, "addValueBegin", column_block_number)
 
-            try:
-                addValueBoth_mode = child.find("addValueBoth").get("mode")
-            except:
-                log.raiseError(12, "addValueBoth", column_block_number)
+                try:
+                    addValueBegin_mode = child.find("addValueBegin").get("mode")
+                except:
+                    log.raiseError(12, "addValueBegin", column_block_number)
 
-            try:
-                replace_mode = child.find("replace").get("mode")
-            except:
-                log.raiseError(11, "replace", column_block_number)
+                try:
+                    addValueBoth = child.find("addValueBoth").text
+                except:
+                    log.raiseError(11, "addValueBoth", column_block_number)
 
-            replaceValArr = []
-            if replace_mode == 'true':
-                for repChild in child.iter("replaceVal"):
-                    replaceDict = {}
+                try:
+                    addValueBoth_mode = child.find("addValueBoth").get("mode")
+                except:
+                    log.raiseError(12, "addValueBoth", column_block_number)
 
-                    try:
-                        replaceValue = repChild.find("value").text
-                    except:
-                        log.raiseError(13, "value", column_block_number)
+                try:
+                    replace_mode = child.find("replace").get("mode")
+                except:
+                    log.raiseError(11, "replace", column_block_number)
 
-                    try:
-                        replaceToValue = repChild.find("toValue").text
-                    except:
-                        log.raiseError(13, "toValue", column_block_number)
-
-                    replaceDict["replaceValue"] = replaceValue
-                    replaceDict["replaceToValue"] = replaceToValue
-                    replaceValArr.append(replaceDict)
-            else:
                 replaceValArr = []
+                if replace_mode == 'true':
+                    for repChild in child.iter("replaceVal"):
+                        replaceDict = {}
+
+                        try:
+                            replaceValue = repChild.find("value").text
+                        except:
+                            log.raiseError(13, "value", column_block_number)
+
+                        try:
+                            replaceToValue = repChild.find("toValue").text
+                        except:
+                            log.raiseError(13, "toValue", column_block_number)
+
+                        replaceDict["replaceValue"] = replaceValue
+                        replaceDict["replaceToValue"] = replaceToValue
+                        replaceValArr.append(replaceDict)
+                else:
+                    replaceValArr = []
 
 
-            if cropEnd_mode == 'true':
-                try:
-                    int(cropEnd)
-                except:
-                    log.raiseError(40, 'withDict/columns', cropEnd, column_block_number)
-            if takeFromBegin_mode == 'true':
-                try:
-                    int(takeFromBegin)
-                except:
-                    log.raiseError(40, 'withDict/columns', takeFromBegin, column_block_number)
-            if cropBegin_mode == 'true':
-                try:
-                    int(cropBegin)
-                except:
-                    log.raiseError(40, 'withDict/columns', cropBegin, column_block_number)
+                if cropEnd_mode == 'true':
+                    try:
+                        int(cropEnd)
+                    except:
+                        log.raiseError(40, 'withDict/columns', cropEnd, column_block_number)
+                if takeFromBegin_mode == 'true':
+                    try:
+                        int(takeFromBegin)
+                    except:
+                        log.raiseError(40, 'withDict/columns', takeFromBegin, column_block_number)
+                if cropBegin_mode == 'true':
+                    try:
+                        int(cropBegin)
+                    except:
+                        log.raiseError(40, 'withDict/columns', cropBegin, column_block_number)
 
-            arrOfDictColumns['colName'] = colName
-            arrOfDictColumns['colNameDb'] = colNameDb
-            arrOfDictColumns['colType'] = colType
-            arrOfDictColumns['cropEnd'] = cropEnd
-            arrOfDictColumns['cropEnd_mode'] = cropEnd_mode
-            arrOfDictColumns['addValueEnd'] = addValueEnd
-            arrOfDictColumns['addValueEnd_mode'] = addValueEnd_mode
-            arrOfDictColumns['takeFromBegin'] = takeFromBegin
-            arrOfDictColumns['takeFromBegin_mode'] = takeFromBegin_mode
-            arrOfDictColumns['cropBegin'] = cropBegin
-            arrOfDictColumns['cropBegin_mode'] = cropBegin_mode
-            arrOfDictColumns['addValueBegin'] = addValueBegin
-            arrOfDictColumns['addValueBegin_mode'] = addValueBegin_mode
-            arrOfDictColumns['addValueBoth'] = addValueBoth
-            arrOfDictColumns['addValueBoth_mode'] = addValueBoth_mode
-            arrOfDictColumns['replace_mode'] = replace_mode
-            arrOfDictColumns['replaceValArr'] = replaceValArr
+                arrOfDictColumns['colName'] = colName
+                arrOfDictColumns['colNameDb'] = colNameDb
+                arrOfDictColumns['colType'] = colType
+                arrOfDictColumns['cropEnd'] = cropEnd
+                arrOfDictColumns['cropEnd_mode'] = cropEnd_mode
+                arrOfDictColumns['addValueEnd'] = addValueEnd
+                arrOfDictColumns['addValueEnd_mode'] = addValueEnd_mode
+                arrOfDictColumns['takeFromBegin'] = takeFromBegin
+                arrOfDictColumns['takeFromBegin_mode'] = takeFromBegin_mode
+                arrOfDictColumns['cropBegin'] = cropBegin
+                arrOfDictColumns['cropBegin_mode'] = cropBegin_mode
+                arrOfDictColumns['addValueBegin'] = addValueBegin
+                arrOfDictColumns['addValueBegin_mode'] = addValueBegin_mode
+                arrOfDictColumns['addValueBoth'] = addValueBoth
+                arrOfDictColumns['addValueBoth_mode'] = addValueBoth_mode
+                arrOfDictColumns['replace_mode'] = replace_mode
+                arrOfDictColumns['replaceValArr'] = replaceValArr
 
-            dict.append(arrOfDictColumns)
+                table_arr['arrOfDictColumns'] = arrOfDictColumns
+            dict.append(table_arr)
 
-    # ---------------
+    # ---
         importDict['withDict'] = dict
     importDict["excelColumns"] = colArrayExcel
 

@@ -1,7 +1,5 @@
 import pandas as pd
 
-
-
 class ExcelSelect:
 
     def __init__(self, path, listNumber, log, arrOfColTypesInExcel):
@@ -30,7 +28,7 @@ class ExcelSelect:
 
 class Dic_DF:
     __instance = None
-    dic_of_df = {'query': None, 'data_frame': None}
+    dic_of_df = []
 
     @classmethod
     def get_instance(cls, log):
@@ -61,8 +59,14 @@ class Dic_DF:
 
         query = f""" SELECT {select_columns_string} FROM {db_table}"""
 
-        if self.dic_of_df.get('query') != query or self.dic_of_df.get('query') is None:
-            self.dic_of_df['query'] = query
+        if len(self.dic_of_df) > 0:
+            q_in_list = list([i.get('query') for i in self.dic_of_df])
+        else:
+            q_in_list = []
+
+        if query not in q_in_list or len(self.dic_of_df) == 0:
+            loc_dic = {}
+            loc_dic['query'] = query
             connector.test_conn(3)
             try:
                 cur.execute(query)
@@ -79,7 +83,11 @@ class Dic_DF:
                     if type(elem) == int:
                         row_to_append.append(elem)
                 df_res.append(row_to_append)
-            self.dic_of_df['data_frame'] = pd.DataFrame(df_res, columns=list_of_columns_to_select)
-            return self.dic_of_df['data_frame']
+
+            loc_dic['data_frame'] = pd.DataFrame(df_res, columns=list_of_columns_to_select)
+
+            self.dic_of_df.append(loc_dic)
+
+            return loc_dic['data_frame']
         else:
-            return self.dic_of_df['data_frame']
+            return list(filter(lambda x: x.get('query') == query, self.dic_of_df))[0][query]

@@ -125,8 +125,7 @@ class Query:
                         dicOfValsToInsert[columnProperty["colName"]] = columnProperty["defaultValue"]
 
                 elif columnProperty['fromDb'] == 'true':
-                    FK = [i['colName'] for i in
-                                  list(filter(lambda x: x['fromDb'] == 'true', self.dbService.dictionary['dbColumns']))][0]
+                    FK = columnProperty['colName']
                     df_dic = df_of_dic.take_df_of_dicDb(self.cur, self.dbService, self.connector)
                     try:
                         df_start = df_dic[f"""{self.dbService.dictionary['withDict'][0]['colNameDb']}"""] == row[1][self.dbService.dictionary['withDict'][0]['colName']]

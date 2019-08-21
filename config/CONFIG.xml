@@ -74,42 +74,42 @@
 
             <tables>
 
-            <table>
-                <dictTableName></dictTableName> <!-- table name in data base -->
+                <table>
+                    <dictTableName></dictTableName> <!-- table name in data base -->
 
-                    <columns>
+                        <columns>
 
-                        <column>
-                            <colName></colName> <!-- column name in excel -->
-                            <colNameDb></colNameDb> <!-- colum name in db -->
-                            <colType></colType> <!-- str / int / float -->
-                            <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
-                            <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
-                            <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
-                            <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
-                            <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
-                            <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
-                            <replace mode="false">                    <!-- <replace mode="true/ false">value</replace> -->
+                            <column>
+                                <colName></colName> <!-- column name in excel -->
+                                <colNameDb></colNameDb> <!-- colum name in db -->
+                                <colType></colType> <!-- str / int / float -->
+                                <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+                                <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+                                <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+                                <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+                                <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
+                                <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+                                <replace mode="false">                    <!-- <replace mode="true/ false">value</replace> -->
 
-                            <replaceVal>
-                                <value></value>                     <!--value-->
-                                <toValue></toValue>                 <!--value-->
-                            </replaceVal>
+                                <replaceVal>
+                                    <value></value>                     <!--value-->
+                                    <toValue></toValue>                 <!--value-->
+                                </replaceVal>
 
-                            <!--...-->
+                                <!--...-->
 
-                        </replace>
-                        </column>
+                                </replace>
+                            </column>
 
-                    <!--<column>-->
-                    <!--...-->
-                    <!--</column>-->
-                    <!--...-->
-                    <!--<column>-->
-                    <!--...-->
-                    <!--</column>-->
+                        <!--<column>-->
+                        <!--...-->
+                        <!--</column>-->
+                        <!--...-->
+                        <!--<column>-->
+                        <!--...-->
+                        <!--</column>-->
 
-                    </columns>
+                        </columns>
                 </table>
 
             <!--<table></table>-->
