@@ -16,13 +16,11 @@ class Connection:
         self.log = log
 
     def connectToTheDB(self, host, user, password, dbname, port, dbtype):
-
         if len(self.connection_arr) == 0:
             if dbtype == 'mssql':
                 try:
                     self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
                     self.cursor = self.conn.cursor()
-
                     self.connection_arr.append({'dbtyoe': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
                 except:
                     self.log.raiseError(18, host, dbname, user, port)
@@ -44,7 +42,6 @@ class Connection:
                     try:
                         self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
                         self.cursor = self.conn.cursor()
-
                         self.connection_arr.append({'dbtyoe': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
                     except:
                         self.log.raiseError(18, host, dbname, user, port)
@@ -57,7 +54,6 @@ class Connection:
                         self.connection_arr.append({'dbtyoe': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
                     except:
                         self.log.raiseError(18, host, dbname, user, port)
-        print(self.connection_arr)
         self.log.raiseInfo(2, host, port, dbname)
 
     def closeConnect(self):

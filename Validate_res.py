@@ -127,10 +127,6 @@ class Validate:
                     if col['colName'] is None:
                         self.log.raiseError(25, counter)
 
-
-
-
-
         #  проверка отсутсвия налов
         for number, colums_in in enumerate(self.dbService.dictionary['dbColumns']):
             if colums_in['ifNull_mode'] == 'false' and colums_in['fromExcel'] == 'true':
