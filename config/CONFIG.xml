@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <main>
+    <dbtype></dbtype>
     <dbHost></dbHost> <!-- host ip / name-->
     <dbUser></dbUser>          <!-- user -->
     <dbPass></dbPass> <!-- password -->
@@ -71,41 +72,55 @@
         </linkedColumns>
 
         <withDict mode="false"> <!-- true/ false" -->
-            <dictTableName></dictTableName> <!-- table name in data base -->
 
-            <columns>
+            <tables>
 
-                <column>
-                    <colName></colName> <!-- column name in excel -->
-                    <colNameDb></colNameDb> <!-- colum name in db -->
-                    <colType></colType> <!-- str / int / float -->
-                    <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
-                    <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
-                    <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
-                    <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
-                    <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
-                    <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
-                    <replace mode="false">                    <!-- <replace mode="true/ false">value</replace> -->
+                <table>
+                    <dictTableName></dictTableName> <!-- table name in data base -->
 
-                    <replaceVal>
-                        <value></value>                     <!--value-->
-                        <toValue></toValue>                 <!--value-->
-                    </replaceVal>
+                        <columns>
 
-                    <!--...-->
+                            <column>
+                                <colName></colName> <!-- column name in excel -->
+                                <colNameDb></colNameDb> <!-- colum name in db -->
+                                <colType></colType> <!-- str / int / float -->
+                                <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+                                <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+                                <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+                                <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+                                <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value</addValueBegin> -->
+                                <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+                                <replace mode="false">                    <!-- <replace mode="true/ false">value</replace> -->
 
-                </replace>
-                </column>
+                                <replaceVal>
+                                    <value></value>                     <!--value-->
+                                    <toValue></toValue>                 <!--value-->
+                                </replaceVal>
 
-            <!--<column>-->
+                                <!--...-->
+
+                                </replace>
+                            </column>
+
+                        <!--<column>-->
+                        <!--...-->
+                        <!--</column>-->
+                        <!--...-->
+                        <!--<column>-->
+                        <!--...-->
+                        <!--</column>-->
+
+                        </columns>
+                </table>
+
+            <!--<table></table>-->
+            <!---->
             <!--...-->
-            <!--</column>-->
-            <!--...-->
-            <!--<column>-->
-            <!--...-->
-            <!--</column>-->
+            <!---->
+            <!--<table></table>-->
 
-            </columns>
+
+            </tables>
         </withDict>
 
     </importXml>

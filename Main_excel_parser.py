@@ -7,6 +7,8 @@ from DB_connector import Connection as con
 
 opts = Opts()
 
+connector = None
+
 for pathToConfigXML in opts.args.config:
     loggerInst = Logger.Log_info.getInstance(pathToConfigXML, opts.args.config)
     loggerInst.set_config(pathToConfigXML)
@@ -19,7 +21,8 @@ for pathToConfigXML in opts.args.config:
                                  dbService.dictionary["dbUser"],
                                  dbService.dictionary["dbPass"],
                                  dbService.dictionary["dbBase"],
-                                 dbService.dictionary["dbPort"])
+                                 dbService.dictionary["dbPort"],
+                                 dbService.dictionary["dbtype"])
 
     validator = Validate_res.Validate(dbService, loggerInst, opts, connector)
     validator.validate()
@@ -34,5 +37,7 @@ for pathToConfigXML in opts.args.config:
 
     loggerInst.raiseInfo(7)
 
-connector.closeConnect()
+if connector:
+    connector.closeConnect()
+
 

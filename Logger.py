@@ -148,7 +148,7 @@ class Log_info:
         if errNum == 34:
             message_temp = f"""{dict_of_err_types.get(3)}: Option <--test_mode> don't selected"""
         if errNum == 35:
-            message_temp = f"""{dict_of_err_types.get(1)}: Message - \n<{message[0]}>"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Message - <{message[0]}>"""
         if errNum == 36:
             message_temp = f"""{dict_of_err_types.get(4)}: Can't concatenate <int>"""
         if errNum == 37:
