@@ -1,26 +1,37 @@
 import pymssql as p
 import time
+import mysql.connector
+
 
 
 class Connection:
     __instance = None
 
     @classmethod
-    def get_instance(cls, log, host, user, password, dbname, port):
+    def get_instance(cls, log, host, user, password, dbname, port, dbtype):
         if not cls.__instance:
-            cls.__instance = Connection(log, host, user, password, dbname, port)
+            cls.__instance = Connection(log, host, user, password, dbname, port, dbtype)
         return cls.__instance
 
-    def __init__(self,log, host, user, password, dbname, port):
-        self.connectToTheDB(log, host, user, password, dbname, port)
+    def __init__(self,log, host, user, password, dbname, port, dbtype):
+        self.connectToTheDB(log, host, user, password, dbname, port, dbtype)
 
-    def connectToTheDB(self, log, host, user, password, dbname, port):
+    def connectToTheDB(self, log, host, user, password, dbname, port, dbtype):
         self.log = log
-        try:
-            self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
-            self.cursor = self.conn.cursor()
-        except Exception:
-            log.raiseError(18, host, dbname, user, port)
+        if dbtype == 'mssql':
+            try:
+                self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
+                self.cursor = self.conn.cursor()
+            except:
+                log.raiseError(18, host, dbname, user, port)
+
+        if dbtype == 'mysql':
+            try:
+                self.conn = mysql.connector.connect(host=host, port=port, user=user, password=password, database=dbname)
+                self.cursor = self.conn.cursor()
+            except:
+                log.raiseError(18, host, dbname, user, port)
+
         log.raiseInfo(2, host, port, dbname)
 
     def closeConnect(self):

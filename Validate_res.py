@@ -22,7 +22,11 @@ class Validate:
             self.connector.closeConnect()
 
     def queryForColumns(self):
-        query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{self.dic["exportTableName_value"]}'); """
+        query = ''
+        if self.dbService.dictionary['dbtype'] == 'mssql':
+            query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{self.dic["exportTableName_value"]}'); """
+        if self.dbService.dictionary['dbtype'] == 'mysql':
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{self.dic["exportTableName_value"]}';"""
         self.connector.test_conn(3)
         return self.exec(query)
 
@@ -101,6 +105,7 @@ class Validate:
                 if col_prop['fromDb'] == 'true' and self.dbService.dictionary['withDict_mode'] == 'false':
                     self.log.raiseError(22, counter)
             counter_fromDb = 0
+
             for col in self.dbService.dictionary['dbColumns']:
                 if col['fromDb'] == 'true':
                     counter_fromDb += 1
@@ -109,11 +114,20 @@ class Validate:
                 self.log.raiseError(23)
 
             for counter, col_in_withDict in enumerate(self.dbService.dictionary['withDict'], 1):
-                if col_in_withDict['colNameDb'] is None :
-                    self.log.raiseError(24, counter)
-                    
-                if col_in_withDict['colName'] is None:
-                    self.log.raiseError(25, counter)
+                if col_in_withDict['dictTableName'] is None:
+                    self.log.raiseError(1, 'dictTableName')
+                if col_in_withDict['indxDbColumn'] is None:
+                    self.log.raiseError(1, 'indxDbColumn')
+                if col_in_withDict['indxColumnDic'] is None:
+                    self.log.raiseError(1, 'indxColumnDic')
+                for col in col_in_withDict['arrOfDictColumns']:
+                    if col['colNameDb'] is None:
+                        self.log.raiseError(24, counter)
+
+                    if col['colName'] is None:
+                        self.log.raiseError(25, counter)
+
+
 
 
 
