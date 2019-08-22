@@ -15,14 +15,14 @@ for pathToConfigXML in opts.args.config:
     loggerInst.raiseInfo(4)
     dbService = xpc.XmlParser(pathToConfigXML, loggerInst, opts)
 
-
-    connector = con.get_instance(loggerInst,
-                                 dbService.dictionary["dbHost"],
-                                 dbService.dictionary["dbUser"],
-                                 dbService.dictionary["dbPass"],
-                                 dbService.dictionary["dbBase"],
-                                 dbService.dictionary["dbPort"],
-                                 dbService.dictionary["dbtype"])
+    connector = con.get_instance(loggerInst)
+    connector.connectToTheDB(
+                             dbService.dictionary["dbHost"],
+                             dbService.dictionary["dbUser"],
+                             dbService.dictionary["dbPass"],
+                             dbService.dictionary["dbBase"],
+                             dbService.dictionary["dbPort"],
+                             dbService.dictionary["dbtype"])
 
     validator = Validate_res.Validate(dbService, loggerInst, opts, connector)
     validator.validate()
