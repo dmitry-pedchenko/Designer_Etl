@@ -25,6 +25,11 @@ def do_XML_parse(pathToFile, log, opts):
         log.raiseError(4,"test_mode")
 
     try:
+        dbtype= root.find("dbtype").text
+    except:
+        log.raiseError(3, "dbtype")
+
+    try:
         dictMode= root.find("dict").text
     except:
         log.raiseError(3,"dict")
@@ -97,6 +102,7 @@ def do_XML_parse(pathToFile, log, opts):
     importDict["dbPort"] = dbPort
     importDict["loadMode"] = loadMode
     importDict["dictMode"] = dictMode
+    importDict["dbtype"] = dbtype
 
     for column_block_number, child in enumerate(importXml_block.iter("column")):
         columnDict = {}
@@ -300,25 +306,37 @@ def do_XML_parse(pathToFile, log, opts):
     importDict["withDict_mode"] = withDict_mode
 
     if root.find("dict").text == 'true' and withDict_mode == 'false':
-        log.raiseError('Error - <--dict true> but if you want to load with dict you must to set <withDict mode="true">')
+        log.raiseError('Error - <dict>true</dict> but if you want to load with dict you must to set <withDict mode="true">')
 
     if root.find("dict").text == 'true':
         dict = []
 
         try:
-            dictTableName = root.find("importXml/withDict/tables").text
+            dictTableName = root.find("importXml/withDict/tables")
         except:
             log.raiseError(3, "importXml/withDict/tables")
 
-        for col_tables_number, table in enumerate(dictTableName['table']):
+        for col_tables_number, table in enumerate(dictTableName.iter('table'), 1):
             table_arr = {}
+            arr_of_columns = []
 
             try:
-                table_arr['dictTableName'] = importDict['dictTableName']
+                table_arr['dictTableName'] = table.find('dictTableName').text
             except:
-                log.raiseError(11, col_tables_number)
+                log.raiseError(11, 'dictTableName', col_tables_number)
 
-            for column_block_number, child in enumerate(root.find("importXml/withDict").iter("column"), 1):
+            try:
+                table_arr['indxDbColumn'] = table.find('indxDbColumn').text
+            except:
+                log.raiseError(11, 'indxDbColumn', col_tables_number)
+
+            try:
+                table_arr['indxColumnDic'] = table.find('indxColumnDic').text
+            except:
+                log.raiseError(11, 'indxColumnDic', col_tables_number)
+
+
+            for column_block_number, child in enumerate(table.iter("column"), 1):
                 arrOfDictColumns = {}
                 try:
                     colName = child.find("colName").text
@@ -456,7 +474,9 @@ def do_XML_parse(pathToFile, log, opts):
                 arrOfDictColumns['replace_mode'] = replace_mode
                 arrOfDictColumns['replaceValArr'] = replaceValArr
 
-                table_arr['arrOfDictColumns'] = arrOfDictColumns
+
+                arr_of_columns.append(arrOfDictColumns)
+            table_arr['arrOfDictColumns'] = arr_of_columns
             dict.append(table_arr)
 
     # ---

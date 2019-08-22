@@ -21,7 +21,8 @@ for pathToConfigXML in opts.args.config:
                                  dbService.dictionary["dbUser"],
                                  dbService.dictionary["dbPass"],
                                  dbService.dictionary["dbBase"],
-                                 dbService.dictionary["dbPort"])
+                                 dbService.dictionary["dbPort"],
+                                 dbService.dictionary["dbtype"])
 
     validator = Validate_res.Validate(dbService, loggerInst, opts, connector)
     validator.validate()

@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 
 <main>
+    <dbtype></dbtype>
     <dbHost></dbHost> <!-- host ip / name-->
     <dbUser></dbUser>          <!-- user -->
     <dbPass></dbPass> <!-- password -->

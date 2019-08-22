@@ -23,7 +23,7 @@ class ExcelSelect:
             self.sheet_name = df.sheet_names[listNumber]
             self.newDf = sheet.fillna("null")
         except Exception as e:
-            log.raiseError(35, e.args[0])
+            log.raiseError(35, e.args[1])
             raise SystemExit(1)
 
 class Dic_DF:
@@ -39,25 +39,22 @@ class Dic_DF:
     def __init__(self, log):
         self.log = log
 
-    def take_df_of_dicDb(self, cur, dbService, connector):
+    def take_df_of_dicDb(self, cur, dbService, connector, fk):
         select_columns_string = ''
         list_of_columns_to_select = []
+        db_table = list(filter(lambda x: x["indxDbColumn"] == fk, dbService.dictionary['withDict']))[0]
 
-        db_table = dbService.dictionary['dictTableName']
-        list_of_FK = [i['colName'] for i in
-                      list(filter(lambda x: x['fromDb'] == 'true', dbService.dictionary['dbColumns']))]
-
-        for columns in dbService.dictionary['withDict']:
+        for columns in db_table['arrOfDictColumns']:
             list_of_columns_to_select.append(columns['colNameDb'])
-        for columns in list_of_FK:
-            list_of_columns_to_select.append(columns)
+
+        list_of_columns_to_select.append(db_table['indxColumnDic'])
 
         for columns in list_of_columns_to_select:
             select_columns_string += columns + ','
 
         select_columns_string = select_columns_string[:-1]
 
-        query = f""" SELECT {select_columns_string} FROM {db_table}"""
+        query = f""" SELECT {select_columns_string} FROM {db_table['dictTableName']}"""
 
         if len(self.dic_of_df) > 0:
             q_in_list = list([i.get('query') for i in self.dic_of_df])
@@ -87,7 +84,6 @@ class Dic_DF:
             loc_dic['data_frame'] = pd.DataFrame(df_res, columns=list_of_columns_to_select)
 
             self.dic_of_df.append(loc_dic)
-
             return loc_dic['data_frame']
         else:
-            return list(filter(lambda x: x.get('query') == query, self.dic_of_df))[0][query]
+            return list(filter(lambda x: x.get('query') == query, self.dic_of_df))[0]['data_frame']

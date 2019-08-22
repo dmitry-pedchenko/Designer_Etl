@@ -126,17 +126,21 @@ class Query:
 
                 elif columnProperty['fromDb'] == 'true':
                     FK = columnProperty['colName']
-                    df_dic = df_of_dic.take_df_of_dicDb(self.cur, self.dbService, self.connector)
+                    df_dic = df_of_dic.take_df_of_dicDb(self.cur, self.dbService, self.connector, FK)
+                    cur_table = list(filter(lambda x: x["indxDbColumn"] == FK, self.dbService.dictionary['withDict']))[0]
                     try:
-                        df_start = df_dic[f"""{self.dbService.dictionary['withDict'][0]['colNameDb']}"""] == row[1][self.dbService.dictionary['withDict'][0]['colName']]
+                        df_start = df_dic[f"""{cur_table['arrOfDictColumns'][0]['colNameDb']}"""] \
+                                   == row[1][cur_table['arrOfDictColumns'][0]['colName']]
+
                     except Exception as e:
                         self.log.raiseError(39, e.args[0])
-                    for col in self.dbService.dictionary['withDict']:
+
+                    for col in cur_table['arrOfDictColumns']:
                         df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col, value=row[1][col['colName']])
                         df_start = df_c & df_start
                     index = None
                     for i in df_dic.loc[df_start].iterrows():
-                        index = i[1][FK]
+                        index = i[1][cur_table['indxColumnDic']]
                     dicOfValsToInsert[columnProperty["colName"]] = index
 
             if self.dbService.dictionary['loadMode'] == 'update':
