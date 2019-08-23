@@ -14,7 +14,7 @@ class XmlParser:
             log.raiseError(1, e.args[0])
 
         pathToExcel = os.path.join(os.path.join(os.getcwd(), 'source'), self.dictionary["importXml_path_value"])
-        if opts.args.check_mode == 'true':
+        if self.dictionary['checkMode_value'] == 'true':
             pathToExcel_link = os.path.join(os.path.join(os.getcwd(), 'source'), self.dictionary["pathToLinkFile"])
 
         arrOfColTypesInExcel = {}
@@ -30,7 +30,7 @@ class XmlParser:
         except Exception as e:
             log.raiseError(16, self.dictionary["importXml_path_value"], int(self.dictionary["sheetNumber_value"]) + 1, e.args[0])
 
-        if opts.args.check_mode == 'true':  # собираю массив свйоств и имен клонок для связанной таблицы --check_mode
+        if self.dictionary['checkMode_value'] == 'true':  # собираю массив свйоств и имен клонок для связанной таблицы checkMode
             arrOfColTypesInExcelLinked = {}
             for prop in self.dictionary["linkedColumns"]:
                 try:
@@ -41,7 +41,7 @@ class XmlParser:
                     log.raiseError(17)
 
         try:
-            if opts.args.check_mode == 'true':
+            if self.dictionary['checkMode_value'] == 'true':
                 dao_link = DAO_DataFrame.ExcelSelect(pathToExcel_link, self.dictionary["linkedFileSheetNumber"], log, arrOfColTypesInExcelLinked)
                 self.dataFrame_link = dao_link.newDf
         except Exception as e:

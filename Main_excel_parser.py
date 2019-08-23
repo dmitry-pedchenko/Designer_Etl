@@ -27,7 +27,7 @@ for pathToConfigXML in opts.args.config:
     validator = Validate_res.Validate(dbService, loggerInst, opts, connector)
     validator.validate()
 
-    if opts.args.check_mode == 'true':
+    if dbService.dictionary['checkMode_value'] == 'true':
         connector.closeConnect()
         loggerInst.raiseInfo(7)
         break

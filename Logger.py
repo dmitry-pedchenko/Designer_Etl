@@ -96,7 +96,7 @@ class Log_info:
         if errNum == 8:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <{self.__config}>""",
         if errNum == 9:
-            message_temp = f"""{dict_of_err_types.get(1)}: <--check_mode true>. if you want to check source file you must to set <linkedColumns mode="true">"""
+            message_temp = f"""{dict_of_err_types.get(1)}: <checkMode>true</checkMode>. if you want to check source file you must to set <linkedColumns mode="true">"""
         if errNum == 10:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <importXml/linkedColumns> tag at block number <{message[1]}> in <{self.__config}>"""
         if errNum == 11:

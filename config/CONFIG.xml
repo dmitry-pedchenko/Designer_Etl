@@ -9,6 +9,7 @@
     <dbPort></dbPort> <!-- port -->
     <loadMode></loadMode> <!-- insert / update -->
     <dict></dict> <!-- true/ false -->
+    <checkMode></checkMode> <!-- true/false -->
 
     <importXml> <!-- configure source excel file -->
         <path></path> <!-- Excel file name.xlsx -->
