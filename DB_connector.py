@@ -2,44 +2,69 @@ import pymssql as p
 import time
 import mysql.connector
 
-
-
 class Connection:
     __instance = None
+    connection_arr = []
 
     @classmethod
-    def get_instance(cls, log, host, user, password, dbname, port, dbtype):
+    def get_instance(cls, log):
         if not cls.__instance:
-            cls.__instance = Connection(log, host, user, password, dbname, port, dbtype)
+            cls.__instance = Connection(log)
         return cls.__instance
 
-    def __init__(self,log, host, user, password, dbname, port, dbtype):
-        self.connectToTheDB(log, host, user, password, dbname, port, dbtype)
-
-    def connectToTheDB(self, log, host, user, password, dbname, port, dbtype):
+    def __init__(self, log):
         self.log = log
-        if dbtype == 'mssql':
-            try:
-                self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
-                self.cursor = self.conn.cursor()
-            except:
-                log.raiseError(18, host, dbname, user, port)
 
-        if dbtype == 'mysql':
-            try:
-                self.conn = mysql.connector.connect(host=host, port=port, user=user, password=password, database=dbname)
-                self.cursor = self.conn.cursor()
-            except:
-                log.raiseError(18, host, dbname, user, port)
+    def connectToTheDB(self, host, user, password, dbname, port, dbtype):
+        if len(self.connection_arr) == 0:
+            if dbtype == 'mssql':
+                try:
+                    self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
+                    self.cursor = self.conn.cursor()
+                    self.connection_arr.append({'dbtyoe': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
+                except:
+                    self.log.raiseError(18, host, dbname, user, port)
 
-        log.raiseInfo(2, host, port, dbname)
+            if dbtype == 'mysql':
+                try:
+                    self.conn = mysql.connector.connect(host=host, port=port, user=user, password=password,
+                                                        database=dbname)
+                    self.cursor = self.conn.cursor()
+                    self.connection_arr.append({'dbtyoe': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
+                except:
+                    self.log.raiseError(18, host, dbname, user, port)
+        else:
+            if dbtype in [x['dbtyoe'] for x in self.connection_arr]:
+                self.conn = list(filter(lambda x: x['dbtyoe'] == dbtype ,self.connection_arr))[0]['conn']
+                self.cursor = list(filter(lambda x: x['dbtyoe'] == dbtype ,self.connection_arr))[0]['cursor']
+            else:
+                if dbtype == 'mssql':
+                    try:
+                        self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
+                        self.cursor = self.conn.cursor()
+                        self.connection_arr.append({'dbtyoe': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
+                    except:
+                        self.log.raiseError(18, host, dbname, user, port)
+
+                if dbtype == 'mysql':
+                    try:
+                        self.conn = mysql.connector.connect(host=host, port=port, user=user, password=password,
+                                                            database=dbname)
+                        self.cursor = self.conn.cursor()
+                        self.connection_arr.append({'dbtyoe': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
+                    except:
+                        self.log.raiseError(18, host, dbname, user, port)
+        self.log.raiseInfo(2, host, port, dbname)
 
     def closeConnect(self):
-        try:
-            self.conn.close()
-            self.log.raiseInfo(3)
-        except:
-            self.log.raiseError(19)
+        if len(self.connection_arr) > 0:
+            try:
+                self.conn.close()
+                for con in self.connection_arr:
+                    con['conn'].close()
+                self.log.raiseInfo(3)
+            except:
+                self.log.raiseError(19)
 
     def get_conn(self):
         return self.conn
@@ -49,7 +74,6 @@ class Connection:
 
     def test_conn(self, attempt):
         query = """SELECT 1"""
-
         has_try = False
         counter_attempt = 0
         while not has_try:

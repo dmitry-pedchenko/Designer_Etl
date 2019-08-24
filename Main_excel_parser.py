@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.join(os.getcwd(), "venv", "Lib", "site-packages"))
+
 import Query_creator as qc
 import XML_DAO as xpc
 import Logger
@@ -15,19 +19,19 @@ for pathToConfigXML in opts.args.config:
     loggerInst.raiseInfo(4)
     dbService = xpc.XmlParser(pathToConfigXML, loggerInst, opts)
 
-
-    connector = con.get_instance(loggerInst,
-                                 dbService.dictionary["dbHost"],
-                                 dbService.dictionary["dbUser"],
-                                 dbService.dictionary["dbPass"],
-                                 dbService.dictionary["dbBase"],
-                                 dbService.dictionary["dbPort"],
-                                 dbService.dictionary["dbtype"])
+    connector = con.get_instance(loggerInst)
+    connector.connectToTheDB(
+                             dbService.dictionary["dbHost"],
+                             dbService.dictionary["dbUser"],
+                             dbService.dictionary["dbPass"],
+                             dbService.dictionary["dbBase"],
+                             dbService.dictionary["dbPort"],
+                             dbService.dictionary["dbtype"])
 
     validator = Validate_res.Validate(dbService, loggerInst, opts, connector)
     validator.validate()
 
-    if opts.args.check_mode == 'true':
+    if dbService.dictionary['checkMode_value'] == 'true':
         connector.closeConnect()
         loggerInst.raiseInfo(7)
         break

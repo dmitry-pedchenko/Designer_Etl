@@ -1,14 +1,15 @@
 <?xml version="1.0"?>
 
 <main>
-    <dbtype></dbtype>
+    <dbtype></dbtype> <!-- mssql/mysql -->
     <dbHost></dbHost> <!-- host ip / name-->
-    <dbUser></dbUser>          <!-- user -->
+    <dbUser></dbUser> <!-- user -->
     <dbPass></dbPass> <!-- password -->
     <dbBase></dbBase> <!-- database name -->
     <dbPort></dbPort> <!-- port -->
     <loadMode></loadMode> <!-- insert / update -->
     <dict></dict> <!-- true/ false -->
+    <checkMode></checkMode> <!-- true/false -->
 
     <importXml> <!-- configure source excel file -->
         <path></path> <!-- Excel file name.xlsx -->
@@ -77,6 +78,8 @@
 
                 <table>
                     <dictTableName></dictTableName> <!-- table name in data base -->
+                    <indxDbColumn>indx_1</indxDbColumn> <!-- index column name in receiver -->
+                    <indxColumnDic>indx</indxColumnDic> <!-- index column name in dictionary -->
 
                         <columns>
 
