@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.join(os.getcwd(), "venv", "Lib", "site-packages"))
+
 import Query_creator as qc
 import XML_DAO as xpc
 import Logger
