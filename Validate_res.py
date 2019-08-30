@@ -143,9 +143,10 @@ class Validate:
             for number, colums_in in enumerate(self.dbService.dictionary['dbColumns']):
                 if colums_in['ifNull_mode'] == 'false' and colums_in['fromExcel'] == 'true':
                     col_name_in_source = list(filter(lambda x: x['colNameDb'] == colums_in['colName'], self.dbService.dictionary['excelColumns']))[0]['colName']
-                    if 'null' in self.dbService.dataFrame[col_name_in_source].values:
-                        self.log.raiseError(26, col_name_in_source,self.dbService.dictionary['importXml_path_value'],
-                                                                self.dbService.dictionary['sheetNumber_value'] + 1)
+                    for i in self.dbService.dataFrame[col_name_in_source].to_numpy().flatten():
+                        if 'null' == i:
+                            self.log.raiseError(26, col_name_in_source, self.dbService.dictionary['importXml_path_value'],
+                                                                    self.dbService.dictionary['sheetNumber_value'] + 1)
 
             #  проверка на уникальность значений в поле
             for col in self.dic['excelColumns']:
