@@ -87,3 +87,6 @@ class Dic_DF:
             return loc_dic['data_frame']
         else:
             return list(filter(lambda x: x.get('query') == query, self.dic_of_df))[0]['data_frame']
+
+    def clear(self):
+        self.dic_of_df = []

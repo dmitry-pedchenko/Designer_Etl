@@ -66,9 +66,9 @@ class Query:
         self.counter = 0    # при каждом запуске скрипта обнуляем счетчик успешно всятавленных строк
         self.rowCounter = 0 # при каждом запуске скрипта обнуляем счетчик общего количества строк
         arrOfSourceColumns = []
-        dicOfColVals = {}
-        dicOfValsToInsert = {}
-        dicOfValsUpdateCondition = {}
+        dicOfColVals = {}   # словарь с именами полей и значениями полей из экселя
+        dicOfValsToInsert = {} # словарь со всеми значениями которые нужно вставить в приемник
+        dicOfValsUpdateCondition = {} # словарь со значениями для вставки в режиме обновления
         arrOfLoadPercents = [25, 50, 75, 100]
 
         hp = helper.Transformation_helper()
@@ -78,6 +78,7 @@ class Query:
 
         if self.dbService.dictionary['dictMode'] == 'true':
             df_of_dic = df.get_instance(self.log)
+            df_of_dic.clear()  # очищаю датафреймы со словарями чтобы на след загрузке были с новыми данными
 
         for row in self.DF.iterrows():
 
@@ -101,12 +102,16 @@ class Query:
 
                 if dicOfColVals.get(columnProperty["colName"]) is not None:  # беру имя колонки в базе и
                                                                  # смотрю есть ли оно в списке источника
-
                     if len(dicOfColVals.get(columnProperty["colName"])) == 1:
-                        if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"])[0] != 'null': #
+                        if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"])[0] != 'null':
                             dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], dicOfColVals.get(columnProperty["colName"])[0]))
-                        else:
+                        elif columnProperty.get("colType") == 'int':
                             dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0])
+                        else:
+                            if columnProperty.get('ifNull') in ['null', 'Null', 'NULL']:
+                                dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0])
+                            else:
+                                dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0]))
                     else:
                         if columnProperty.get("colType") == 'str':  #
                             string = ''
@@ -130,11 +135,9 @@ class Query:
                     cur_table = list(filter(lambda x: x["indxDbColumn"] == FK, self.dbService.dictionary['withDict']))[0]
                     try:
                         df_start = df_dic[f"""{cur_table['arrOfDictColumns'][0]['colNameDb']}"""] \
-                                   == row[1][cur_table['arrOfDictColumns'][0]['colName']]
-
+                                   == f"""{row[1][cur_table['arrOfDictColumns'][0]['colName']]}"""
                     except Exception as e:
                         self.log.raiseError(39, e.args[0])
-
                     for col in cur_table['arrOfDictColumns']:
                         df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col, value=row[1][col['colName']])
                         df_start = df_c & df_start
