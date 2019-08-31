@@ -42,8 +42,7 @@ class Transformation_helper:
         if rowProperties.get("replace_mode") == 'true':
             self.value = self.replace(self.value, rowProperties.get("replaceValArr"))
 
-        if dbProperties.get("ifNull_mode") == 'true':
-            if value == 'null':
-                self.value = dbProperties.get("ifNull")
+        if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
+            self.value = dbProperties.get("ifNull")
 
         return str(self.value).replace('\n', '').replace("'", "''").strip()
