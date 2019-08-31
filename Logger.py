@@ -174,7 +174,7 @@ class Log_info:
         if info_num == 0:
             message_temp = f"Success"
         if info_num == 1:
-            message_temp = f"""Success open excel file: <{message[0]}> on page name: <{message[1]}>, list number: <{message[2] + 1}>"""
+            message_temp = f"""Success open excel file: <{message[0]}> on page name: <{message[1]}>, list number: <{message[2]}>"""
         if info_num == 2:
             message_temp = f"""Success connection to host: <{message[0]}>, port: <{message[1]}>, database name: <{message[2]}>"""
         if info_num == 3:
