@@ -2,9 +2,6 @@ import XML_parser
 import DAO_DataFrame
 import os
 
-
-
-
 class XmlParser:
 
     def __init__(self, pathToConfig, log, opts):
@@ -20,7 +17,6 @@ class XmlParser:
         arrOfColTypesInExcel = {}
         for prop in self.dictionary["excelColumns"]:
             arrOfColTypesInExcel[prop['colName']] = prop['colType']
-
 
         try:
             dao = DAO_DataFrame.ExcelSelect(pathToExcel, self.dictionary["sheetNumber_value"], log, arrOfColTypesInExcel)
