@@ -34,7 +34,7 @@ class Validate:
     def validate(self):
         excel_columns = [i["colName"] for i in self.dic["excelColumns"]]
         excel_columns_Db_to_source = [i["colNameDb"] for i in self.dic["excelColumns"]]
-        db_columns = [i["colName"] for i in self.dic["dbColumns"]]
+
 
         listOfNotExistInDB = []
         listOfNotExistInConfig = []
@@ -97,6 +97,7 @@ class Validate:
 
         else:
             #  проверка соответсвия указанных колонок в базе указанным колонокам в источнике
+            db_columns = [i["colName"] for i in self.dic["dbColumns"]]
             for column_name in db_columns:
                 col_db_properties = list(filter(lambda x: x["colName"] == column_name,
                                                 self.dic["dbColumns"]))  # находим свойства текущей колонки
