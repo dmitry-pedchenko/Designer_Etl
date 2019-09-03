@@ -49,10 +49,11 @@ def do_XML_parse(pathToFile, log, opts):
     except:
         log.raiseError(3, "importXml/path")
 
-    try:
-        exportTableName_value = root.find("exportTable/path").text
-    except:
-        log.raiseError(3, "exportTable/path")
+    if checkMode_value == 'false':
+        try:
+            exportTableName_value = root.find("exportTable/path").text
+        except:
+            log.raiseError(3, "exportTable/path")
 
     try:
         dbHost = root.find("dbHost").text
@@ -93,7 +94,8 @@ def do_XML_parse(pathToFile, log, opts):
     importDict['testRunMode_value'] = testRunMode_value
     importDict['checkMode_value'] = checkMode_value
     importDict['importXml_path_value'] = importXml_path_value
-    importDict['exportTableName_value'] = exportTableName_value
+    if checkMode_value == 'false':
+        importDict['exportTableName_value'] = exportTableName_value
     importDict['sheetNumber_value'] = sheetNumber_value
     importDict['dbHost'] = dbHost
     importDict['dbUser'] = dbUser
@@ -111,11 +113,12 @@ def do_XML_parse(pathToFile, log, opts):
             colName = child.find("colName").text
         except:
             log.raiseError(5, "colName",column_block_number)
-            
-        try:
-            colNameDb = child.find("colNameDb").text
-        except:
-            log.raiseError(5, "colNameDb", column_block_number,)
+
+        if checkMode_value == 'false':
+            try:
+                colNameDb = child.find("colNameDb").text
+            except:
+                log.raiseError(5, "colNameDb", column_block_number,)
             
         try:
             colType = child.find("colType").text
@@ -231,7 +234,8 @@ def do_XML_parse(pathToFile, log, opts):
                 log.raiseError(40, 'importXml/columns', cropBegin, column_block_number)
 
         columnDict['colName'] = colName
-        columnDict['colNameDb'] = colNameDb
+        if checkMode_value == 'false':
+            columnDict['colNameDb'] = colNameDb
         columnDict['colType'] = colType
         columnDict['isPK'] = isPK
         columnDict['cropEnd'] = cropEnd
@@ -273,6 +277,11 @@ def do_XML_parse(pathToFile, log, opts):
         except:
             log.raiseError(3, "importXml/linkedColumns/linkedFileSheetNumber")
 
+        try:
+            if_both = root.find("importXml/linkedColumns/both").text
+        except:
+            log.raiseError(3, "importXml/linkedColumns/both")
+
         for counter, child in enumerate(root.find("importXml/linkedColumns").iter("column"), 1):
             dictColumn = {}
             try:
@@ -291,6 +300,7 @@ def do_XML_parse(pathToFile, log, opts):
 
 
         importDict['linkedColumns'] = arrOfLinkedColumns
+        importDict['if_both'] = if_both
         importDict['pathToLinkFile'] = pathToLinkFile
         importDict['linkedFileSheetNumber'] = int(linkedFileSheetNumber) - 1
 

@@ -33,8 +33,6 @@ class Validate:
 
     def validate(self):
         excel_columns = [i["colName"] for i in self.dic["excelColumns"]]
-        excel_columns_Db_to_source = [i["colNameDb"] for i in self.dic["excelColumns"]]
-        db_columns = [i["colName"] for i in self.dic["dbColumns"]]
 
         listOfNotExistInDB = []
         listOfNotExistInConfig = []
@@ -66,21 +64,28 @@ class Validate:
 
             if len(listOfNotExistInLinkedTable) == 0 and len(listOfNotExistInSourceTable) == 0:
                 for col_in_link_tag in self.dbService.dictionary['linkedColumns']:
+                    arr_of_not_exists = []
                     for row_in_source in self.df.iterrows():
                         if row_in_source[1][col_in_link_tag['colNameInSource']] not in self.dbService.dataFrame_link[
                             col_in_link_tag['linkedColName']].values:
-                            self.log.raiseError(21, self.dbService.dictionary['importXml_path_value'],
-                                                row_in_source[1][col_in_link_tag['colNameInSource']],
-                                                col_in_link_tag['colNameInSource'],
-                                                col_in_link_tag['linkedColName'],
-                                                self.dbService.dictionary['pathToLinkFile'],
-                                                self.dbService.dictionary['linkedFileSheetNumber'] + 1)
+                            arr_of_not_exists = [].append(row_in_source[1][col_in_link_tag['colNameInSource']])
+                    if len(arr_of_not_exists) > 0:
+                        self.log.raiseError(21, self.dbService.dictionary['importXml_path_value'],
+                                            arr_of_not_exists,
+                                            col_in_link_tag['colNameInSource'],
+                                            col_in_link_tag['linkedColName'],
+                                            self.dbService.dictionary['pathToLinkFile'],
+                                            self.dbService.dictionary['linkedFileSheetNumber'] + 1)
 
-                    for row_in_link in self.dbService.dataFrame_link.iterrows():
-                        if row_in_link[1][col_in_link_tag['linkedColName']] not in self.dbService.dataFrame[
-                            col_in_link_tag['colNameInSource']].values:
+                    arr_of_not_exists = []
+                    if self.dbService.dictionary['if_both'] == 'true':
+                        for row_in_link in self.dbService.dataFrame_link.iterrows():
+                            if row_in_link[1][col_in_link_tag['linkedColName']] not in self.dbService.dataFrame[
+                                col_in_link_tag['colNameInSource']].values:
+                                arr_of_not_exists.append(row_in_link[1][col_in_link_tag['linkedColName']])
+                        if len(arr_of_not_exists) > 0:
                             self.log.raiseError(21, self.dbService.dictionary['pathToLinkFile'],
-                                                row_in_link[1][col_in_link_tag['linkedColName']],
+                                                arr_of_not_exists,
                                                 col_in_link_tag['linkedColName'],
                                                 col_in_link_tag['colNameInSource'],
                                                 self.dbService.dictionary['importXml_path_value'],
@@ -97,6 +102,8 @@ class Validate:
 
         else:
             #  проверка соответсвия указанных колонок в базе указанным колонокам в источнике
+            excel_columns_Db_to_source = [i["colNameDb"] for i in self.dic["excelColumns"]]
+            db_columns = [i["colName"] for i in self.dic["dbColumns"]]
             for column_name in db_columns:
                 col_db_properties = list(filter(lambda x: x["colName"] == column_name,
                                                 self.dic["dbColumns"]))  # находим свойства текущей колонки

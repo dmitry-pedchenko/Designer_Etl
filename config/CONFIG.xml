@@ -56,6 +56,7 @@
         <!--only for check mode-->
             <pathToLinkFile></pathToLinkFile> <!-- excel file name.xlsx -->
             <linkedFileSheetNumber></linkedFileSheetNumber> <!-- List number in excel [1... ] -->
+            <both></both>                                   <!-- true / false -->
 
             <column>
                 <linkedColName></linkedColName> <!-- column name in excel file to compare -->
