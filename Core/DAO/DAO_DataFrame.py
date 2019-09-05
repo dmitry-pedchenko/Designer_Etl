@@ -19,12 +19,15 @@ class ExcelSelect:
 
         try:
             df = pd.ExcelFile(path)
-            sheet = df.parse(listNumber, converters=arrConverters)
-            self.sheet_name = df.sheet_names[listNumber]
-            self.newDf = sheet.fillna("null")
-        except Exception as e:
-            log.raiseError(35, e.args[1])
-            raise SystemExit(1)
+        except:
+            log.raiseError(43, path)
+
+        if not df.sheet_names:
+            log.raiseError(42)
+
+        sheet = df.parse(listNumber, converters=arrConverters)
+        self.sheet_name = df.sheet_names[listNumber]
+        self.newDf = sheet.fillna("null")
 
 class Dic_DF:
     __instance = None

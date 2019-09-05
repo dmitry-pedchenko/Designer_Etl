@@ -1,5 +1,5 @@
-import Row_transformation_helper as helper
-from DAO_DataFrame import Dic_DF as df
+from Core.Query import Row_transformation_helper as helper
+from Core.DAO.DAO_DataFrame import Dic_DF as df
 
 class Query:
     def __init__(self, dbService, log, opts, connector):
@@ -169,5 +169,21 @@ class Query:
             self.log.raiseInfo(11, self.rowCounter)
             self.log.raiseInfo(13, self.pathToLog)
         else:
+
+            if not self.log.debug_stat_dict:
+                pass
+            else:
+                self.log.raiseDebug(0, "\n\nDEBUG OVERALL\n")
+                for debug in self.log.debug_stat_dict:
+                    self.log.raiseDebug(0, f"\n\n -----------------\nDEBUG MESSAGE FROM DATABSE\n\n"
+                                           f"{debug}\n\n"
+                                           f"NUMBER OF ENTRIES :\n {self.log.debug_stat_dict.get(debug)}\n"
+                                           f"-----------------\n")
+
+                self.log.clear_debug()
+
             self.log.raiseInfo(12, self.counter, self.rowCounter - self.counter)
             self.log.raiseInfo(13, self.pathToLog)
+
+
+

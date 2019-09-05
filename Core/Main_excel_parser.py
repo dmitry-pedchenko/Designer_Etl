@@ -2,12 +2,12 @@ import sys
 import os
 sys.path.append(os.path.join(os.getcwd(), "env", "Lib", "site-packages"))
 
-import Query_creator as qc
-import XML_DAO as xpc
-import Logger
-import Validate_res
-from Opt_parser import Opts
-from DB_connector import Connection as con
+from Core.Logger import Logger
+from Core.Validate import Validate_res
+from Core.Query import Query_creator as qc
+from Core.DAO import XML_DAO as xpc
+from Core.Parser.Opt_parser import Opts
+from Core.DAO.DB_connector import Connection as con
 
 opts = Opts()
 

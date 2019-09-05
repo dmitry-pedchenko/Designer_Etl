@@ -6,6 +6,7 @@ from string import Template
 class Log_info:
     __instance = None
     __config = None
+    debug_stat_dict = {}  # список дебага в формате сообщение : количество сообщений
 
     @classmethod
     def getInstance(cls, pathToConfigXML, configs_list):
@@ -74,7 +75,8 @@ class Log_info:
             1: "Error at parsing XML",
             2: "Error at DB connection",
             3: "Validate error",
-            4: "Query creating error"
+            4: "Query creating error",
+            5: "Error at open Excel"
         }
 
         if errNum == 0:
@@ -110,7 +112,7 @@ class Log_info:
         if errNum == 15:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find property mode in tag <{message[0]}> in <column> tag at block number <{message[1]}> in <exportTable/columns> block in <{self.__config}>"""
         if errNum == 16:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't open excel file on path: <{message[0]}> on page: <{message[1]}> - \nSystem message: <{message[2]}>"""
+            message_temp = f"""{dict_of_err_types.get(5)}: Can't open excel file on path: <{message[0]}> on page: <{message[1]}> - \nSystem message: <{message[2]}>"""
         if errNum == 17:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <colName> for tag <colNameInSource> from tag <linkedColumns>"""
         if errNum == 18:
@@ -161,6 +163,11 @@ class Log_info:
             message_temp = f"""{dict_of_err_types.get(1)}: In tag <{message[0]}>. Value <{message[1]}> in column number <{message[2] + 1}> not <int> type"""
         if errNum == 41:
             message_temp = f"""{dict_of_err_types.get(3)}: At <exportTable/columns> tag in column number <{message[0]}> in <name>{message[1]}<name> incompatible set of attributes"""
+        if errNum == 42:
+            message_temp = f"""{dict_of_err_types.get(5)}: Excel file is not contains lists (make sure that format is .xlsx and file is not resaved from another format)"""
+        if errNum == 43:
+            message_temp = f"""{dict_of_err_types.get(5)}: Can't find file <{message[0]}>"""
+
 
         self.logger.error(t.substitute(num=errNum, message=message_temp))
         raise SystemExit(1)
@@ -218,6 +225,15 @@ class Log_info:
             message_temp = f"""Error in database while commiting query:\nRow number:<{message[0]}>\nQuery: 
                             <{message[1]}>\nMessage - \n<{message[2]}>\n"""
 
+            if f"{message[2]}" in self.debug_stat_dict:
+                debug_counter = self.debug_stat_dict.get(f"{message[2]}")
+                self.debug_stat_dict[f"{message[2]}"] = debug_counter + 1
+            else:
+                self.debug_stat_dict[f"{message[2]}"] = 1
+
         self.logger.debug(t.substitute(number=debug_num, message=message_temp))
+
+    def clear_debug(self):
+        self.debug_stat_dict = {}
 
 

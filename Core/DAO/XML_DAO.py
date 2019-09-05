@@ -1,5 +1,5 @@
-import XML_parser
-import DAO_DataFrame
+from Core.Parser import XML_parser
+from Core.DAO import DAO_DataFrame
 import os
 
 class XmlParser:
@@ -22,7 +22,7 @@ class XmlParser:
             dao = DAO_DataFrame.ExcelSelect(pathToExcel, self.dictionary["sheetNumber_value"], log, arrOfColTypesInExcel)
             self.dataFrame = dao.newDf
 
-            log.raiseInfo(1, self.dictionary["importXml_path_value"],dao.sheet_name,self.dictionary["sheetNumber_value"] + 1)
+            log.raiseInfo(1, self.dictionary["importXml_path_value"], dao.sheet_name, self.dictionary["sheetNumber_value"] + 1)
         except Exception as e:
             log.raiseError(16, self.dictionary["importXml_path_value"], int(self.dictionary["sheetNumber_value"]) + 1, e.args[0])
 
