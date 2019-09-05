@@ -6,6 +6,7 @@ from string import Template
 class Log_info:
     __instance = None
     __config = None
+    debug_stat_dict = {}  # список дебага в формате сообщение : количество сообщений
 
     @classmethod
     def getInstance(cls, pathToConfigXML, configs_list):
@@ -218,6 +219,15 @@ class Log_info:
             message_temp = f"""Error in database while commiting query:\nRow number:<{message[0]}>\nQuery: 
                             <{message[1]}>\nMessage - \n<{message[2]}>\n"""
 
+            if f"{message[2]}" in self.debug_stat_dict:
+                debug_counter = self.debug_stat_dict.get(f"{message[2]}")
+                self.debug_stat_dict[f"{message[2]}"] = debug_counter + 1
+            else:
+                self.debug_stat_dict[f"{message[2]}"] = 1
+
         self.logger.debug(t.substitute(number=debug_num, message=message_temp))
+
+    def clear_debug(self):
+        self.debug_stat_dict = {}
 
 
