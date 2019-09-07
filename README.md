@@ -1128,7 +1128,7 @@ importXml указываем имя этой колонки в тех колон
 ### Тег linkedColumns
 
 этот тег нужен для режима сравения двух файлов 
-Он работает только в режиме `<checkMode>true</checkMode>`. В режиме загрузки *insert* ставим `<checkMode>false</checkMode>` а `<linkedColumns mode="false">`
+Он работает только в режиме `<checkMode>true</checkMode>`. В режиме загрузки *insert* ставим `<checkMode>true</checkMode>` а `<linkedColumns mode="true">`
 
 ```
 <linkedColumns mode="true"> <!-- <linkedColumns mode="true / false"> -->
