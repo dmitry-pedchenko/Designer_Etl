@@ -26,7 +26,7 @@ class Log_info:
 
     def getLogger(self, configs_list):
         currentPath = os.getcwd()
-        pathToLogFolder = os.path.join(currentPath, 'log')  # folder log
+        pathToLogFolder = os.path.join(currentPath,'..', 'log')  # folder log
         if not os.path.exists(pathToLogFolder):
             print("Creating dir <log>")
             os.mkdir(pathToLogFolder)
