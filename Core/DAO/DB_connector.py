@@ -21,7 +21,7 @@ class Connection:
                 try:
                     self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
                     self.cursor = self.conn.cursor()
-                    self.connection_arr.append({'dbtyoe': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
+                    self.connection_arr.append({'dbtype': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
                 except:
                     self.log.raiseError(18, host, dbname, user, port)
 
@@ -30,19 +30,19 @@ class Connection:
                     self.conn = mysql.connector.connect(host=host, port=port, user=user, password=password,
                                                         database=dbname)
                     self.cursor = self.conn.cursor()
-                    self.connection_arr.append({'dbtyoe': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
+                    self.connection_arr.append({'dbtype': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
                 except:
                     self.log.raiseError(18, host, dbname, user, port)
         else:
-            if dbtype in [x['dbtyoe'] for x in self.connection_arr]:
-                self.conn = list(filter(lambda x: x['dbtyoe'] == dbtype ,self.connection_arr))[0]['conn']
-                self.cursor = list(filter(lambda x: x['dbtyoe'] == dbtype ,self.connection_arr))[0]['cursor']
+            if dbtype in [x['dbtype'] for x in self.connection_arr]:
+                self.conn = list(filter(lambda x: x['dbtype'] == dbtype ,self.connection_arr))[0]['conn']
+                self.cursor = list(filter(lambda x: x['dbtype'] == dbtype ,self.connection_arr))[0]['cursor']
             else:
                 if dbtype == 'mssql':
                     try:
                         self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
                         self.cursor = self.conn.cursor()
-                        self.connection_arr.append({'dbtyoe': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
+                        self.connection_arr.append({'dbtype': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
                     except:
                         self.log.raiseError(18, host, dbname, user, port)
 
@@ -51,7 +51,7 @@ class Connection:
                         self.conn = mysql.connector.connect(host=host, port=port, user=user, password=password,
                                                             database=dbname)
                         self.cursor = self.conn.cursor()
-                        self.connection_arr.append({'dbtyoe': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
+                        self.connection_arr.append({'dbtype': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
                     except:
                         self.log.raiseError(18, host, dbname, user, port)
         self.log.raiseInfo(2, host, port, dbname)
