@@ -1,5 +1,5 @@
-from Core.Query import Row_transformation_helper as helper
-from Core.DAO.DAO_DataFrame import Dic_DF as df
+from Query import Row_transformation_helper as helper
+from DAO.DAO_DataFrame import Dic_DF as df
 
 class Query:
     def __init__(self, dbService, log, opts, connector):
