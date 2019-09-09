@@ -103,6 +103,7 @@ class Query:
                 if dicOfColVals.get(columnProperty["colName"]) is not None:  # беру имя колонки в базе и
                                                                  # смотрю есть ли оно в списке источника
                     if len(dicOfColVals.get(columnProperty["colName"])) == 1:
+                        # если на одно поле в приемнике одно поле в источнике
                         if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"])[0] != 'null':
                             dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], dicOfColVals.get(columnProperty["colName"])[0]))
                         elif columnProperty.get("colType") == 'int':
@@ -112,7 +113,7 @@ class Query:
                                 dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0])
                             else:
                                 dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0]))
-                    else:
+                    else:  # если несколько полей в источнике идут в одно поле в приемнике
                         if columnProperty.get("colType") == 'str':  #
                             string = ''
                             for col in dicOfColVals.get(columnProperty["colName"]):
