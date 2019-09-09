@@ -12,7 +12,7 @@ def do_XML_parse(pathToFile, log, opts):
     try:
         root = et.parse(pathToFile).getroot()
     except Exception as e:
-        log.raiseError(2, pathToFile, e.args[1])
+        log.raiseError(1, e)
 
     try:
         sheetNumber_value = int(root.find("importXml/sheetNumber").text) - 1
@@ -214,8 +214,31 @@ def do_XML_parse(pathToFile, log, opts):
                 replaceDict["replaceValue"] = replaceValue
                 replaceDict["replaceToValue"] = replaceToValue
                 replaceValArr.append(replaceDict)
-        else:
-            replaceValArr = []
+
+        try:
+            filter_mode = child.find("filter").get("mode")
+        except:
+            log.raiseError(5, "filter", column_block_number)
+
+        filterArr = []
+
+        if filter_mode == 'true':
+            for child_filter in child.iter("filterVal"):
+                filterDict = {}
+
+                try:
+                    filterMode = child_filter.find("filterMode").text
+                except:
+                    log.raiseError(7, "filterMode", column_block_number)
+
+                try:
+                    filterValue = child_filter.find("filterValue").text
+                except:
+                    log.raiseError(7, "filterValue", column_block_number)
+
+                filterDict["filterMode"] = filterMode
+                filterDict["filterValue"] = filterValue
+                filterArr.append(filterDict)
 
         if cropEnd_mode == 'true':
             try:
@@ -252,6 +275,9 @@ def do_XML_parse(pathToFile, log, opts):
         columnDict['addValueBoth_mode'] = addValueBoth_mode
         columnDict['replace_mode'] = replace_mode
         columnDict['replaceValArr'] = replaceValArr
+        columnDict['filter_mode'] = filter_mode
+        columnDict['filterArr'] = filterArr
+
 
         colArrayExcel.append(columnDict)
     importDict["excelColumns"] = colArrayExcel

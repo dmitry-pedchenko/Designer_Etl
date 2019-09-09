@@ -1,5 +1,6 @@
 from Query import Row_transformation_helper as helper
 from DAO.DAO_DataFrame import Dic_DF as df
+from Query.Filter import filter_arr
 
 class Query:
     def __init__(self, dbService, log, opts, connector):
@@ -71,25 +72,38 @@ class Query:
         dicOfValsUpdateCondition = {} # словарь со значениями для вставки в режиме обновления
         arrOfLoadPercents = [25, 50, 75, 100]
 
+
         hp = helper.Transformation_helper()
 
         for each in self.dic["excelColumns"]:
-            arrOfSourceColumns.append({"colNameDb":each["colNameDb"],"colName":each["colName"]})  # собираю массив из колонок которые надо брать
+            # собираю массив из колонок которые надо брать
+            arrOfSourceColumns.append({"colNameDb": each["colNameDb"], "colName": each["colName"]})
 
         if self.dbService.dictionary['dictMode'] == 'true':
             df_of_dic = df.get_instance(self.log)
             df_of_dic.clear()  # очищаю датафреймы со словарями чтобы на след загрузке были с новыми данными
 
         for row in self.DF.iterrows():
+            filter_flag_arr = []  # флаг указывающий на то что фильтр сработал и в строке неподходящее значение
+            for each in arrOfSourceColumns:
+                if list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filter_mode'] == 'true':
+                    filter_flag_arr.append(filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filterArr'],
+                                row[1][each["colName"]]
+                                ))
 
-            for each in arrOfSourceColumns:  # прохожу по столбцам в источнике и собираю словарь значений и колонок
+                # прохожу по столбцам в источнике и собираю словарь значений и колонок
                 # с именами ключей в виде названия колонки в приемнике
                 # список потому что может быть несколько полей
                 if dicOfColVals.get(each["colNameDb"]) is None:
+                    #  если в списке нет значения для данного поля
                     dicOfColVals[each["colNameDb"]] = []
                     dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
                 else:
                     dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
+            if False in filter_flag_arr:
+                # если есть значение которое попало под фильтр то пропускаем эту строчку
+                dicOfColVals = {}
+                continue
 
             for columnProperty in self.dic["dbColumns"]:      # прохожу по колонкам в базе данных
 
@@ -166,6 +180,7 @@ class Query:
             self.execQuery(fullQuery)
 
             dicOfColVals = {}  # очищаю словарь чтобы на следующей итерации снова начал заполняться
+
 
         if self.dic["testRunMode_value"] == 'true':
             self.log.raiseInfo(11, self.rowCounter)

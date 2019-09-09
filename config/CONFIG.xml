@@ -28,7 +28,7 @@
                 <cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
                 <addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value,value</addValueBegin> -->
                 <addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
-                <replace mode="false">                    <!-- <replace mode="true/ false">value</replace> -->
+                <replace mode="true">                    <!-- <replace mode="true/ false">value</replace> -->
 
                     <replaceVal>
                         <value></value>                     <!--value-->
@@ -38,6 +38,15 @@
                     <!--...-->
 
                 </replace>
+                <filter mode="true">
+                    <filterVal>
+                        <filterMode></filterMode>      <!-- != = > < <= >= -->
+                        <filterValue></filterValue>    <!-- value -->
+                    </filterVal>
+
+                    <!-- ...  -->
+
+                </filter>
             </column>
 
         <!--<column>-->
@@ -52,7 +61,7 @@
         </columns>
 
 
-        <linkedColumns mode="false"> <!-- <linkedColumns mode="true / false"> -->
+        <linkedColumns mode="true"> <!-- <linkedColumns mode="true / false"> -->
         <!--only for check mode-->
             <pathToLinkFile></pathToLinkFile> <!-- excel file name.xlsx -->
             <linkedFileSheetNumber></linkedFileSheetNumber> <!-- List number in excel [1... ] -->
@@ -73,14 +82,14 @@
 
         </linkedColumns>
 
-        <withDict mode="false"> <!-- true/ false" -->
+        <withDict mode="true"> <!-- true/ false" -->
 
             <tables>
 
                 <table>
                     <dictTableName></dictTableName> <!-- table name in data base -->
-                    <indxDbColumn>indx_1</indxDbColumn> <!-- index column name in receiver -->
-                    <indxColumnDic>indx</indxColumnDic> <!-- index column name in dictionary -->
+                    <indxDbColumn></indxDbColumn> <!-- index column name in receiver -->
+                    <indxColumnDic></indxColumnDic> <!-- index column name in dictionary -->
 
                         <columns>
 
