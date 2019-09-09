@@ -94,13 +94,14 @@ class Query:
             for columnProperty in self.dic["dbColumns"]:      # прохожу по колонкам в базе данных
 
                 if columnProperty["isAutoInc"] == 'true':
-                    continue # поля с автоинкрементом не берем а идем дальше и не вносим их в список
+                    continue  # поля с автоинкрементом не берем а идем дальше и не вносим их в список
 
                 curColumnExcelEqualsDbColumn = list(filter(lambda x: x["colNameDb"] == columnProperty["colName"], self.dic["excelColumns"]))
 
                 # надо пройтись по значениям dicOfColVals и развернуть список
 
-                if dicOfColVals.get(columnProperty["colName"]) is not None:  # беру имя колонки в базе и
+                if dicOfColVals.get(columnProperty["colName"]) is not None:
+                                                                # беру имя колонки в базе и
                                                                  # смотрю есть ли оно в списке источника
                     if len(dicOfColVals.get(columnProperty["colName"])) == 1:
                         # если на одно поле в приемнике одно поле в источнике
