@@ -38,7 +38,16 @@
                     <!--...-->
 
                 </replace>
+
                 <filter mode="true">
+
+                    <f_cropEnd mode="false"></f_cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+                    <f_addValueEnd mode="false"></f_addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+                    <f_takeFromBegin mode="false"></f_takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+                    <f_cropBegin mode="false"></f_cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+                    <f_addValueBegin mode="false"></f_addValueBegin> <!-- <addValueBegin mode="true/ false">value,value</addValueBegin> -->
+                    <f_addValueBoth mode="false"></f_addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+
                     <filterVal>
                         <filterMode></filterMode>      <!-- != = > < <= >= -->
                         <filterValue></filterValue>    <!-- value -->
