@@ -1,5 +1,4 @@
 
-
 class Transformation_helper:
 
     def cropEnd(self, value, valueToCrop):

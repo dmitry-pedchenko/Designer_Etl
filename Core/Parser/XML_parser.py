@@ -223,6 +223,83 @@ def do_XML_parse(pathToFile, log, opts):
         filterArr = []
 
         if filter_mode == 'true':
+            filter_dict_edit = {}
+
+            try:
+                f_cropEnd = child.find("filter/f_cropEnd").text
+            except:
+                f_log.raiseError(5, "filter/f_cropEnd", column_block_number)
+
+            try:
+                f_cropEnd_mode = child.find("filter/f_cropEnd").get("mode")
+            except:
+                log.raiseError(6, "filter/f_cropEnd", column_block_number)
+
+            try:
+                f_addValueEnd = child.find("filter/f_addValueEnd").text
+            except:
+                log.raiseError(5, "filter/f_addValueEnd", column_block_number)
+
+            try:
+                f_addValueEnd_mode = child.find("filter/f_addValueEnd").get("mode")
+            except:
+                log.raiseError(6, "filter/f_addValueEnd", column_block_number)
+
+            try:
+                f_takeFromBegin = child.find("filter/f_takeFromBegin").text
+            except:
+                log.raiseError(5, "filter/f_takeFromBegin", column_block_number)
+
+            try:
+                f_takeFromBegin_mode = child.find("filter/f_takeFromBegin").get("mode")
+            except:
+                log.raiseError(6, "filter/f_takeFromBegin", column_block_number)
+
+            try:
+                f_cropBegin = child.find("filter/f_cropBegin").text
+            except:
+                log.raiseError(5, "filter/f_cropBegin", column_block_number)
+
+            try:
+                f_cropBegin_mode = child.find("filter/f_cropBegin").get("mode")
+            except:
+                log.raiseError(6, "filter/f_cropBegin", column_block_number)
+
+            try:
+                f_addValueBegin = child.find("filter/f_addValueBegin").text
+            except:
+                log.raiseError(5, "filter/f_addValueBegin", column_block_number)
+
+            try:
+                f_addValueBegin_mode = child.find("filter/f_addValueBegin").get("mode")
+            except:
+                log.raiseError(6, "filter/f_addValueBegin", column_block_number)
+
+            try:
+                f_addValueBoth = child.find("filter/f_addValueBoth").text
+            except:
+                log.raiseError(5, "filter/f_addValueBoth", column_block_number)
+
+            try:
+                f_addValueBoth_mode = child.find("filter/f_addValueBoth").get("mode")
+            except:
+                log.raiseError(6, "filter/f_addValueBoth", column_block_number)
+
+            filter_dict_edit["cropEnd"] = f_cropEnd
+            filter_dict_edit["cropEnd_mode"] = f_cropEnd_mode
+            filter_dict_edit["addValueEnd"] = f_addValueEnd
+            filter_dict_edit["addValueEnd_mode"] = f_addValueEnd_mode
+            filter_dict_edit["takeFromBegin"] = f_takeFromBegin
+            filter_dict_edit["takeFromBegin_mode"] = f_takeFromBegin_mode
+            filter_dict_edit["cropBegin"] = f_cropBegin
+            filter_dict_edit["cropBegin_mode"] = f_cropBegin_mode
+            filter_dict_edit["addValueBegin"] = f_addValueBegin
+            filter_dict_edit["addValueBegin_mode"] = f_addValueBegin_mode
+            filter_dict_edit["addValueBoth"] = f_addValueBoth
+            filter_dict_edit["addValueBoth_mode"] = f_addValueBoth_mode
+
+
+
             for child_filter in child.iter("filterVal"):
                 filterDict = {}
 
@@ -306,7 +383,8 @@ def do_XML_parse(pathToFile, log, opts):
         columnDict['filterArr'] = filterArr
         columnDict['post_filter_mode'] = post_filter_mode
         columnDict['postfilterArr'] = postfilterArr
-
+        if filter_mode == 'true':
+            columnDict['filter_dict_edit'] = filter_dict_edit
 
 
         colArrayExcel.append(columnDict)

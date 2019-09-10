@@ -82,21 +82,19 @@ class Query:
         if self.dbService.dictionary['dictMode'] == 'true':
             df_of_dic = df.get_instance(self.log)
             df_of_dic.clear()  # очищаю датафреймы со словарями чтобы на след загрузке были с новыми данными
-
         for row in self.DF.iterrows():
             filter_flag_arr = []  # флаг указывающий на то что фильтр сработал и в строке неподходящее значение
             post_filter_flag_arr = []  # флаг указывающий на то что пост фильтр сработал и в строке неподходящее значение
             for each in arrOfSourceColumns:
                 if list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filter_mode'] == 'true':
-                    filter_flag_arr.append(filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filterArr'],
-                                row[1][each["colName"]]
-                                ))
+                    filter_flag_arr.append(
+                        filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filterArr'],
+                        hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]["filter_dict_edit"], value=row[1][each["colName"]])))
 
                 if list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['post_filter_mode'] == 'true':
-                    post_filter_flag_arr.append(filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['postfilterArr'],
-                                hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0],
-                                                     value=row[1][each["colName"]])))
-
+                    post_filter_flag_arr.append(
+                        filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['postfilterArr'],
+                                hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0], value=row[1][each["colName"]])))
                 # прохожу по столбцам в источнике и собираю словарь значений и колонок
                 # с именами ключей в виде названия колонки в приемнике
                 # список потому что может быть несколько полей
@@ -106,7 +104,6 @@ class Query:
                     dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
                 else:
                     dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
-
             if False in filter_flag_arr:
                 # если есть значение которое попало под фильтр то пропускаем эту строчку
                 dicOfColVals = {}
@@ -192,7 +189,6 @@ class Query:
             self.execQuery(fullQuery)
 
             dicOfColVals = {}  # очищаю словарь чтобы на следующей итерации снова начал заполняться
-
 
         if self.dic["testRunMode_value"] == 'true':
             self.log.raiseInfo(11, self.rowCounter)

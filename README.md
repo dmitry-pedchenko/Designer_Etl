@@ -346,6 +346,14 @@ Inserted: <КОЛИЧЕСТВО ВСТАВЛЕННЫХ СТРОК>; Rows lost: <
 
                 </replace>
                 <filter mode="true">
+                    
+                    <f_cropEnd mode="false"></f_cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+                    <f_addValueEnd mode="false"></f_addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+                    <f_takeFromBegin mode="false"></f_takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+                    <f_cropBegin mode="false"></f_cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+                    <f_addValueBegin mode="false"></f_addValueBegin> <!-- <addValueBegin mode="true/ false">value,value</addValueBegin> -->
+                    <f_addValueBoth mode="false"></f_addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+                
                     <filterVal>
                         <filterMode></filterMode>      <!-- != = > < <= >= -->
                         <filterValue></filterValue>    <!-- value -->
@@ -772,6 +780,14 @@ true или false в зависимости от нужного режима з�
 Тег имеет вид
 ```xml
 <filter mode="true">
+
+    <f_cropEnd mode="false"></f_cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+    <f_addValueEnd mode="false"></f_addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+    <f_takeFromBegin mode="false"></f_takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+    <f_cropBegin mode="false"></f_cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+    <f_addValueBegin mode="false"></f_addValueBegin> <!-- <addValueBegin mode="true/ false">value,value</addValueBegin> -->
+    <f_addValueBoth mode="false"></f_addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+    
     <filterVal>
         <filterMode></filterMode>      <!-- != = > < <= >= -->
         <filterValue></filterValue>    <!-- value -->
@@ -781,6 +797,21 @@ true или false в зависимости от нужного режима з�
 
 </filter>
 ```
+Теги 
+```xml
+<f_cropEnd mode="false"></f_cropEnd> 
+<f_addValueEnd mode="false"></f_addValueEnd> 
+<f_takeFromBegin mode="false"></f_takeFromBegin> 
+<f_cropBegin mode="false"></f_cropBegin> 
+<f_addValueBegin mode="false"></f_addValueBegin> 
+<f_addValueBoth mode="false"></f_addValueBoth> 
+```
+Изменяют значение в ячейке перед тем как начать процедуру сравнения со значением
+в темге `<filterVal>` . Этот процесс изменяет значение только для процерки,
+для того чтобы произвести фильтрацию по измененному значению. Но измененное
+значение не идет дальше в загрузку. 
+
+
 В блоке `<filterVal>` находятся два тега отвечающие за режим фильтрации
 и за значение с которым сравнивается значение в поле.
 
