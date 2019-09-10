@@ -354,6 +354,15 @@ Inserted: <КОЛИЧЕСТВО ВСТАВЛЕННЫХ СТРОК>; Rows lost: <
                     <!-- ...  -->
 
                 </filter>
+                <post-filter mode="true">
+                    <postfilterVal>
+                        <filterMode></filterMode>      <!-- != = > < <= >= -->
+                        <filterValue></filterValue>    <!-- value -->
+                    </postfilterVal>
+
+                    <!-- ...  -->
+
+                </post-filter>
             </column>
 
         <!--<column>-->
@@ -755,7 +764,8 @@ true или false в зависимости от нужного режима з�
 
 ##### filter
 
-Отвечает за фильтрацию поля по значению, если тег включен то при истинном значении условия поле берется в выборку. У включенного тега `<filter mode="true">`
+Отвечает за фильтрацию поля по значению перед преобразованием значения в ячейке (если такое есть), 
+если тег включен то при истинном значении условия строка берется в выборку. У включенного тега `<filter mode="true">`
 Тег имеет вид
 ```
 <filter mode="true">
@@ -777,6 +787,42 @@ true или false в зависимости от нужного режима з�
 |<filterValue>|значение с которым сравнивается поле|
 
 При режимах ` > < <= >= ` Тег `<colType>` должен быть равен `int` или `float`
+
+##### filter
+
+Отвечает за фильтрацию поля по значению после преобразованием значения в ячейке (если такое есть).
+Преобразование значения ячейки происходит в тегах 
+```
+<cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
+<addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
+<takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
+<cropBegin mode="false"></cropBegin> <!-- <cropBegin mode="true/ false">value</cropBegin> -->
+<addValueBegin mode="false"></addValueBegin> <!-- <addValueBegin mode="true/ false">value,value</addValueBegin> -->
+<addValueBoth mode="false"></addValueBoth> <!-- <addValueBoth mode="true/ false">value</addValueBoth> -->
+<replace mode="true">                    <!-- <replace mode="true/ false">value</replace> -->
+
+    <replaceVal>
+        <value></value>                     <!--value-->
+        <toValue></toValue>                 <!--value-->
+    </replaceVal>
+
+    <!--...-->
+
+</replace>
+```
+если тег включен то при истинном значении условия строка берется в выборку. У включенного тега `<post-filter mode="true">`
+Тег имеет вид
+```
+<post-filter mode="true">
+    <postfilterVal>
+        <filterMode></filterMode>      <!-- != = > < <= >= -->
+        <filterValue></filterValue>    <!-- value -->
+    </postfilterVal>
+
+    <!-- ...  -->
+
+</post-filter>
+```
 
 
 ##### Порядок выполнения преобразования
@@ -802,6 +848,8 @@ true или false в зависимости от нужного режима з�
                 <addValueBegin mode="false"></addValueBegin>
                 <addValueBoth mode="false"></addValueBoth>
                 <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
             </column>
 
             <column>
@@ -817,6 +865,8 @@ true или false в зависимости от нужного режима з�
                 <addValueBegin mode="false"></addValueBegin>
                 <addValueBoth mode="false"></addValueBoth>
                 <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
             </column>
 ```
 

@@ -1,6 +1,6 @@
-from Query import Row_transformation_helper as helper
+from Validate import Row_transformation_helper as helper
 from DAO.DAO_DataFrame import Dic_DF as df
-from Query.Filter import filter_arr
+from Validate.Filter import filter_arr
 
 class Query:
     def __init__(self, dbService, log, opts, connector):
@@ -85,11 +85,17 @@ class Query:
 
         for row in self.DF.iterrows():
             filter_flag_arr = []  # флаг указывающий на то что фильтр сработал и в строке неподходящее значение
+            post_filter_flag_arr = []  # флаг указывающий на то что пост фильтр сработал и в строке неподходящее значение
             for each in arrOfSourceColumns:
                 if list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filter_mode'] == 'true':
                     filter_flag_arr.append(filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filterArr'],
                                 row[1][each["colName"]]
                                 ))
+
+                if list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['post_filter_mode'] == 'true':
+                    post_filter_flag_arr.append(filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['postfilterArr'],
+                                hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0],
+                                                     value=row[1][each["colName"]])))
 
                 # прохожу по столбцам в источнике и собираю словарь значений и колонок
                 # с именами ключей в виде названия колонки в приемнике
@@ -100,8 +106,14 @@ class Query:
                     dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
                 else:
                     dicOfColVals[each["colNameDb"]].append(row[1][each["colName"]])
+
             if False in filter_flag_arr:
                 # если есть значение которое попало под фильтр то пропускаем эту строчку
+                dicOfColVals = {}
+                continue
+
+            if False in post_filter_flag_arr:
+                # если есть значение которое попало под пост фильтр то пропускаем эту строчку
                 dicOfColVals = {}
                 continue
 
