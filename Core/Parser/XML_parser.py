@@ -240,6 +240,33 @@ def do_XML_parse(pathToFile, log, opts):
                 filterDict["filterValue"] = filterValue
                 filterArr.append(filterDict)
 
+        try:
+            post_filter_mode = child.find("post-filter").get("mode")
+        except:
+            log.raiseError(5, "post-filter", column_block_number)
+
+        postfilterArr = []
+
+        if post_filter_mode == 'true':
+            for child_filter in child.iter("postfilterVal"):
+                filterDict = {}
+
+                try:
+                    filterMode = child_filter.find("filterMode").text
+                except:
+                    log.raiseError(7, "filterMode", column_block_number)
+
+                try:
+                    filterValue = child_filter.find("filterValue").text
+                except:
+                    log.raiseError(7, "filterValue", column_block_number)
+
+                filterDict["filterMode"] = filterMode
+                filterDict["filterValue"] = filterValue
+                postfilterArr.append(filterDict)
+
+
+
         if cropEnd_mode == 'true':
             try:
                 int(cropEnd)
@@ -277,6 +304,9 @@ def do_XML_parse(pathToFile, log, opts):
         columnDict['replaceValArr'] = replaceValArr
         columnDict['filter_mode'] = filter_mode
         columnDict['filterArr'] = filterArr
+        columnDict['post_filter_mode'] = post_filter_mode
+        columnDict['postfilterArr'] = postfilterArr
+
 
 
         colArrayExcel.append(columnDict)

@@ -47,6 +47,15 @@
                     <!-- ...  -->
 
                 </filter>
+                <post-filter mode="true">
+                    <postfilterVal>
+                        <filterMode></filterMode>      <!-- != = > < <= >= -->
+                        <filterValue></filterValue>    <!-- value -->
+                    </postfilterVal>
+
+                    <!-- ...  -->
+
+                </post-filter>
             </column>
 
         <!--<column>-->

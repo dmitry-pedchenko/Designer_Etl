@@ -23,7 +23,7 @@ class Transformation_helper:
                 return repToVal
         return value
 
-    def checkAndTransform(self, dbProperties, rowProperties, value):
+    def checkAndTransform(self, dbProperties = None, rowProperties = None, value = None):
         self.value = value
 
         if rowProperties.get("cropEnd_mode") == 'true':
@@ -42,7 +42,8 @@ class Transformation_helper:
         if rowProperties.get("replace_mode") == 'true':
             self.value = self.replace(self.value, rowProperties.get("replaceValArr"))
 
-        if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
-            self.value = dbProperties.get("ifNull")
+        if dbProperties:
+            if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
+                self.value = dbProperties.get("ifNull")
 
         return str(self.value).replace('\n', '').replace("'", "''").strip()
