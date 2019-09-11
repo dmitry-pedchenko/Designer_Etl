@@ -327,7 +327,7 @@ Inserted: <КОЛИЧЕСТВО ВСТАВЛЕННЫХ СТРОК>; Rows lost: <
             <column>
                 <colName></colName> <!-- column name in excel -->
                 <colNameDb></colNameDb> <!-- colum name in db -->
-                <colType></colType> <!-- str / int / float -->
+                <colType></colType> <!-- str / int / float / date-->
                 <isPK></isPK> <!-- true/ false -->
                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
@@ -420,7 +420,7 @@ Inserted: <КОЛИЧЕСТВО ВСТАВЛЕННЫХ СТРОК>; Rows lost: <
                             <column>
                                 <colName></colName> <!-- column name in excel -->
                                 <colNameDb></colNameDb> <!-- colum name in db -->
-                                <colType></colType> <!-- str / int / float -->
+                                <colType></colType> <!-- str / int / float / date -->
                                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                                 <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
@@ -691,7 +691,7 @@ true или false в зависимости от нужного режима з�
 |---|---|
 |colName|указывает для какой колонки в базе этот блок|
 |colNameDb|указывает в какое поле в базе идут данные из этой колонки он должен быть равен одному из тегов name из блока exportTable|
-|colType|описывает к какому типу будет преобразовано значение из этой колонки. Принимает значение int str float|
+|colType|описывает к какому типу будет преобразовано значение из этой колонки. Принимает значение int str float date|
 |isPK|тег нужен для проверки колонки на уникалоность значений в колонке в источнике. true или false|
 
 далее идут теги со свойствами. 
@@ -971,7 +971,7 @@ true или false в зависимости от нужного режима з�
 |isConc|является ли данное поле составным полем из нескольких полей.true да false нет|
 |fromExcel|берется ли данное поле из файла Excel|
 |defaultValue|принимает в себя строку, которую нужно вставлять когда поле не берется из файла|
-|colType|описывает какого типа будут вставляться строчки. int str|
+|colType|описывает какого типа будут вставляться строчки. int str. Если вставляется в базу значения типа date то либо int или str это не имеет значения|
 |ifNull|нужен для того, чтобы заменять поля получаемые из базы на другие значение,если они становятся налами|
 |fromDb| указывает на то берется ли значение из словарной таблицы в базе. false нет true да|
 |isUpdateCondition|если <isUpdateCondition>true</isUpdateCondition> то эта колонка податает в условие WHERE в апдейте и по ней будут искаться колонки для апдейта|
@@ -1072,7 +1072,7 @@ importXml указываем имя этой колонки в тех колон
                             <column>
                                 <colName></colName> <!-- column name in excel -->
                                 <colNameDb></colNameDb> <!-- colum name in db -->
-                                <colType></colType> <!-- str / int / float -->
+                                <colType></colType> <!-- str / int / float / date-->
                                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                                 <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
@@ -1121,7 +1121,7 @@ importXml указываем имя этой колонки в тех колон
                             <column>
                                 <colName></colName> <!-- column name in excel -->
                                 <colNameDb></colNameDb> <!-- colum name in db -->
-                                <colType></colType> <!-- str / int / float -->
+                                <colType></colType> <!-- str / int / float / date -->
                                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                                 <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->

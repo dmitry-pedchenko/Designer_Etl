@@ -20,7 +20,7 @@
             <column>
                 <colName></colName> <!-- column name in excel -->
                 <colNameDb></colNameDb> <!-- colum name in db -->
-                <colType></colType> <!-- str / int / float -->
+                <colType></colType> <!-- str / int / float / date -->
                 <isPK></isPK> <!-- true/ false -->
                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
@@ -114,7 +114,7 @@
                             <column>
                                 <colName></colName> <!-- column name in excel -->
                                 <colNameDb></colNameDb> <!-- colum name in db -->
-                                <colType></colType> <!-- str / int / float -->
+                                <colType></colType> <!-- str / int / float / date -->
                                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
                                 <takeFromBegin mode="false"></takeFromBegin> <!-- <takeFromBegin mode="true/ false">value</takeFromBegin> -->
