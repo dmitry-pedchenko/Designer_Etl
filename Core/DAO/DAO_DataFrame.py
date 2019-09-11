@@ -1,4 +1,6 @@
 import pandas as pd
+import datetime
+
 
 class ExcelSelect:
 
@@ -8,6 +10,7 @@ class ExcelSelect:
         lambdaStr = lambda x: str(x)
         lambdaInt = lambda x: int(x)
         lambdaFloat = lambda x: float(x)
+        lambdaDate = lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y")
 
         for col in arrOfColTypesInExcel.keys():
             if arrOfColTypesInExcel.get(col) == 'str':
@@ -16,6 +19,8 @@ class ExcelSelect:
                 arrConverters[col] = lambdaInt
             if arrOfColTypesInExcel.get(col) == 'float':
                 arrConverters[col] = lambdaFloat
+            if arrOfColTypesInExcel.get(col) == 'date':
+                arrConverters[col] = lambdaDate
 
         try:
             df = pd.ExcelFile(path)

@@ -45,4 +45,7 @@ class Transformation_helper:
             if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
                 self.value = dbProperties.get("ifNull")
 
+        if rowProperties.get("colType") == 'date':
+            self.value = value.strftime("%Y%m%d")
+
         return str(self.value).replace('\n', '').replace("'", "''").strip()
