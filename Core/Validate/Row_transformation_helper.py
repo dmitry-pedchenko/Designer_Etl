@@ -22,9 +22,8 @@ class Transformation_helper:
                 return repToVal
         return value
 
-    def checkAndTransform(self, dbProperties = None, rowProperties = None, value = None):
+    def checkAndTransform(self, dbProperties = None, rowProperties = None, value = None, str_type = None):
         self.value = value
-
         if rowProperties.get("cropEnd_mode") == 'true':
             self.value = self.cropEnd(self.value, rowProperties.get("cropEnd"))
         if rowProperties.get("cropBegin_mode") == 'true':
@@ -44,8 +43,8 @@ class Transformation_helper:
         if dbProperties:
             if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
                 self.value = dbProperties.get("ifNull")
-
-        if rowProperties.get("colType") == 'date':
+        if str_type == 'date':
             self.value = value.strftime("%Y%m%d")
+            return self.value
 
         return str(self.value).replace('\n', '').replace("'", "''").strip()

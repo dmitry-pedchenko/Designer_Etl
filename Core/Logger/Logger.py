@@ -167,6 +167,8 @@ class Log_info:
             message_temp = f"""{dict_of_err_types.get(5)}: Excel file is not contains lists (make sure that format is .xlsx and file is not resaved from another format)"""
         if errNum == 43:
             message_temp = f"""{dict_of_err_types.get(5)}: Can't find file <{message[0]}>"""
+        if errNum == 44:
+            message_temp = f"""{dict_of_err_types.get(4)}: Message - <{message[0]}>"""
 
 
         self.logger.error(t.substitute(num=errNum, message=message_temp))
