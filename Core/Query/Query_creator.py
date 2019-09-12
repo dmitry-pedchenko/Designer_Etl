@@ -183,16 +183,17 @@ class Query:
                     FK = columnProperty['colName']
                     df_dic = df_of_dic.take_df_of_dicDb(self.cur, self.dbService, self.connector, FK)
                     cur_table = list(filter(lambda x: x["indxDbColumn"] == FK, self.dbService.dictionary['withDict']))[0]
+
                     try:
                         df_start = df_dic[f"""{cur_table['arrOfDictColumns'][0]['colNameDb']}"""] \
                                    == f"""{row[1][cur_table['arrOfDictColumns'][0]['colName']]}"""
                     except Exception as e:
                         self.log.raiseError(39, e.args[0])
-                    for col in cur_table['arrOfDictColumns']:
+                    for num, col in enumerate(cur_table['arrOfDictColumns']):
                         df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty,
                                                                                 col,
                                                                                 value=row[1][col['colName']],
-                                                                                str_type=curColumnExcelEqualsDbColumn[0]['colType'])
+                                                                                str_type=cur_table['arrOfDictColumns'][num]['colType'])
                         df_start = df_c & df_start
                     index = None
                     for i in df_dic.loc[df_start].iterrows():

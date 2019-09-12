@@ -30,6 +30,7 @@ Excel в базы данных MySQL и Microsoft SQL. Для работы пр�
     1. [Режим сравнения двух файлов Excel](#Режим-сравнения-двух-файлов-Excel)
         1. [Тег linkedColumns](#Тег-linkedColumns)
     1. [Режим обновления записей в БД](#Режим-обновления-записей-в-БД)
+9. [Пример-загрузки](#Пример-загрузки)
 
 
 
@@ -1367,6 +1368,624 @@ importXml указываем имя этой колонки в тех колон
 ---
 [:arrow_up:Оглавление](#Оглавление)
 
+
+## Пример загрузки
+
+Допустим нам нужно загрузить данные в таблицу `central` со следующей конфигурацией:
+
+|Поле|Тип|ключ|
+|---|---|---|
+|indx_1|int|внешний ключ к таблице dic_1|
+|indx_2|int|внешний ключ к таблице dic_2|
+|col_1|varchar|-|
+|col_2|varchar|-|
+|col_3|varchar|-|
+
+Но так как в этой таблице имеется два поля `indx_1 indx_2` которые ссылаются
+на две другие таблицы, то нужно предварительно прогрузить значения в эти две таблицы
+
+Таблицы dic_1 и dic_2 имеют следующие конфигуации
+
+```dic_1```
+
+|Поле|Тип|ключ|
+|---|---|---|
+|col_1|varchar|-|
+|col_2|varchar|-|
+|col_3|varchar|-|
+|indx|int|первичный ключ, автоинкремент|
+
+```dic_2```
+
+|Поле|Тип|ключ|
+|---|---|---|
+|col_1|varchar|-|
+|col_2|varchar|-|
+|indx|int|первичный ключ, автоинкремент|
+
+А также источник данных excel файл который имеет следующие поля
+
+|Поле|Тип|
+|---|---|
+|dict_1_1|строка|
+|dict_1_2|строка|
+|dict_1_3|дата|
+|dict_2_1|строка|
+|dict_2_2|строка|
+|col_1|строка|
+|col_2|строка|
+|col_3|строка|
+
+Для загрузки данных необходимо положить эксель файл `source.xlsx` в корень проекта в папку `Source`.
+
+Затем в папке проекта необходимо создать три файла конфигурации (два для
+загрузки двух таблиц и третью для загрузки целевой таблицы)
+
+Первый файл назовем `dic_1.xml`. Его содержимое
+
+```xml
+<?xml version="1.0"?>
+
+<main>
+    <dbtype>mysql</dbtype> 
+    <dbHost>localhost</dbHost> 
+    <dbUser>user</dbUser> 
+    <dbPass>password</dbPass> 
+    <dbBase>dbbase</dbBase> 
+    <dbPort>3306</dbPort> 
+    <loadMode>insert</loadMode> 
+    <dict>false</dict> 
+    <checkMode>false</checkMode> 
+
+    <importXml> 
+        <path>source.xlsx</path> 
+        <sheetNumber>1</sheetNumber> 
+
+        <columns>
+
+            <column>
+                <colName>dict_1_1</colName> 
+                <colNameDb>col_1</colNameDb> 
+                <colType>str</colType> 
+                <isPK>false</isPK> 
+                <cropEnd mode="false"></cropEnd> 
+                <addValueEnd mode="false"></addValueEnd> 
+                <takeFromBegin mode="false"></takeFromBegin> 
+                <cropBegin mode="false"></cropBegin> 
+                <addValueBegin mode="false"></addValueBegin> 
+                <addValueBoth mode="false"></addValueBoth> 
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+            <column>
+                <colName>dict_1_2</colName> 
+                <colNameDb>col_2</colNameDb> 
+                <colType>str</colType> 
+                <isPK>false</isPK> 
+                <cropEnd mode="false"></cropEnd> 
+                <addValueEnd mode="false"></addValueEnd> 
+                <takeFromBegin mode="false"></takeFromBegin> 
+                <cropBegin mode="false"></cropBegin> 
+                <addValueBegin mode="false"></addValueBegin> 
+                <addValueBoth mode="false"></addValueBoth> 
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+            <column>
+                <colName>dict_1_3</colName> 
+                <colNameDb>col_3</colNameDb> 
+                <colType>date</colType> 
+                <isPK>false</isPK> 
+                <cropEnd mode="false"></cropEnd> 
+                <addValueEnd mode="false"></addValueEnd> 
+                <takeFromBegin mode="false"></takeFromBegin> 
+                <cropBegin mode="false"></cropBegin> 
+                <addValueBegin mode="false"></addValueBegin> 
+                <addValueBoth mode="false"></addValueBoth> 
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+        </columns>
+
+
+        <linkedColumns mode="false"></linkedColumns>
+
+        <withDict mode="false"></withDict>
+
+    </importXml>
+
+    <exportTable> 
+        <path>dic_1</path>            
+
+        <columns>
+
+            <column>
+                <name>col_1</name>                                
+                <fromExcel>true</fromExcel>                  
+                <fromDb>false</fromDb>                       
+                <isAutoInc>false</isAutoInc>                 
+                <isConc>false</isConc>                       
+                <defaultValue mode="false"></defaultValue>   
+                <colType>str</colType>                       
+                <isUpdateCondition>false</isUpdateCondition> 
+                <ifNull mode="false"></ifNull>               
+            </column>
+
+            <column>
+                <name>col_2</name>                                
+                <fromExcel>true</fromExcel>                  
+                <fromDb>false</fromDb>                       
+                <isAutoInc>false</isAutoInc>                 
+                <isConc>false</isConc>                       
+                <defaultValue mode="false"></defaultValue>   
+                <colType>str</colType>                       
+                <isUpdateCondition>false</isUpdateCondition> 
+                <ifNull mode="false"></ifNull>                 
+            </column>
+
+            <column>
+                <name>col_3</name>                                
+                <fromExcel>true</fromExcel>                  
+                <fromDb>false</fromDb>                       
+                <isAutoInc>false</isAutoInc>                 
+                <isConc>false</isConc>                       
+                <defaultValue mode="false"></defaultValue>   
+                <colType>str</colType>                       
+                <isUpdateCondition>false</isUpdateCondition> 
+                <ifNull mode="false"></ifNull>                 
+            </column>
+
+            <column>
+                <name>indx</name>                                
+                <fromExcel>false</fromExcel>                 
+                <fromDb>false</fromDb>                     
+                <isAutoInc>true</isAutoInc>                 
+                <isConc>false</isConc>                    
+                <defaultValue mode="false"></defaultValue>   
+                <colType>str</colType>                   
+                <isUpdateCondition>false</isUpdateCondition> 
+                <ifNull mode="false"></ifNull>                 
+            </column>
+
+        </columns>
+    </exportTable>
+</main>
+
+```
+
+Второй файл назовем `dic_2.xml`. Его содержимое
+
+```xml
+<?xml version="1.0"?>
+
+<main>
+    <dbtype>mysql</dbtype> 
+    <dbHost>localhost</dbHost> 
+    <dbUser>user</dbUser> 
+    <dbPass>password</dbPass> 
+    <dbBase>dbbase</dbBase> 
+    <dbPort>3306</dbPort> 
+    <loadMode>insert</loadMode> 
+    <dict>false</dict> 
+    <checkMode>false</checkMode> 
+
+    <importXml> 
+        <path>source.xlsx</path>  
+        <sheetNumber>1</sheetNumber>  
+
+        <columns>
+
+            <column>
+                <colName>dict_2_1</colName> 
+                <colNameDb>col_1</colNameDb>  
+                <colType>str</colType>  
+                <isPK>false</isPK>  
+                <cropEnd mode="false"></cropEnd> 
+                <addValueEnd mode="false"></addValueEnd>  
+                <takeFromBegin mode="false"></takeFromBegin>  
+                <cropBegin mode="false"></cropBegin>  
+                <addValueBegin mode="false"></addValueBegin>  
+                <addValueBoth mode="false"></addValueBoth> 
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+            <column>
+                <colName>dict_2_2</colName>  
+                <colNameDb>col_2</colNameDb>  
+                <colType>str</colType>  
+                <isPK>false</isPK>  
+                <cropEnd mode="false"></cropEnd> 
+                <addValueEnd mode="false"></addValueEnd>  
+                <takeFromBegin mode="false"></takeFromBegin>  
+                <cropBegin mode="false"></cropBegin>  
+                <addValueBegin mode="false"></addValueBegin>  
+                <addValueBoth mode="false"></addValueBoth>  
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+        </columns>
+
+
+        <linkedColumns mode="false"></linkedColumns>
+
+        <withDict mode="false"></withDict>
+
+    </importXml>
+
+    <exportTable>  
+        <path>dic_2</path>    
+
+        <columns>
+
+            <column>
+                <name>col_1</name>                       
+                <fromExcel>true</fromExcel>           
+                <fromDb>false</fromDb>                 
+                <isAutoInc>false</isAutoInc>             
+                <isConc>false</isConc>                
+                <defaultValue mode="false"></defaultValue>    
+                <colType>str</colType>        
+                <isUpdateCondition>false</isUpdateCondition>  
+                <ifNull mode="false"></ifNull>             
+            </column>
+
+            <column>
+                <name>col_2</name>                         
+                <fromExcel>true</fromExcel>              
+                <fromDb>false</fromDb>                 
+                <isAutoInc>false</isAutoInc>              
+                <isConc>false</isConc>              
+                <defaultValue mode="false"></defaultValue>    
+                <colType>str</colType>                    
+                <isUpdateCondition>false</isUpdateCondition>  
+                <ifNull mode="false"></ifNull>            
+            </column>
+
+            <column>
+                <name>indx</name>                           
+                <fromExcel>false</fromExcel>             
+                <fromDb>false</fromDb>                  
+                <isAutoInc>true</isAutoInc>       
+                <isConc>false</isConc>                   
+                <defaultValue mode="false"></defaultValue>   
+                <colType>str</colType>           
+                <isUpdateCondition>false</isUpdateCondition>  
+                <ifNull mode="false"></ifNull>               
+            </column>
+
+        </columns>
+    </exportTable>
+</main>
+
+```
+
+Конфигурационный файл основной загрузки назовем ```main.xml``` 
+
+```xml
+<?xml version="1.0"?>
+
+<main>
+    <dbtype>mysql</dbtype> 
+    <dbHost>localhost</dbHost> 
+    <dbUser>user</dbUser> 
+    <dbPass>password</dbPass> 
+    <dbBase>dbbase</dbBase> 
+    <dbPort>3306</dbPort> 
+    <loadMode>insert</loadMode> 
+    <dict>true</dict> 
+    <checkMode>false</checkMode> 
+
+    <importXml> 
+        <path>source.xlsx</path>  
+        <sheetNumber>1</sheetNumber>  
+
+        <columns>
+
+            <column>
+                <colName>col_1</colName>  
+                <colNameDb>col_1</colNameDb> 
+                <colType>str</colType>  
+                <isPK>false</isPK>  
+                <cropEnd mode="false"></cropEnd>  
+                <addValueEnd mode="false"></addValueEnd>  
+                <takeFromBegin mode="false"></takeFromBegin>  
+                <cropBegin mode="false"></cropBegin>  
+                <addValueBegin mode="false"></addValueBegin>  
+                <addValueBoth mode="false"></addValueBoth>  
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+            <column>
+                <colName>col_2</colName> 
+                <colNameDb>col_2</colNameDb>  
+                <colType>str</colType>  
+                <isPK>false</isPK> 
+                <cropEnd mode="false"></cropEnd>  
+                <addValueEnd mode="false"></addValueEnd> 
+                <takeFromBegin mode="false"></takeFromBegin>  
+                <cropBegin mode="false"></cropBegin> 
+                <addValueBegin mode="false"></addValueBegin> 
+                <addValueBoth mode="false"></addValueBoth>  
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+            <column>
+                <colName>col_3</colName>  
+                <colNameDb>col_3</colNameDb>  
+                <colType>str</colType>  
+                <isPK>false</isPK>  
+                <cropEnd mode="false"></cropEnd>  
+                <addValueEnd mode="false"></addValueEnd>  
+                <takeFromBegin mode="false"></takeFromBegin>  
+                <cropBegin mode="false"></cropBegin> 
+                <addValueBegin mode="false"></addValueBegin>  
+                <addValueBoth mode="false"></addValueBoth> 
+                <replace mode="false"></replace>
+                <filter mode="false"></filter>
+                <post-filter mode="false"></post-filter>
+            </column>
+
+
+        </columns>
+
+
+        <linkedColumns mode="false"></linkedColumns>
+
+        <withDict mode="true">  
+
+            <tables>
+
+                <table>
+                    <dictTableName>dic_1</dictTableName>  
+                    <indxDbColumn>indx_1</indxDbColumn>  
+                    <indxColumnDic>indx</indxColumnDic> 
+
+                        <columns>
+
+                            <column>
+                                <colName>dict_1_1</colName>  
+                                <colNameDb>col_1</colNameDb>  
+                                <colType>str</colType>  
+                                <cropEnd mode="false"></cropEnd>  
+                                <addValueEnd mode="false"></addValueEnd> 
+                                <takeFromBegin mode="false"></takeFromBegin>  
+                                <cropBegin mode="false"></cropBegin>  
+                                <addValueBegin mode="false"></addValueBegin> 
+                                <addValueBoth mode="false"></addValueBoth>  
+                                <replace mode="false"></replace>
+                            </column>
+
+
+                            <column>
+                                <colName>dict_1_2</colName>  
+                                <colNameDb>col_2</colNameDb>  
+                                <colType>str</colType>  
+                                <cropEnd mode="false"></cropEnd> 
+                                <addValueEnd mode="false"></addValueEnd>  
+                                <takeFromBegin mode="false"></takeFromBegin>  
+                                <cropBegin mode="false"></cropBegin>  
+                                <addValueBegin mode="false"></addValueBegin>  
+                                <addValueBoth mode="false"></addValueBoth>  
+                                <replace mode="false"></replace>
+                            </column>
+
+
+                            <column>
+                                <colName>dict_1_3</colName>  
+                                <colNameDb>col_3</colNameDb>  
+                                <colType>date</colType>  
+                                <cropEnd mode="false"></cropEnd> 
+                                <addValueEnd mode="false"></addValueEnd>  
+                                <takeFromBegin mode="false"></takeFromBegin>  
+                                <cropBegin mode="false"></cropBegin> 
+                                <addValueBegin mode="false"></addValueBegin>  
+                                <addValueBoth mode="false"></addValueBoth> 
+                                <replace mode="false"></replace>
+                            </column>
+                        </columns>
+                </table>
+
+                <table>
+                    <dictTableName>dic_2</dictTableName>  
+                    <indxDbColumn>indx_2</indxDbColumn>  
+                    <indxColumnDic>indx</indxColumnDic>  
+
+                        <columns>
+
+                            <column>
+                                <colName>dict_2_1</colName>  
+                                <colNameDb>col_1</colNameDb> 
+                                <colType>str</colType>  
+                                <cropEnd mode="false"></cropEnd>  
+                                <addValueEnd mode="false"></addValueEnd>  
+                                <takeFromBegin mode="false"></takeFromBegin>  
+                                <cropBegin mode="false"></cropBegin>  
+                                <addValueBegin mode="false"></addValueBegin>  
+                                <addValueBoth mode="false"></addValueBoth>  
+                                <replace mode="false"></replace>
+                            </column>
+
+                            <column>
+                                <colName>dict_2_2</colName>  
+                                <colNameDb>col_2</colNameDb>  
+                                <colType>str</colType>  
+                                <cropEnd mode="false"></cropEnd> 
+                                <addValueEnd mode="false"></addValueEnd>  
+                                <takeFromBegin mode="false"></takeFromBegin>  
+                                <cropBegin mode="false"></cropBegin>  
+                                <addValueBegin mode="false"></addValueBegin>  
+                                <addValueBoth mode="false"></addValueBoth>  
+                                <replace mode="false"></replace>
+                            </column>
+
+                        </columns>
+                </table>
+
+            </tables>
+        </withDict>
+
+    </importXml>
+
+    <exportTable>  
+        <path>central</path>          
+
+        <columns>
+
+            <column>
+                <name>col_1</name>                       
+                <fromExcel>true</fromExcel>             
+                <fromDb>false</fromDb>                 
+                <isAutoInc>false</isAutoInc>            
+                <isConc>false</isConc>                     
+                <defaultValue mode="false"></defaultValue>   
+                <colType>str</colType>                    
+                <isUpdateCondition>false</isUpdateCondition>  
+                <ifNull mode="false"></ifNull>           
+            </column>
+
+            <column>
+                <name>col_2</name>                            
+                <fromExcel>true</fromExcel>                
+                <fromDb>false</fromDb>                     
+                <isAutoInc>false</isAutoInc>                 
+                <isConc>false</isConc>                    
+                <defaultValue mode="false"></defaultValue>   
+                <colType>str</colType>                     
+                <isUpdateCondition>false</isUpdateCondition> 
+                <ifNull mode="false"></ifNull>              
+            </column>
+
+            <column>
+                <name>col_3</name>                           
+                <fromExcel>true</fromExcel>             
+                <fromDb>false</fromDb>                  
+                <isAutoInc>false</isAutoInc>            
+                <isConc>false</isConc>                     
+                <defaultValue mode="false"></defaultValue>  
+                <colType>str</colType>                       
+                <isUpdateCondition>false</isUpdateCondition>  
+                <ifNull mode="false"></ifNull>                
+            </column>
+
+            <column>
+                <name>indx_1</name>                          
+                <fromExcel>false</fromExcel>              
+                <fromDb>true</fromDb>                    
+                <isAutoInc>false</isAutoInc>               
+                <isConc>false</isConc>                    
+                <defaultValue mode="false"></defaultValue>  
+                <colType>int</colType>                    
+                <isUpdateCondition>false</isUpdateCondition>  
+                <ifNull mode="false"></ifNull>               
+            </column>
+
+            <column>
+                <name>indx_2</name>                            
+                <fromExcel>false</fromExcel>                 
+                <fromDb>true</fromDb>                 
+                <isAutoInc>false</isAutoInc>           
+                <isConc>false</isConc>                    
+                <defaultValue mode="false"></defaultValue>  
+                <colType>int</colType>                     
+                <isUpdateCondition>false</isUpdateCondition>  
+                <ifNull mode="false"></ifNull>               
+            </column>
+
+        </columns>
+    </exportTable>
+</main>
+
+```
+
+Для запуска загруки необходимо открыть консоль из корневой директории ```Core```
+и написать в консоли следующую команду 
+
+```
+python Main_excel parser.py --test_mode true --config dic_1.xml dic_2.xml main.xml
+```
+
+Дання команда запустит все три конфигурации в тестовом режиме. Зайдя в корневую
+директорию `log` и найдя папку с данной загрузкой можно открыть файл `debug.txt`
+и убедиться в том, что все команды вставки сформировались корректно
+
+Далее выполним загрузку в базу данных следующей командой 
+
+```
+python Main_excel parser.py --test_mode false --config dic_1.xml dic_2.xml main.xml
+```
+
+Из листинга логов мы увидим то, что загрузка прошла успешно
+
+
+```
+2019-09-12 18:36:58,185 - ETL - INFO - Starts executing... dic_1.xml
+2019-09-12 18:36:58,217 - ETL - INFO - Success open excel file: <source.xlsx> on page name: <Sheet1>, list number: <1>
+2019-09-12 18:36:58,281 - ETL - INFO - Success connection to host: <localhost>, port: <3306>, database name: <dbbase>
+2019-09-12 18:36:58,281 - ETL - INFO - Begin validating files...
+2019-09-12 18:36:58,287 - ETL - INFO - Validate success...
+2019-09-12 18:36:58,287 - ETL - INFO - Loading in db begin...
+2019-09-12 18:36:58,287 - ETL - INFO - Test mode: <false>
+2019-09-12 18:36:58,288 - ETL - INFO - Rows readed: 0%
+2019-09-12 18:36:58,294 - ETL - INFO - Rows readed: 25%
+2019-09-12 18:36:58,297 - ETL - INFO - Rows readed: 50%
+2019-09-12 18:36:58,301 - ETL - INFO - Rows readed: 75%
+2019-09-12 18:36:58,303 - ETL - INFO - Rows readed: 100%
+2019-09-12 18:36:58,304 - ETL - INFO - Inserted: <9>; Rows lost: <0>
+2019-09-12 18:36:58,304 - ETL - INFO - Log files created in: </Designer_Etl/Core/../log/2019_09_12_18_36_58_['dic_1.xml', 'dic_2.xml', 'main.xml']>
+2019-09-12 18:36:58,304 - ETL - INFO - Ends executing... successfully completed <dic_1.xml>
+---
+2019-09-12 18:36:58,305 - ETL - INFO - Starts executing... dic_2.xml
+2019-09-12 18:36:58,312 - ETL - INFO - Success open excel file: <source.xlsx> on page name: <Sheet1>, list number: <1>
+2019-09-12 18:36:58,312 - ETL - INFO - Success connection to host: <localhost>, port: <3306>, database name: <dbbase>
+2019-09-12 18:36:58,312 - ETL - INFO - Begin validating files...
+2019-09-12 18:36:58,313 - ETL - INFO - Validate success...
+2019-09-12 18:36:58,314 - ETL - INFO - Loading in db begin...
+2019-09-12 18:36:58,314 - ETL - INFO - Test mode: <false>
+2019-09-12 18:36:58,314 - ETL - INFO - Rows readed: 0%
+2019-09-12 18:36:58,320 - ETL - INFO - Rows readed: 25%
+2019-09-12 18:36:58,322 - ETL - INFO - Rows readed: 50%
+2019-09-12 18:36:58,326 - ETL - INFO - Rows readed: 75%
+2019-09-12 18:36:58,327 - ETL - INFO - Rows readed: 100%
+2019-09-12 18:36:58,328 - ETL - INFO - Inserted: <9>; Rows lost: <0>
+2019-09-12 18:36:58,328 - ETL - INFO - Log files created in: </Designer_Etl/Core/../log/2019_09_12_18_36_58_['dic_1.xml', 'dic_2.xml', 'main.xml']>
+2019-09-12 18:36:58,328 - ETL - INFO - Ends executing... successfully completed <dic_2.xml>
+---
+2019-09-12 18:36:58,329 - ETL - INFO - Starts executing... main.xml
+2019-09-12 18:36:58,336 - ETL - INFO - Success open excel file: <source.xlsx> on page name: <Sheet1>, list number: <1>
+2019-09-12 18:36:58,336 - ETL - INFO - Success connection to host: <localhost>, port: <3306>, database name: <dbbase>
+2019-09-12 18:36:58,336 - ETL - INFO - Begin validating files...
+2019-09-12 18:36:58,337 - ETL - INFO - Validate success...
+2019-09-12 18:36:58,338 - ETL - INFO - Loading in db begin...
+2019-09-12 18:36:58,338 - ETL - INFO - Test mode: <false>
+2019-09-12 18:36:58,354 - ETL - INFO - Rows readed: 0%
+2019-09-12 18:36:58,377 - ETL - INFO - Rows readed: 25%
+2019-09-12 18:36:58,392 - ETL - INFO - Rows readed: 50%
+2019-09-12 18:36:58,415 - ETL - INFO - Rows readed: 75%
+2019-09-12 18:36:58,424 - ETL - INFO - Rows readed: 100%
+2019-09-12 18:36:58,425 - ETL - INFO - Inserted: <9>; Rows lost: <0>
+2019-09-12 18:36:58,425 - ETL - INFO - Log files created in: </Designer_Etl/Core/../log/2019_09_12_18_36_58_['dic_1.xml', 'dic_2.xml', 'main.xml']>
+2019-09-12 18:36:58,425 - ETL - INFO - Ends executing... successfully completed <main.xml>
+---
+2019-09-12 18:36:58,430 - ETL - INFO - Connection to DB closed
+```
+
+
+---
+[:arrow_up:Оглавление](#Оглавление)
 
 
 
