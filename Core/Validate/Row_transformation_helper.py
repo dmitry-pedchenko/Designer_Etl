@@ -43,6 +43,7 @@ class Transformation_helper:
         if dbProperties:
             if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
                 self.value = dbProperties.get("ifNull")
+
         if str_type == 'date':
             self.value = value.strftime("%Y%m%d")
             return self.value

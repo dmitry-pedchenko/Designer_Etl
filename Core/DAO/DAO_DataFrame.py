@@ -78,19 +78,28 @@ class Dic_DF:
                 res = cur.fetchall()
             except Exception as e:
                 self.log.raiseError(38, e.args[1])
-
             df_res = []
+
             for row in res:
                 row_to_append = []
-                for elem in row:
-                    if type(elem) == str:
-                        row_to_append.append(elem.replace('\xa0', '\xa0').strip())
-                    if type(elem) == int:
+                for num, elem in enumerate(row):
+
+                    if num + 1 != len(row):
+                        if db_table['arrOfDictColumns'][num]['colType'] == 'str':
+                            row_to_append.append(elem.replace('\xa0', '\xa0').strip())
+                        if db_table['arrOfDictColumns'][num]['colType'] == 'int':
+                            row_to_append.append(elem)
+                        if db_table['arrOfDictColumns'][num]['colType'] == 'date':
+                            if elem:
+                                row_to_append.append(datetime.datetime.strptime(str(elem), "%Y-%m-%d %H:%M:%S"))
+                        if db_table['arrOfDictColumns'][num]['colType'] == 'float':
+                            row_to_append.append(float(elem))
+                    else:
                         row_to_append.append(elem)
+
                 df_res.append(row_to_append)
 
             loc_dic['data_frame'] = pd.DataFrame(df_res, columns=list_of_columns_to_select)
-
             self.dic_of_df.append(loc_dic)
             return loc_dic['data_frame']
         else:

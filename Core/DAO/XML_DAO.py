@@ -15,9 +15,16 @@ class XmlParser:
             pathToExcel_link = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), self.dictionary["pathToLinkFile"])
 
         arrOfColTypesInExcel = {}
-        for prop in self.dictionary["excelColumns"]:
-            arrOfColTypesInExcel[prop['colName']] = prop['colType']
 
+        if self.dictionary["dictMode"] == 'false':
+            for prop in self.dictionary["excelColumns"]:
+                arrOfColTypesInExcel[prop['colName']] = prop['colType']
+        elif self.dictionary["dictMode"] == 'true':
+            for prop in self.dictionary["excelColumns"]:
+                arrOfColTypesInExcel[prop['colName']] = prop['colType']
+            for table in self.dictionary['withDict']:
+                for prop in table['arrOfDictColumns']:
+                    arrOfColTypesInExcel[prop['colName']] = prop['colType']
         try:
             dao = DAO_DataFrame.ExcelSelect(pathToExcel, self.dictionary["sheetNumber_value"], log, arrOfColTypesInExcel)
             self.dataFrame = dao.newDf
@@ -26,25 +33,25 @@ class XmlParser:
         except Exception as e:
             log.raiseError(16, self.dictionary["importXml_path_value"], int(self.dictionary["sheetNumber_value"]) + 1, e.args[0])
 
-        if self.dictionary['checkMode_value'] == 'true':  # собираю массив свйоств и имен клонок для связанной таблицы checkMode
+        if self.dictionary['checkMode_value'] == 'true':
+            # собираю массив свйоств и имен клонок для связанной таблицы checkMode
             arrOfColTypesInExcelLinked = {}
             for prop in self.dictionary["linkedColumns"]:
                 try:
-                    arrOfColTypesInExcelLinked[prop['linkedColName']] = list(filter(lambda x: x['colName'] ==
-                                                                                              prop['colNameInSource'],
-                                                                                    self.dictionary['excelColumns']))[0]['colType']
+                    arrOfColTypesInExcelLinked[prop['linkedColName']] = \
+                        list(filter(lambda x: x['colName'] == prop['colNameInSource'], self.dictionary['excelColumns']))[0]['colType']
                 except:
                     log.raiseError(17)
 
         try:
             if self.dictionary['checkMode_value'] == 'true':
-                dao_link = DAO_DataFrame.ExcelSelect(pathToExcel_link, self.dictionary["linkedFileSheetNumber"], log, arrOfColTypesInExcelLinked)
+                dao_link = DAO_DataFrame.ExcelSelect(pathToExcel_link,
+                                                     self.dictionary["linkedFileSheetNumber"],
+                                                     log,
+                                                     arrOfColTypesInExcelLinked)
                 self.dataFrame_link = dao_link.newDf
         except Exception as e:
-            log.raiseError(16, self.dictionary["pathToLinkFile"],int(self.dictionary["linkedFileSheetNumber"]) + 1, e.args[0])
-
-
-
-
-
-
+            log.raiseError(16,
+                           self.dictionary["pathToLinkFile"],
+                           int(self.dictionary["linkedFileSheetNumber"]) + 1,
+                           e.args[0])
