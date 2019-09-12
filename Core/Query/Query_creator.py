@@ -88,13 +88,23 @@ class Query:
             for each in arrOfSourceColumns:
                 if list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filter_mode'] == 'true':
                     filter_flag_arr.append(
-                        filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filterArr'],
-                        hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]["filter_dict_edit"], value=row[1][each["colName"]])))
+                        filter_arr(self.log,
+                                   list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['colType'],
+                                   list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['filterArr'],
+                                   hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0],
+                                                        value=row[1][each["colName"]],
+                                                        str_type=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['colType'])
+                                   ))
 
                 if list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['post_filter_mode'] == 'true':
                     post_filter_flag_arr.append(
-                        filter_arr(list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['postfilterArr'],
-                                hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0], value=row[1][each["colName"]])))
+                        filter_arr(self.log,
+                                   list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['colType'],
+                                   list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['postfilterArr'],
+                                   hp.checkAndTransform(rowProperties=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0],
+                                                        value=row[1][each["colName"]],
+                                                        str_type=list(filter(lambda x: x["colName"] == each["colName"], self.dic["excelColumns"]))[0]['colType'])
+                                   ))
                 # прохожу по столбцам в источнике и собираю словарь значений и колонок
                 # с именами ключей в виде названия колонки в приемнике
                 # список потому что может быть несколько полей
@@ -129,19 +139,34 @@ class Query:
                     if len(dicOfColVals.get(columnProperty["colName"])) == 1:
                         # если на одно поле в приемнике одно поле в источнике
                         if columnProperty.get("colType") == 'str' and dicOfColVals.get(columnProperty["colName"])[0] != 'null':
-                            dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], dicOfColVals.get(columnProperty["colName"])[0]))
+                            dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty,
+                                                                                                                curColumnExcelEqualsDbColumn[0],
+                                                                                                                dicOfColVals.get(columnProperty["colName"])[0],
+                                                                                                                str_type=curColumnExcelEqualsDbColumn[0]['colType']))
                         elif columnProperty.get("colType") == 'int':
-                            dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0])
+                            dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty,
+                                                                                                curColumnExcelEqualsDbColumn[0],
+                                                                                                dicOfColVals.get(columnProperty["colName"])[0],
+                                                                                                str_type=curColumnExcelEqualsDbColumn[0]['colType'])
                         else:
                             if columnProperty.get('ifNull') in ['null', 'Null', 'NULL']:
-                                dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0])
+                                dicOfValsToInsert[columnProperty["colName"]] = hp.checkAndTransform(columnProperty,
+                                                                                                    curColumnExcelEqualsDbColumn[0],
+                                                                                                    dicOfColVals.get(columnProperty["colName"])[0],
+                                                                                                    str_type=curColumnExcelEqualsDbColumn[0]['colType'])
                             else:
-                                dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0],dicOfColVals.get(columnProperty["colName"])[0]))
+                                dicOfValsToInsert[columnProperty["colName"]] = " '{}' ".format(hp.checkAndTransform(columnProperty,
+                                                                                                                    curColumnExcelEqualsDbColumn[0],
+                                                                                                                    dicOfColVals.get(columnProperty["colName"])[0],
+                                                                                                                    str_type=curColumnExcelEqualsDbColumn[0]['colType']))
                     else:  # если несколько полей в источнике идут в одно поле в приемнике
                         if columnProperty.get("colType") == 'str':  #
                             string = ''
                             for col in dicOfColVals.get(columnProperty["colName"]):
-                                string += "{}".format(hp.checkAndTransform(columnProperty, curColumnExcelEqualsDbColumn[0], col))
+                                string += "{}".format(hp.checkAndTransform(columnProperty,
+                                                                           curColumnExcelEqualsDbColumn[0],
+                                                                           col,
+                                                                           str_type=curColumnExcelEqualsDbColumn[0]['colType']))
                             string = f"'{string}'"
                             dicOfValsToInsert[columnProperty["colName"]] = string
                         else:
@@ -164,7 +189,10 @@ class Query:
                     except Exception as e:
                         self.log.raiseError(39, e.args[0])
                     for col in cur_table['arrOfDictColumns']:
-                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty, col, value=row[1][col['colName']])
+                        df_c = df_dic[col['colNameDb']] == hp.checkAndTransform(columnProperty,
+                                                                                col,
+                                                                                value=row[1][col['colName']],
+                                                                                str_type=curColumnExcelEqualsDbColumn[0]['colType'])
                         df_start = df_c & df_start
                     index = None
                     for i in df_dic.loc[df_start].iterrows():
