@@ -2,7 +2,7 @@ import xml.etree.ElementTree as et
 import os
 
 
-def do_XML_parse(pathToFile, log, opts):
+def do_XML_parse(pathToFile, log, opts=None):
     colArrayExcel = []  # массив включающий в себя все колонки из источника
     importDict = {}  # словарь для каждой колонки
     colArrayDB = []  # массив с колонками в базе
@@ -19,10 +19,13 @@ def do_XML_parse(pathToFile, log, opts):
     except:
         log.raiseError(3,"importXml/sheetNumber")
 
-    try:
-        testRunMode_value = opts.args.test_mode
-    except:
-        log.raiseError(4,"test_mode")
+    if opts:
+        try:
+            testRunMode_value = opts.args.test_mode
+        except:
+            log.raiseError(4,"test_mode")
+    else:
+        testRunMode_value='true'
 
     try:
         dbtype= root.find("dbtype").text
