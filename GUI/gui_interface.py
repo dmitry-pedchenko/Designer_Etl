@@ -11,6 +11,7 @@ import Source_tree
 import wizard_configuration
 import target_column_editor_viewer
 
+
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -23,7 +24,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.splitter.setChildrenCollapsible(False)
         self.config_dict = []
         self.treeWidget_1 = Source_tree.Source_tree()
-        # self.treeWidget_1.headerItem().setText(0, "Source rows")
 
         self.treeWidget_2 = QtWidgets.QTreeWidget()
         self.treeWidget_2.headerItem().setText(0, "Target rows")
@@ -41,11 +41,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSave.triggered.connect(self.save_configuration)
         self.ui.actionConfiguration_Wizard.triggered.connect(self.show_wizrd)
         self.treeWidget_1.actionDeleteColumn.triggered.connect(self.deleteColumn)
+        self.treeWidget_1.actionDeleteReplace.triggered.connect(self.deleteReplace)
 
     def deleteColumn(self):
         element = list(filter(lambda x: x['colName'].col_name == self.treeWidget_1.currentItem().col_name, self.list_of_source_cols_links))[0]
         self.list_of_source_cols_links.remove(element)
         self.treeWidget_1.takeTopLevelItem(self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
+
+    def deleteReplace(self):
+        cur_column = list(filter(lambda x: x['colName'].col_name == self.treeWidget_1.currentItem().parent().col_name, self.list_of_source_cols_links))[0]
+        cur_column['replace_box'].remove(self.treeWidget_1.currentItem())
+        self.treeWidget_1.currentItem().parent().takeChild(self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
 
     def show_wizrd(self):
         self.wizard = wizard_configuration.WizardConfig()
@@ -61,31 +67,31 @@ class MainWindow(QtWidgets.QMainWindow):
         path_name_config = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
         path = os.path.basename(path_name_config[0])
 
-        self.loggerInst = Logger.Log_info.getInstance(path, path)
-        self.loggerInst.set_config(path)
+        if path:
+            self.loggerInst = Logger.Log_info.getInstance(path, path)
+            self.loggerInst.set_config(path)
 
-        self.config_dict = xml_parse(path, self.loggerInst)
+            self.config_dict = xml_parse(path, self.loggerInst)
 
-        # test vars
-        self.colnames_of_receiver = [name['colName'] for name in self.config_dict['dbColumns']]
-        # --- --- ---
+            # test vars
+            self.colnames_of_receiver = [name['colName'] for name in self.config_dict['dbColumns']]
+            # --- --- ---
 
-        for col in self.config_dict['excelColumns']:
-            input_column_editor_viewer.create_input_column(self.treeWidget_1,
-                                                           self.colnames_of_receiver,
-                                                           col,
-                                                           list_of_cols=self.list_of_source_cols_links)
-        for col in self.config_dict['dbColumns']:
-            target_column_editor_viewer.create_receiver_column(
-                self.treeWidget_2,
-                self.colnames_of_receiver,
-                col,
-                self.list_of_receiver_cols_links
-            )
+            for col in self.config_dict['excelColumns']:
+                input_column_editor_viewer.create_input_column(self.treeWidget_1,
+                                                               self.colnames_of_receiver,
+                                                               col,
+                                                               list_of_cols=self.list_of_source_cols_links)
+            for col in self.config_dict['dbColumns']:
+                target_column_editor_viewer.create_receiver_column(
+                    self.treeWidget_2,
+                    self.colnames_of_receiver,
+                    col,
+                    self.list_of_receiver_cols_links
+                )
 
 
     def duplicateColumn(self):
-        print(self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
         input_column_editor_viewer.create_input_column(self.treeWidget_1,
                                                        self.colnames_of_receiver,
                                                        self.treeWidget_1.currentItem().column_property,

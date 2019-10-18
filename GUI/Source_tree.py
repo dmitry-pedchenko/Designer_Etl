@@ -18,24 +18,21 @@ class Source_tree(QtWidgets.QTreeWidget):
 
         self.context_menu_duplicate_replace = QtWidgets.QMenu()
         self.actionDuplicateReplace = QtWidgets.QAction()
+        self.actionDeleteReplace = QtWidgets.QAction()
         self.actionDuplicateReplace.setText("Duplicate Replace")
+        self.actionDeleteReplace.setText("Delete Replace")
         self.context_menu_duplicate_replace.addAction(self.actionDuplicateReplace)
-
-        # self.itemClicked.connect(self.cur_item)
+        self.context_menu_duplicate_replace.addAction(self.actionDeleteReplace)
 
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         if self.currentItem().text(0) == 'colName':
             self.context_menu_duplicate_row.exec(event.globalPos())
 
         try:
-            if self.currentItem().name_widget_for_colname_check.text() == 'replace':
+            if self.currentItem().checkBox_widget_for_replace_check.text() == 'replace':
                 self.context_menu_duplicate_replace.exec(event.globalPos())
         except:
             pass
 
 
-
-
-    # def cur_item(self, item, col):
-    #     print(item)
 
