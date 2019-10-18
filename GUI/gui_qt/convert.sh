@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-pyuic5 mainwindow.ui -o form.py -x
+pyuic5 mainwindow.ui -o main_window.py -x
 pyuic5 setup_db_widget.ui -o form_preferences.py -x
 pyuic5 wizard_page_1.ui -o form_wizard_page_1.py -x
 pyuic5 wizard_page_2.ui -o form_wizard_page_2.py -x

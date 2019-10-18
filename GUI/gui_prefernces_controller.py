@@ -1,11 +1,11 @@
 from PyQt5 import QtWidgets, QtCore
 import sys
-from gui_qt import form
+from gui_qt import main_window
 from gui_qt import form_preferences
 import os
 
 class Pref_Window(QtWidgets.QWidget):
-    def __init__(self, list_of_db_pref: dict, config_dict: dict):
+    def __init__(self, list_of_db_pref: dict, config_dict: list):
         super().__init__()
         self.pref = {}
         self.config_dict = config_dict

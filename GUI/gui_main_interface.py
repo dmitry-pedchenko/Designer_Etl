@@ -1,13 +1,14 @@
 from PyQt5 import QtWidgets, QtCore
 import sys
-from gui_qt import form
+from gui_qt import main_window
 from gui_qt import form_preferences
 import gui_prefernces_controller
-import input_column_editor_viewer
+import source_column_editor_viewer
 import os
 from Parser.XML_parser import do_XML_parse as xml_parse
 from Logger import Logger
 import Source_tree
+import Receiver_tree
 import wizard_configuration
 import target_column_editor_viewer
 
@@ -18,15 +19,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_of_source_cols_links = []
         self.list_of_receiver_cols_links = []
         self.list_of_db_pref = {}
-        self.ui = form.Ui_MainWindow()
+        self.ui = main_window.Ui_MainWindow()
         self.ui.setupUi(self)
         self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
         self.splitter.setChildrenCollapsible(False)
         self.config_dict = []
         self.treeWidget_1 = Source_tree.Source_tree()
-
-        self.treeWidget_2 = QtWidgets.QTreeWidget()
-        self.treeWidget_2.headerItem().setText(0, "Target rows")
+        self.treeWidget_2 = Receiver_tree.Receiver_tree()
 
         self.splitter.addWidget(self.treeWidget_1)
         self.splitter.addWidget(self.treeWidget_2)
@@ -57,8 +56,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.wizard = wizard_configuration.WizardConfig()
         self.wizard.show()
 
-
-
     def show_pref(self):
         self.pref = gui_prefernces_controller.Pref_Window(self.list_of_db_pref, self.config_dict)
         self.pref.show()
@@ -78,10 +75,10 @@ class MainWindow(QtWidgets.QMainWindow):
             # --- --- ---
 
             for col in self.config_dict['excelColumns']:
-                input_column_editor_viewer.create_input_column(self.treeWidget_1,
-                                                               self.colnames_of_receiver,
-                                                               col,
-                                                               list_of_cols=self.list_of_source_cols_links)
+                source_column_editor_viewer.create_input_column(self.treeWidget_1,
+                                                                self.colnames_of_receiver,
+                                                                col,
+                                                                list_of_cols=self.list_of_source_cols_links)
             for col in self.config_dict['dbColumns']:
                 target_column_editor_viewer.create_receiver_column(
                     self.treeWidget_2,
@@ -92,17 +89,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def duplicateColumn(self):
-        input_column_editor_viewer.create_input_column(self.treeWidget_1,
-                                                       self.colnames_of_receiver,
-                                                       self.treeWidget_1.currentItem().column_property,
-                                                       list_of_cols=self.list_of_source_cols_links,
-                                                       index=self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
+        source_column_editor_viewer.create_input_column(self.treeWidget_1,
+                                                        self.colnames_of_receiver,
+                                                        self.treeWidget_1.currentItem().column_property,
+                                                        list_of_cols=self.list_of_source_cols_links,
+                                                        index=self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
 
     def duplicateReplace(self):
-        replace = input_column_editor_viewer.ReplaceRow(self.treeWidget_1.currentItem().column_property,
-                                              self.treeWidget_1,
-                                              self.treeWidget_1.currentItem().parent(),
-                                            after_widget=self.treeWidget_1.currentItem())
+        replace = source_column_editor_viewer.ReplaceRow(self.treeWidget_1.currentItem().column_property,
+                                                         self.treeWidget_1,
+                                                         self.treeWidget_1.currentItem().parent(),
+                                                         after_widget=self.treeWidget_1.currentItem())
 
         self.treeWidget_1.addTopLevelItem(replace)
 

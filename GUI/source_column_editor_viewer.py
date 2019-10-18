@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, QtCore
 import sys
 import datetime
 
-def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, column_property: dict, list_of_cols: list, index=None):
+def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, column_property: dict, list_of_cols: list, indx=None):
     tree_table.setColumnCount(2)
     tree_table.setHeaderLabels(['Property Name', 'Value'])
     # tree_table.setColumnWidth(1100, 200)
@@ -63,8 +63,8 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
     filter_box = FilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox)
     post_filter_box = PostFilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox)
 
-    if index is not None:
-        tree_table.insertTopLevelItem(index, colName_box)
+    if indx is not None:
+        tree_table.insertTopLevelItem(indx, colName_box)
     else:
         tree_table.addTopLevelItem(colName_box)
     tree_table.addTopLevelItem(colNameDb_box)
@@ -407,13 +407,14 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         self.column_property = column_property
         self.coltypes = coltypes
         self.parent = parent
-        self.widget_for_filter_check = QtWidgets.QWidget()
-        hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
-        self.checkBox_widget_for_filter_check = QtWidgets.QCheckBox()
-        self.name_widget_for_colname_check = QtWidgets.QLabel('filter')
-        hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_filter_check)
-        hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        self.widget_for_filter_check.setLayout(hbox_widget_for_colname_check)
+
+        # self.widget_for_filter_check = QtWidgets.QWidget()
+        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
+        self.checkBox_widget_for_filter_check = QtWidgets.QCheckBox('filter')
+        # self.name_widget_for_colname_check = QtWidgets.QLabel('filter')
+        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_filter_check)
+        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
+        # self.widget_for_filter_check.setLayout(hbox_widget_for_colname_check)
 
         #
 
@@ -520,7 +521,7 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
 
         #         -----
 
-        parent.setItemWidget(self, 0, self.widget_for_filter_check)
+        parent.setItemWidget(self, 0, self.checkBox_widget_for_filter_check)
         parent.setItemWidget(self.filter_box_sub_f_cropEnd, 0, self.checkBox_widget_f_cropEnd_check)
         parent.setItemWidget(self.filter_box_sub_f_addValueEnd, 0, self.checkBox_widget_f_addValueEnd_check)
         parent.setItemWidget(self.filter_box_sub_f_takeFromBegin, 0, self.checkBox_widget_f_takeFromBegin_check)
@@ -588,6 +589,7 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                 self.checkBox_widget_f_addValueBoth_check.setCheckState(QtCore.Qt.Unchecked)
                 self.line_edit_addBegin_Both_filter.setDisabled(True)
                 self.line_edit_addEnd_Both_filter.setDisabled(True)
+                self.widget_for_add_both_filter.setDisabled(True)
             # --------
             if self.column_property['colType'] == 'str':
                 self.line_edit_addEnd_filter = QtWidgets.QLineEdit()
@@ -685,6 +687,7 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
             self.line_edit_f_addValueBegin.setDisabled(True)
             self.line_edit_addEnd_Both_filter.setDisabled(True)
             self.line_edit_addBegin_Both_filter.setDisabled(True)
+            self.widget_for_add_both_filter.setDisabled(True)
 
     def state_change_cropEnd(self):
         if self.checkBox_widget_f_cropEnd_check.isChecked():
@@ -720,9 +723,11 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         if self.checkBox_widget_f_addValueBoth_check.isChecked():
             self.line_edit_addBegin_Both_filter.setDisabled(False)
             self.line_edit_addEnd_Both_filter.setDisabled(False)
+            self.widget_for_add_both_filter.setDisabled(False)
         else:
             self.line_edit_addBegin_Both_filter.setDisabled(True)
             self.line_edit_addEnd_Both_filter.setDisabled(True)
+            self.widget_for_add_both_filter.setDisabled(True)
 
     def state_change(self):
         if self.checkBox_widget_for_filter_check.isChecked():
@@ -841,9 +846,11 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
         if self.checkBox_widget_for_post_filter_check.isChecked():
             self.combo_box_post_filter_condition.setDisabled(False)
             self.line_edit_post_filter.setDisabled(False)
+            self.widget_for_post_filter.setDisabled(False)
         else:
             self.combo_box_post_filter_condition.setDisabled(True)
             self.line_edit_post_filter.setDisabled(True)
+            self.widget_for_post_filter.setDisabled(True)
 
     def initialize(self):
         if self.column_property['post_filter_mode'] == 'true':
@@ -861,6 +868,7 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
             self.checkBox_widget_for_post_filter_check.setCheckState(QtCore.Qt.Unchecked)
             self.line_edit_post_filter.setDisabled(True)
             self.combo_box_post_filter_condition.setDisabled(True)
+            self.widget_for_post_filter.setDisabled(True)
 
     def set_data_type_widget(self, index):
         if self.coltypes[index] == 'String':
@@ -896,3 +904,5 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
         self.widget_for_post_filter.setLayout(hbox_layout_post_filter)
 
         self.parent.setItemWidget(self, 1, self.widget_for_post_filter)
+
+        self.checkBox_widget_for_post_filter_check.stateChanged.emit(1)
