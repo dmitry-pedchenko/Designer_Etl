@@ -5,9 +5,9 @@ from gui_qt import form_preferences
 import os
 
 class Pref_Window(QtWidgets.QWidget):
-    def __init__(self, list_of_db_pref: dict, config_dict: list):
+    def __init__(self, main_gui_widget, list_of_db_pref: dict, config_dict: dict, pref: dict):
         super().__init__()
-        self.pref = {}
+        self.main_gui = main_gui_widget
         self.config_dict = config_dict
         self.list_of_db_pref = list_of_db_pref
         self.ui = form_preferences.Ui_Form()
@@ -16,7 +16,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.comboBox_chose_loadMode.insertItem(1, 'update')
         list_of_db_types = ['mysql', 'mssql']
         self.ui.lineEdit_dbtype.addItems(list_of_db_types)
-
+        self.pref = pref
         if config_dict:
             self.initialize()
 
@@ -29,6 +29,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.lineEdit_dbbase.textChanged.connect(self.add_asterisc_dbbase)
         self.ui.lineEdit_dbport.textChanged.connect(self.add_asterisc_dbport)
         self.ui.checkBox_checkMode.stateChanged.connect(self.add_asterisc_checkBox_checkMode)
+        self.ui.checkBox_Dictionary.stateChanged.connect(self.add_asterisc_checkBox_Dictionary)
         self.ui.comboBox_chose_loadMode.currentIndexChanged.connect(self.add_asterisc_loadMode)
         self.ui.open_excel_file.clicked.connect(self.open_excel_folder)
 
@@ -50,6 +51,10 @@ class Pref_Window(QtWidgets.QWidget):
                 self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Checked)
             else:
                 self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Unchecked)
+
+    def add_asterisc_checkBox_Dictionary(self):
+        if self.ui.checkBox_Dictionary.text()[0] != '*':
+            self.ui.checkBox_Dictionary.setText(f"*{self.ui.checkBox_Dictionary.text()}")
 
     def add_asterisc_dbtype(self):
         if self.ui.label_dbtype.text()[0] != '*':
@@ -76,6 +81,26 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_dbPort.setText(f"*{self.ui.label_dbPort.text()}")
 
     def add_asterisc_checkBox_checkMode(self):
+        if self.ui.checkBox_checkMode.isChecked():
+            self.ui.label_2.setDisabled(True)
+            self.ui.open_excel_file_2.setDisabled(True)
+            self.ui.target_table_name.setDisabled(True)
+            self.ui.label_check_mode.setDisabled(False)
+            self.ui.open_excel_compare_file.setDisabled(False)
+            self.ui.compare_file.setDisabled(False)
+            self.ui.comboBox_set_list_checked.setDisabled(False)
+            self.ui.checkBox_Dictionary.setDisabled(True)
+        else:
+            self.ui.label_2.setDisabled(False)
+            self.ui.open_excel_file_2.setDisabled(False)
+            self.ui.target_table_name.setDisabled(False)
+            self.ui.label_check_mode.setDisabled(True)
+            self.ui.open_excel_compare_file.setDisabled(True)
+            self.ui.compare_file.setDisabled(True)
+            self.ui.comboBox_set_list_checked.setDisabled(True)
+            self.ui.checkBox_Dictionary.setDisabled(False)
+
+
         if self.ui.checkBox_checkMode.text()[0] != '*':
             self.ui.checkBox_checkMode.setText(f"*{self.ui.checkBox_checkMode.text()}")
 
@@ -122,9 +147,33 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.checkBox_checkMode.setText(f"{self.ui.checkBox_checkMode.text()[1:]}")
             self.ui.checkBox_checkMode.adjustSize()
 
+        if self.ui.checkBox_Dictionary.text()[0] == '*':
+            self.ui.checkBox_Dictionary.setText(f"{self.ui.checkBox_Dictionary.text()[1:]}")
+            self.ui.checkBox_Dictionary.adjustSize()
+
         if self.ui.label_loadMode.text()[0] == '*':
             self.ui.label_loadMode.setText(f"{self.ui.label_loadMode.text()[1:]}")
             self.ui.label_loadMode.adjustSize()
+
+
+        if self.ui.checkBox_Dictionary.isChecked():
+            self.main_gui.ui.actionDictionary.setChecked(True)
+            self.main_gui.ui.actionDictionary.triggered.emit(1)
+
+        # self.pref['dbtype'] = self.ui.lineEdit_dbtype
+        # self.pref['dbHost'] = self.ui.lineEdit_dbhost
+        # self.pref['dbUser'] = self.ui.lineEdit_dbuser
+        # self.pref['dbPass'] = self.ui.lineEdit_dbpass
+        # self.pref['dbBase'] = self.ui.lineEdit_dbbase
+        # self.pref['dbPort'] = self.ui.lineEdit_dbport
+        # self.pref['Load Mode'] = self.ui.comboBox_chose_loadMode
+        # self.pref['excelFileName'] = self.ui.excelFileName
+        # self.pref['comboBox_list_source_excel'] = self.ui.comboBox_list_source_excel
+        # self.pref['target_table_name'] = self.ui.target_table_name
+        # self.pref['checkBox_checkMode'] = self.ui.checkBox_checkMode
+        # self.pref['compare_file'] = self.ui.compare_file
+        # self.pref['comboBox_set_list_checked'] = self.ui.comboBox_set_list_checked
+        # self.pref['checkBox_Dictionary'] = self.ui.checkBox_Dictionary
 
     def open_excel_folder(self):
         path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
