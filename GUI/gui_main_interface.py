@@ -10,6 +10,9 @@ import Source_tree
 import Receiver_tree
 import wizard_configuration
 import target_column_editor_viewer
+import Dict_tree
+from dict_column_editor_viewer import create_dict_column
+
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -20,6 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.config_dict = {}
         self.list_of_db_pref = {}
         self.pref = {}
+        self.list_of_dict_pref = {}
 
         self.ui = main_window.Ui_MainWindow()
         self.ui.setupUi(self)
@@ -39,6 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionConfig_Editor.triggered.connect(self.show_config_editor)
         self.ui.actionLoader.triggered.connect(self.show_loader)
         self.ui.actionDictionary.triggered.connect(self.show_dictionary)
+
 
     def create_config_editor(self):
         if self.tab_widget_config_editor:
@@ -66,7 +71,15 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         else:
             self.tab_widget_dictionary = QtWidgets.QWidget()
-        #     create widget here
+            self.tree_dict = Dict_tree.DictTree()
+            hlayout = QtWidgets.QHBoxLayout()
+            hlayout.addWidget(self.tree_dict)
+            self.tab_widget_dictionary.setLayout(hlayout)
+
+            for row in self.config_dict['withDict']:
+                create_dict_column(self.config_dict, parent=self.tree_dict, cur_column_pref=row)
+
+
 
         self.tabWidget.addTab(self.tab_widget_dictionary, 'Dictionary Editor')
 
@@ -121,8 +134,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.wizard.show()
 
     def show_pref(self):
-        self.pref = gui_prefernces_controller.Pref_Window(self, self.list_of_db_pref, self.config_dict, self.pref)
-        self.pref.show()
+        self.pref_gui = gui_prefernces_controller.Pref_Window(self, self.list_of_db_pref, self.config_dict, self.pref)
+        self.pref_gui.show()
 
     def show_open_config(self):
         path_name_config = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
@@ -138,24 +151,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.config_dict = xml_parse(path, self.loggerInst)
 
-            # test vars
-            self.colnames_of_receiver = [name['colName'] for name in self.config_dict['dbColumns']]
-            # --- --- ---
+            if self.config_dict['checkMode_value'] == 'false':
+                # test vars
+                self.colnames_of_receiver = [name['colName'] for name in self.config_dict['dbColumns']]
+                # --- --- ---
 
-            for col in self.config_dict['excelColumns']:
-                source_column_editor_viewer.create_input_column(self.treeWidget_1,
+                for col in self.config_dict['excelColumns']:
+                    source_column_editor_viewer.create_input_column(self.treeWidget_1,
                                                                 self.colnames_of_receiver,
                                                                 col,
                                                                 list_of_cols=self.list_of_source_cols_links)
-            for col in self.config_dict['dbColumns']:
-                target_column_editor_viewer.create_receiver_column(
-                    self.treeWidget_2,
-                    col,
-                    list_of_cols=self.list_of_receiver_cols_links
-                )
-        self.show_pref()
+                for col in self.config_dict['dbColumns']:
+                    target_column_editor_viewer.create_receiver_column(
+                        self.treeWidget_2,
+                        col,
+                        list_of_cols=self.list_of_receiver_cols_links
+                    )
+            self.show_pref()
 
-        if self.pref.ui.checkBox_Dictionary.isChecked():
+        if self.pref_gui.ui.checkBox_Dictionary.isChecked():
             self.ui.actionDictionary.triggered.emit(1)
 
     def duplicateColumn(self):
