@@ -23,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.config_dict = {}
         self.list_of_db_pref = {}
         self.pref = {}
-        self.list_of_dict_pref = {}
+        self.list_of_dict_pref = []
 
         self.ui = main_window.Ui_MainWindow()
         self.ui.setupUi(self)
@@ -43,6 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionConfig_Editor.triggered.connect(self.show_config_editor)
         self.ui.actionLoader.triggered.connect(self.show_loader)
         self.ui.actionDictionary.triggered.connect(self.show_dictionary)
+
 
 
     def create_config_editor(self):
@@ -71,15 +72,13 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         else:
             self.tab_widget_dictionary = QtWidgets.QWidget()
-            self.tree_dict = Dict_tree.DictTree()
+            self.tree_dict = Dict_tree.DictTree(self.list_of_dict_pref)
             hlayout = QtWidgets.QHBoxLayout()
             hlayout.addWidget(self.tree_dict)
             self.tab_widget_dictionary.setLayout(hlayout)
 
             for row in self.config_dict['withDict']:
-                create_dict_column(self.config_dict, parent=self.tree_dict, cur_column_pref=row)
-
-
+                create_dict_column(self.list_of_dict_pref, parent=self.tree_dict, cur_column_pref=row)
 
         self.tabWidget.addTab(self.tab_widget_dictionary, 'Dictionary Editor')
 
@@ -144,7 +143,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionConfig_Editor.setChecked(True)
         self.ui.actionConfig_Editor.triggered.emit(1)
 
-
         if path:
             self.loggerInst = Logger.Log_info.getInstance(path, path)
             self.loggerInst.set_config(path)
@@ -170,6 +168,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.show_pref()
 
         if self.pref_gui.ui.checkBox_Dictionary.isChecked():
+            self.ui.actionDictionary.setChecked(True)
             self.ui.actionDictionary.triggered.emit(1)
 
     def duplicateColumn(self):

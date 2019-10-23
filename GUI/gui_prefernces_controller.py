@@ -5,6 +5,7 @@ from gui_qt import form_preferences
 import os
 from PyQt5 import QtGui
 
+
 class Pref_Window(QtWidgets.QWidget):
     def __init__(self, main_gui_widget, list_of_db_pref: dict, config_dict: dict, pref: dict):
         super().__init__()
@@ -99,8 +100,6 @@ class Pref_Window(QtWidgets.QWidget):
             if self.config_dict['checkMode_value'] == 'true':
                 self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Checked)
                 self.create_links_columns()
-
-
             else:
                 self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Unchecked)
                 self.ui.label_check_mode.setDisabled(True)
@@ -109,6 +108,11 @@ class Pref_Window(QtWidgets.QWidget):
                 self.ui.comboBox_set_list_checked.setDisabled(True)
                 self.treeWidget_linked_columns.setDisabled(True)
                 self.ui.checkBox_both.setDisabled(True)
+
+            if self.config_dict['dictMode'] == 'true':
+                self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Checked)
+            else:
+                self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Unchecked)
 
 
     def add_asterisc_checkBox_Dictionary(self):

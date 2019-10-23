@@ -40,7 +40,9 @@
     </property>
     <addaction name="actionPreferences"/>
     <addaction name="actionOpen"/>
+    <addaction name="actionClose_Project"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSave_as"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuSystem">
@@ -124,6 +126,16 @@
    </property>
    <property name="text">
     <string>Config Editor</string>
+   </property>
+  </action>
+  <action name="actionClose_Project">
+   <property name="text">
+    <string>Close Project</string>
+   </property>
+  </action>
+  <action name="actionSave_as">
+   <property name="text">
+    <string>Save as...</string>
    </property>
   </action>
  </widget>

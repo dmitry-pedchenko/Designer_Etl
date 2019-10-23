@@ -1,22 +1,19 @@
 from PyQt5 import QtWidgets, QtCore
-import sys
 import datetime
+
 
 def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, column_property: dict, list_of_cols: list, indx=None):
     tree_table.setColumnCount(2)
     tree_table.setHeaderLabels(['Property Name', 'Value'])
-    # tree_table.setColumnWidth(1100, 200)
-
+    dic = {}
+    dic['replace_box'] = []
 
     combo_box_colType = QtWidgets.QComboBox()
     list_of_types_dict_to_comboBox = {'String': 'str', 'Float': 'float', 'Integer': 'int', 'Date': 'date'}
     list_of_coltypes_in_comboBox = ['String', 'Float', 'Integer', 'Date']
     combo_box_colType.addItems(list_of_coltypes_in_comboBox)
 
-    # combo_box_isPk = QtWidgets.QComboBox()
     list_of_state_dict_isPk = {'True': 'true', 'False': 'false'}
-    # list_of_state_isPk = ['True', 'False']
-    # combo_box_isPk.addItems(list_of_state_isPk)
 
     combo_box_isPk = QtWidgets.QCheckBox()
     state = list(filter(lambda x: list_of_state_dict_isPk[x] == column_property['isPK'],
@@ -45,10 +42,6 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
             list(filter(lambda x: list_of_types_dict_to_comboBox[x] == column_property['colType'],
                         list_of_types_dict_to_comboBox))[0]))
 
-    # combo_box_isPk.setCurrentIndex(
-    #     list_of_state_isPk.index(list(filter(lambda x: list_of_state_dict_isPk[x] == column_property['isPK'],
-    #                                          list_of_state_dict_isPk))[0]))
-
     colName_box = ColumnNameRow(column_property)
     colNameDb_box = QtWidgets.QTreeWidgetItem(colName_box, ['colNameDb', ])
     colType_box = QtWidgets.QTreeWidgetItem(colName_box, ['colType', ])
@@ -59,7 +52,43 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
     cropBegin_box = CropBeginRow(column_property, tree_table, parent_widget=colName_box)
     addValueBegin_box = AddValueBeginRow(column_property, tree_table, parent_widget=colName_box)
     addValueBoth_box = AddValueBothRow(column_property, tree_table, parent_widget=colName_box)
-    replace_box = ReplaceRow(column_property, tree_table, parent_widget=colName_box, after_widget=addValueBoth_box)
+
+    if column_property['replace_mode'] == 'true':
+        link_to_prior = None
+        for count, replace in enumerate(column_property['replaceValArr']):
+            if link_to_prior is not None:
+                replace_box = ReplaceRow(
+                    row=replace,
+                    column_property=column_property,
+                    parent=tree_table,
+                    parent_widget=colName_box,
+                    after_widget=link_to_prior
+                )
+            else:
+                replace_box = ReplaceRow(
+                    row=replace,
+                    column_property=column_property,
+                    parent=tree_table,
+                    parent_widget=colName_box,
+                    after_widget=addValueBoth_box
+                )
+            link_to_prior = replace_box
+            tree_table.addTopLevelItem(replace_box)
+            dic['replace_box'].append(replace_box)
+
+    else:
+        replace_box = ReplaceRow(
+                row=None,
+                column_property=column_property,
+                parent=tree_table,
+                parent_widget=colName_box,
+                # after_widget=addValueBoth_box
+                after_widget=addValueBoth_box
+            )
+
+        tree_table.addTopLevelItem(replace_box)
+        dic['replace_box'].append(replace_box)
+
     filter_box = FilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox)
     post_filter_box = PostFilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox)
 
@@ -67,25 +96,25 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
         tree_table.insertTopLevelItem(indx, colName_box)
     else:
         tree_table.addTopLevelItem(colName_box)
-    tree_table.addTopLevelItem(colNameDb_box)
-    tree_table.addTopLevelItem(colType_box)
-    tree_table.addTopLevelItem(isPK_box)
-    tree_table.addTopLevelItem(cropEnd_box)
-    tree_table.addTopLevelItem(addValueEnd_box)
-    tree_table.addTopLevelItem(takeFromBegin_box)
-    tree_table.addTopLevelItem(cropBegin_box)
-    tree_table.addTopLevelItem(addValueBegin_box)
-    tree_table.addTopLevelItem(addValueBoth_box)
-    tree_table.addTopLevelItem(replace_box)
-    tree_table.addTopLevelItem(filter_box)
-    tree_table.addTopLevelItem(post_filter_box)
+    # tree_table.addTopLevelItem(colNameDb_box)
+    # tree_table.addTopLevelItem(colType_box)
+    # tree_table.addTopLevelItem(isPK_box)
+    # tree_table.addTopLevelItem(cropEnd_box)
+    # tree_table.addTopLevelItem(addValueEnd_box)
+    # tree_table.addTopLevelItem(takeFromBegin_box)
+    # tree_table.addTopLevelItem(cropBegin_box)
+    # tree_table.addTopLevelItem(addValueBegin_box)
+    # tree_table.addTopLevelItem(addValueBoth_box)
+    # tree_table.addTopLevelItem(replace_box)
+    # tree_table.addTopLevelItem(filter_box)
+    # tree_table.addTopLevelItem(post_filter_box)
 
 
     tree_table.setItemWidget(colNameDb_box, 1, combo_box_dbName)
     tree_table.setItemWidget(colType_box, 1, combo_box_colType)
     tree_table.setItemWidget(isPK_box, 1, combo_box_isPk)
 
-    dic = {}
+
 
     dic['colName'] = colName_box
     dic['isPK'] = combo_box_isPk
@@ -97,8 +126,7 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
     dic['cropBegin_box'] = cropBegin_box
     dic['addValueBegin_box'] = addValueBegin_box
     dic['addValueBoth_box'] = addValueBoth_box
-    dic['replace_box'] = []
-    dic['replace_box'].append(replace_box)
+
     dic['filter_box'] = filter_box
     dic['post_filter_box'] = post_filter_box
 
@@ -118,19 +146,12 @@ class CropEndRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        # self.widget_for_cropEnd_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_cropEnd_check = QtWidgets.QCheckBox('cropEnd')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('cropEnd')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_cropEnd_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_cropEnd_check.setLayout(hbox_widget_for_colname_check)
 
         self.spin_box_cropEnd = QtWidgets.QSpinBox()
         self.spin_box_cropEnd.setRange(0, 255)
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_cropEnd_check)
-        # parent.setItemWidget(self, 0, self.widget_for_cropEnd_check)
         parent.setItemWidget(self, 1, self.spin_box_cropEnd)
 
         self.initialize()
@@ -156,13 +177,7 @@ class AddValueEndRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        # self.widget_for_addValueEnd_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_addValueEnd_check = QtWidgets.QCheckBox('addValueEnd')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('addValueEnd')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_addValueEnd_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_addValueEnd_check.setLayout(hbox_widget_for_colname_check)
 
         self.line_edit_addValueEnd = QtWidgets.QLineEdit()
 
@@ -192,13 +207,7 @@ class TakeFromBeginRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        # self.widget_for_takeFromBegin_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_takeFromBegin_check = QtWidgets.QCheckBox('takeFromBegin')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('takeFromBegin')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_takeFromBegin_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_takeFromBegin_check.setLayout(hbox_widget_for_colname_check)
 
         self.spin_box_takeFromBegin = QtWidgets.QSpinBox()
         self.spin_box_takeFromBegin.setRange(0, 255)
@@ -229,14 +238,7 @@ class CropBeginRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        # self.widget_for_cropBegin_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_cropBegin_check = QtWidgets.QCheckBox('cropBegin')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('cropBegin')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_cropBegin_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_cropBegin_check.setLayout(hbox_widget_for_colname_check)
-        #
         self.spin_box_cropBegin = QtWidgets.QSpinBox()
         self.spin_box_cropBegin.setRange(0, 255)
 
@@ -266,13 +268,7 @@ class AddValueBeginRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        # self.widget_for_addValueBegin_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_addValueBegin_check = QtWidgets.QCheckBox('addValueBegin')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('addValueBegin')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_addValueBegin_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_addValueBegin_check.setLayout(hbox_widget_for_colname_check)
 
         self.line_edit_addValueBegin = QtWidgets.QLineEdit()
 
@@ -315,13 +311,7 @@ class AddValueBothRow(QtWidgets.QTreeWidgetItem):
         hbox_layout_both_filter.addWidget(self.line_edit_addEnd_Both_filter)
         self.widget_for_add_both_filter.setLayout(hbox_layout_both_filter)
 
-        # self.widget_for_addValueBoth_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_addValueBoth_check = QtWidgets.QCheckBox('addValueBoth')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('addValueBoth')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_addValueBoth_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_addValueBoth_check.setLayout(hbox_widget_for_colname_check)
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_addValueBoth_check)
         parent.setItemWidget(self, 1, self.widget_for_add_both_filter)
@@ -350,12 +340,10 @@ class AddValueBothRow(QtWidgets.QTreeWidgetItem):
 
 
 class ReplaceRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, after_widget=None):
-        # super().__init__(parent_widget, ['', ])
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, after_widget=None, row: dict=None):
         super().__init__(parent_widget, after_widget)
-
         self.column_property = column_property
-
+        self.row = row
         self.widget_for_replace = QtWidgets.QWidget()
         hbox_layout_replace = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both = QtWidgets.QLineEdit()
@@ -368,13 +356,7 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
         hbox_layout_replace.addWidget(self.line_edit_addEnd_Both)
         self.widget_for_replace.setLayout(hbox_layout_replace)
 
-        # self.widget_for_replace_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_replace_check = QtWidgets.QCheckBox('replace')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('replace')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_replace_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_replace_check.setLayout(hbox_widget_for_colname_check)
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_replace_check)
         parent.setItemWidget(self, 1, self.widget_for_replace)
@@ -382,14 +364,15 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
         self.checkBox_widget_for_replace_check.stateChanged.connect(self.state_change)
 
     def initialize(self):
-        if self.column_property['replace_mode'] != 'false':
-            self.line_edit_addBegin_Both.setText(self.column_property['replaceValArr'][0]['replaceValue'])
-            self.line_edit_addEnd_Both.setText(self.column_property['replaceValArr'][0]['replaceToValue'])
-            self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Checked)
-        else:
-            self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Unchecked)
-            self.line_edit_addBegin_Both.setDisabled(True)
-            self.line_edit_addEnd_Both.setDisabled(True)
+        if self.row:
+            if self.column_property['replace_mode'] != 'false':
+                self.line_edit_addBegin_Both.setText(self.row['replaceValue'])
+                self.line_edit_addEnd_Both.setText(self.row['replaceToValue'])
+                self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Checked)
+            else:
+                self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Unchecked)
+                self.line_edit_addBegin_Both.setDisabled(True)
+                self.line_edit_addEnd_Both.setDisabled(True)
 
     def state_change(self):
         if self.checkBox_widget_for_replace_check.isChecked():
@@ -408,67 +391,13 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         self.coltypes = coltypes
         self.parent = parent
 
-        # self.widget_for_filter_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_filter_check = QtWidgets.QCheckBox('filter')
-        # self.name_widget_for_colname_check = QtWidgets.QLabel('filter')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_filter_check)
-        # hbox_widget_for_colname_check.addWidget(self.name_widget_for_colname_check)
-        # self.widget_for_filter_check.setLayout(hbox_widget_for_colname_check)
-
-        #
-
-        # self.widget_for_f_cropEnd_check = QtWidgets.QWidget()
-        # hbox_widget_for_f_cropEnd_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_f_cropEnd_check = QtWidgets.QCheckBox('f_cropEnd')
-        # self.name_widget_for_f_cropEnd_check = QtWidgets.QLabel('f_cropEnd')
-        # hbox_widget_for_f_cropEnd_check.addWidget(self.checkBox_widget_f_cropEnd_check)
-        # hbox_widget_for_f_cropEnd_check.addWidget(self.name_widget_for_f_cropEnd_check)
-        # self.widget_for_f_cropEnd_check.setLayout(hbox_widget_for_f_cropEnd_check)
-
-        # self.widget_for_f_addValueEnd_check = QtWidgets.QWidget()
-        # hbox_widget_for_f_addValueEnd_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_f_addValueEnd_check = QtWidgets.QCheckBox('f_addValueEnd')
-        # self.name_widget_for_f_addValueEnd_check = QtWidgets.QLabel('f_addValueEnd')
-        # hbox_widget_for_f_addValueEnd_check.addWidget(self.checkBox_widget_f_addValueEnd_check)
-        # hbox_widget_for_f_addValueEnd_check.addWidget(self.name_widget_for_f_addValueEnd_check)
-        # self.widget_for_f_addValueEnd_check.setLayout(hbox_widget_for_f_addValueEnd_check)
-
-        # self.widget_for_f_takeFromBegin_check = QtWidgets.QWidget()
-        # hbox_widget_for_f_takeFromBegin_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_f_takeFromBegin_check = QtWidgets.QCheckBox('f_takeFromBegin')
-        # self.name_widget_for_f_takeFromBegin_check = QtWidgets.QLabel('f_takeFromBegin')
-        # hbox_widget_for_f_takeFromBegin_check.addWidget(self.checkBox_widget_f_takeFromBegin_check)
-        # hbox_widget_for_f_takeFromBegin_check.addWidget(self.name_widget_for_f_takeFromBegin_check)
-        # self.widget_for_f_takeFromBegin_check.setLayout(hbox_widget_for_f_takeFromBegin_check)
-
-        # self.widget_for_f_cropBegin_check = QtWidgets.QWidget()
-        # hbox_widget_for_f_cropBegin_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_f_cropBegin_check = QtWidgets.QCheckBox('f_cropBegin')
-        # self.name_widget_for_f_cropBegin_check = QtWidgets.QLabel('f_cropBegin')
-        # hbox_widget_for_f_cropBegin_check.addWidget(self.checkBox_widget_f_cropBegin_check)
-        # hbox_widget_for_f_cropBegin_check.addWidget(self.name_widget_for_f_cropBegin_check)
-        # self.widget_for_f_cropBegin_check.setLayout(hbox_widget_for_f_cropBegin_check)
-
-        # self.widget_for_f_addValueBegin_check = QtWidgets.QWidget()
-        # hbox_widget_for_f_addValueBegin_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_f_addValueBegin_check = QtWidgets.QCheckBox('f_addValueBegin')
-        # self.name_widget_for_f_addValueBegin_check = QtWidgets.QLabel('f_addValueBegin')
-        # hbox_widget_for_f_addValueBegin_check.addWidget(self.checkBox_widget_f_addValueBegin_check)
-        # hbox_widget_for_f_addValueBegin_check.addWidget(self.name_widget_for_f_addValueBegin_check)
-        # self.widget_for_f_addValueBegin_check.setLayout(hbox_widget_for_f_addValueBegin_check)
-
-        # self.widget_for_f_addValueBoth_check = QtWidgets.QWidget()
-        # hbox_widget_for_f_addValueBoth_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_f_addValueBoth_check = QtWidgets.QCheckBox('f_addValueBoth')
-        # self.name_widget_for_f_addValueBoth_check = QtWidgets.QLabel('f_addValueBoth')
-        # hbox_widget_for_f_addValueBoth_check.addWidget(self.checkBox_widget_f_addValueBoth_check)
-        # hbox_widget_for_f_addValueBoth_check.addWidget(self.name_widget_for_f_addValueBoth_check)
-        # self.widget_for_f_addValueBoth_check.setLayout(hbox_widget_for_f_addValueBoth_check)
-
-        # ---
-
-        #
 
         self.spin_box_f_cropEnd = QtWidgets.QSpinBox()
         self.spin_box_f_cropEnd.setRange(0, 255)
@@ -826,13 +755,7 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
         hbox_layout_post_filter.addWidget(self.line_edit_post_filter)
         self.widget_for_post_filter.setLayout(hbox_layout_post_filter)
 
-        # self.widget_for_post_filter_check = QtWidgets.QWidget()
-        # hbox_widget_for_colname_check = QtWidgets.QHBoxLayout()
         self.checkBox_widget_for_post_filter_check = QtWidgets.QCheckBox('post_filter')
-        # name_widget_for_colname_check = QtWidgets.QLabel('post_filter')
-        # hbox_widget_for_colname_check.addWidget(self.checkBox_widget_for_post_filter_check)
-        # hbox_widget_for_colname_check.addWidget(name_widget_for_colname_check)
-        # self.widget_for_post_filter_check.setLayout(hbox_widget_for_colname_check)
 
         self.initialize()
 

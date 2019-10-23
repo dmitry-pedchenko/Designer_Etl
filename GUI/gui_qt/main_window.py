@@ -59,9 +59,15 @@ class Ui_MainWindow(object):
         self.actionConfig_Editor = QtWidgets.QAction(MainWindow)
         self.actionConfig_Editor.setCheckable(True)
         self.actionConfig_Editor.setObjectName("actionConfig_Editor")
+        self.actionClose_Project = QtWidgets.QAction(MainWindow)
+        self.actionClose_Project.setObjectName("actionClose_Project")
+        self.actionSave_as = QtWidgets.QAction(MainWindow)
+        self.actionSave_as.setObjectName("actionSave_as")
         self.menuHello.addAction(self.actionPreferences)
         self.menuHello.addAction(self.actionOpen)
+        self.menuHello.addAction(self.actionClose_Project)
         self.menuHello.addAction(self.actionSave)
+        self.menuHello.addAction(self.actionSave_as)
         self.menuHello.addAction(self.actionExit)
         self.menuSystem.addAction(self.actionConfiguration_Wizard)
         self.menuView.addAction(self.actionLoader)
@@ -90,6 +96,8 @@ class Ui_MainWindow(object):
         self.actionOpen.setText(_translate("MainWindow", "Open"))
         self.actionDictionary.setText(_translate("MainWindow", "Dictionary"))
         self.actionConfig_Editor.setText(_translate("MainWindow", "Config Editor"))
+        self.actionClose_Project.setText(_translate("MainWindow", "Close Project"))
+        self.actionSave_as.setText(_translate("MainWindow", "Save as..."))
 
 
 if __name__ == "__main__":
