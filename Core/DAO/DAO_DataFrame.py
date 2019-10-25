@@ -23,15 +23,15 @@ class ExcelSelect:
                 arrConverters[col] = lambdaDate
 
         try:
-            df = pd.ExcelFile(path)
+            self.df = pd.ExcelFile(path)
         except:
             log.raiseError(43, path)
 
-        if not df.sheet_names:
+        if not self.df.sheet_names:
             log.raiseError(42)
 
-        sheet = df.parse(listNumber, converters=arrConverters)
-        self.sheet_name = df.sheet_names[listNumber]
+        sheet = self.df.parse(listNumber, converters=arrConverters)
+        self.sheet_name = self.df.sheet_names[listNumber]
         self.newDf = sheet.fillna("null")
 
 class Dic_DF:

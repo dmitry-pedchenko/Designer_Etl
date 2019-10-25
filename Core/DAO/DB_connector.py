@@ -72,7 +72,7 @@ class Connection:
     def get_cur(self):
         return self.cursor
 
-    def test_conn(self, attempt):
+    def test_conn(self, attempt=3):
         query = """SELECT 1"""
         has_try = False
         counter_attempt = 0

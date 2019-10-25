@@ -2,17 +2,16 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 
 def create_dict_column(pref, parent, cur_column_pref):
-
     dict_pref = {}
     dict_pref['columns'] = []
-    temp_dict = {}
-    temp_dict['replace_box'] = []
 
     main_row = MainDictTableName(cur_column_pref, parent)
     dict_pref_indxDbColumn = IndxDbColumn(cur_column_pref, parent=main_row, tree_widget=parent)
     dict_pref_indxColumnDic = IndxColumnDic(cur_column_pref, parent=main_row, tree_widget=parent)
 
     for row in cur_column_pref['arrOfDictColumns']:
+        temp_dict = {}
+        temp_dict['replace_box'] = []
 
         colNameRow = ColumnNameRow(row, main_row,parent)
         colNameDbRow = ColumnNameDbRow(row, colNameRow, parent)
@@ -88,9 +87,8 @@ def create_dict_column(pref, parent, cur_column_pref):
 
 class MainDictTableName(QtWidgets.QTreeWidgetItem):
     def __init__(self, cur_column_pref, parent):
-        self.cur_column_pref = cur_column_pref
         super().__init__(parent, ['table', ])
-
+        self.cur_column_pref = cur_column_pref
         # test data
         list_combo_box_dictTableName = ['dic_1', 'dic_2']
         #

@@ -52,16 +52,16 @@ class DictTree(QtWidgets.QTreeWidget):
             table_item=self.currentItem().parent().parent()
 
         )
+
         self.addTopLevelItem(replace)
-        cur_column = list(
+        cur_table = list(
             filter(lambda x: x['dictTableName'].combo_box_dictTableName.currentText() == self.currentItem().table_item.combo_box_dictTableName.currentText(),
                     self.list_of_dict_pref)
         )[0]['columns']
 
-
         list(
         filter(lambda x: x['colNameRow'].combo_box.currentText() == self.currentItem().parent().combo_box.currentText(),
-                    cur_column)
+               cur_table)
         )[0]['replace_box'].append(replace)
 
 

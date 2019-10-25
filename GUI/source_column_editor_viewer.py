@@ -2,7 +2,13 @@ from PyQt5 import QtWidgets, QtCore
 import datetime
 
 
-def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, column_property: dict, list_of_cols: list, indx=None):
+def create_input_column(tree_table: QtWidgets.QTreeWidget,
+                        db_colnames: list,
+                        column_property: dict,
+                        list_of_cols: list,
+                        indx=None,
+                        source_columnes: list=None
+                        ):
     tree_table.setColumnCount(2)
     tree_table.setHeaderLabels(['Property Name', 'Value'])
     dic = {}
@@ -18,7 +24,6 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
     combo_box_isPk = QtWidgets.QCheckBox()
     state = list(filter(lambda x: list_of_state_dict_isPk[x] == column_property['isPK'],
                                              list_of_state_dict_isPk))[0]
-
 
     combo_box_dbName = QtWidgets.QComboBox()
 
@@ -42,7 +47,7 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
             list(filter(lambda x: list_of_types_dict_to_comboBox[x] == column_property['colType'],
                         list_of_types_dict_to_comboBox))[0]))
 
-    colName_box = ColumnNameRow(column_property)
+    colName_box = ColumnNameRow(column_property, source_columnes, tree_table)
     colNameDb_box = QtWidgets.QTreeWidgetItem(colName_box, ['colNameDb', ])
     colType_box = QtWidgets.QTreeWidgetItem(colName_box, ['colType', ])
     isPK_box = QtWidgets.QTreeWidgetItem(colName_box, ['isPK', ])
@@ -96,19 +101,6 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
         tree_table.insertTopLevelItem(indx, colName_box)
     else:
         tree_table.addTopLevelItem(colName_box)
-    # tree_table.addTopLevelItem(colNameDb_box)
-    # tree_table.addTopLevelItem(colType_box)
-    # tree_table.addTopLevelItem(isPK_box)
-    # tree_table.addTopLevelItem(cropEnd_box)
-    # tree_table.addTopLevelItem(addValueEnd_box)
-    # tree_table.addTopLevelItem(takeFromBegin_box)
-    # tree_table.addTopLevelItem(cropBegin_box)
-    # tree_table.addTopLevelItem(addValueBegin_box)
-    # tree_table.addTopLevelItem(addValueBoth_box)
-    # tree_table.addTopLevelItem(replace_box)
-    # tree_table.addTopLevelItem(filter_box)
-    # tree_table.addTopLevelItem(post_filter_box)
-
 
     tree_table.setItemWidget(colNameDb_box, 1, combo_box_dbName)
     tree_table.setItemWidget(colType_box, 1, combo_box_colType)
@@ -136,8 +128,14 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget, db_colnames: list, co
 
 
 class ColumnNameRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property):
-        super().__init__(["colName", column_property['colName']])
+    def __init__(self, column_property, arr_of_db_columns, tree_widget):
+        super().__init__(tree_widget, ["colName", ])
+        self.combo_box_name = QtWidgets.QComboBox()
+        self.combo_box_name.addItems(arr_of_db_columns)
+
+        self.combo_box_name.setCurrentIndex(arr_of_db_columns.index(column_property['colName']))
+        tree_widget.setItemWidget(self, 1, self.combo_box_name)
+
         self.col_name = column_property['colName']
         self.column_property = column_property
 

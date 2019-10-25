@@ -12,7 +12,9 @@ import wizard_configuration
 import target_column_editor_viewer
 import Dict_tree
 from dict_column_editor_viewer import create_dict_column
-
+import Core.DAO.DB_connector as db_con
+from Validate import Validate_res
+from DAO import XML_DAO as xpc
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -43,7 +45,33 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionConfig_Editor.triggered.connect(self.show_config_editor)
         self.ui.actionLoader.triggered.connect(self.show_loader)
         self.ui.actionDictionary.triggered.connect(self.show_dictionary)
+        self.ui.actionClose_Project.triggered.connect(self.close_project_data)
 
+    def close_project_data(self):
+
+        if self.ui.actionConfig_Editor.isChecked():
+            self.ui.actionConfig_Editor.setChecked(False)
+            self.ui.actionConfig_Editor.triggered.emit(0)
+        if self.ui.actionDictionary.isChecked():
+            self.ui.actionDictionary.setChecked(False)
+            self.ui.actionDictionary.triggered.emit(0)
+        if self.ui.actionLoader.isChecked():
+            self.ui.actionLoader.setChecked(False)
+            self.ui.actionLoader.triggered.emit(0)
+        if self.ui.actionEditor.isChecked():
+            self.ui.actionEditor.setChecked(False)
+            self.ui.actionEditor.triggered.emit(0)
+
+        self.list_of_source_cols_links = []
+        self.list_of_receiver_cols_links = []
+        self.config_dict = {}
+        self.list_of_db_pref = {}
+        self.pref = {}
+        self.list_of_dict_pref = []
+
+        self.tab_widget_config_editor = None
+        self.tab_widget_loader = None
+        self.tab_widget_dictionary = None
 
 
     def create_config_editor(self):
@@ -133,32 +161,48 @@ class MainWindow(QtWidgets.QMainWindow):
         self.wizard.show()
 
     def show_pref(self):
-        self.pref_gui = gui_prefernces_controller.Pref_Window(self, self.list_of_db_pref, self.config_dict, self.pref)
+        self.pref_gui = gui_prefernces_controller.Pref_Window(self, self.list_of_db_pref, self.config_dict, self.pref, self.dbService, self.loggerInst)
         self.pref_gui.show()
 
     def show_open_config(self):
         path_name_config = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
         path = os.path.basename(path_name_config[0])
 
-        self.ui.actionConfig_Editor.setChecked(True)
-        self.ui.actionConfig_Editor.triggered.emit(1)
-
         if path:
+            self.close_project_data()
+            self.ui.actionConfig_Editor.setChecked(True)
+            self.ui.actionConfig_Editor.triggered.emit(1)
             self.loggerInst = Logger.Log_info.getInstance(path, path)
             self.loggerInst.set_config(path)
 
             self.config_dict = xml_parse(path, self.loggerInst)
 
             if self.config_dict['checkMode_value'] == 'false':
-                # test vars
-                self.colnames_of_receiver = [name['colName'] for name in self.config_dict['dbColumns']]
-                # --- --- ---
+
+                con = db_con.Connection.get_instance(self.loggerInst)
+                con.connectToTheDB(host=self.config_dict['dbHost'],
+                                   user=self.config_dict['dbUser'],
+                                   password=self.config_dict['dbPass'],
+                                   dbname=self.config_dict['dbBase'],
+                                   port=int(self.config_dict['dbPort']),
+                                   dbtype=self.config_dict['dbtype']
+                                   )
+                con.test_conn()
+                connector = con.get_instance(self.loggerInst)
+                self.dbService = xpc.XmlParser(path, self.loggerInst)
+                validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
+                self.columns_in_db = validator.queryForColumns()
+                self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
+
+                self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
 
                 for col in self.config_dict['excelColumns']:
                     source_column_editor_viewer.create_input_column(self.treeWidget_1,
                                                                 self.colnames_of_receiver,
                                                                 col,
-                                                                list_of_cols=self.list_of_source_cols_links)
+                                                                list_of_cols=self.list_of_source_cols_links,
+                                                                source_columnes=self.columns_in_source
+                                                                    )
                 for col in self.config_dict['dbColumns']:
                     target_column_editor_viewer.create_receiver_column(
                         self.treeWidget_2,
@@ -167,16 +211,21 @@ class MainWindow(QtWidgets.QMainWindow):
                     )
             self.show_pref()
 
+
+
         if self.pref_gui.ui.checkBox_Dictionary.isChecked():
             self.ui.actionDictionary.setChecked(True)
             self.ui.actionDictionary.triggered.emit(1)
+
 
     def duplicateColumn(self):
         source_column_editor_viewer.create_input_column(self.treeWidget_1,
                                                         self.colnames_of_receiver,
                                                         self.treeWidget_1.currentItem().column_property,
                                                         list_of_cols=self.list_of_source_cols_links,
-                                                        indx=self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
+                                                        indx=self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row(),
+                                                        source_columnes=self.columns_in_source
+                                                        )
 
     def duplicateReplace(self):
         replace = source_column_editor_viewer.ReplaceRow(self.treeWidget_1.currentItem().column_property,
@@ -191,6 +240,8 @@ class MainWindow(QtWidgets.QMainWindow):
         print(self.list_of_source_cols_links,
               self.list_of_receiver_cols_links
               )
+
+
 
 
 if __name__ == '__main__':

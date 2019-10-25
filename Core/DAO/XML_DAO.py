@@ -4,7 +4,7 @@ import os
 
 class XmlParser:
 
-    def __init__(self, pathToConfig, log, opts):
+    def __init__(self, pathToConfig, log, opts=None):
         try:
             self.dictionary = XML_parser.do_XML_parse(pathToConfig, log, opts)
         except Exception as e:
@@ -28,6 +28,7 @@ class XmlParser:
         try:
             dao = DAO_DataFrame.ExcelSelect(pathToExcel, self.dictionary["sheetNumber_value"], log, arrOfColTypesInExcel)
             self.dataFrame = dao.newDf
+            self.df = dao.df
 
             log.raiseInfo(1, self.dictionary["importXml_path_value"], dao.sheet_name, self.dictionary["sheetNumber_value"] + 1)
         except Exception as e:
@@ -50,6 +51,7 @@ class XmlParser:
                                                      log,
                                                      arrOfColTypesInExcelLinked)
                 self.dataFrame_link = dao_link.newDf
+                self.df_link = dao_link.df
         except Exception as e:
             log.raiseError(16,
                            self.dictionary["pathToLinkFile"],

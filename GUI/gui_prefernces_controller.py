@@ -4,12 +4,16 @@ from gui_qt import main_window
 from gui_qt import form_preferences
 import os
 from PyQt5 import QtGui
+from DAO import XML_DAO as xpc
+import pandas as pd
 
 
 class Pref_Window(QtWidgets.QWidget):
-    def __init__(self, main_gui_widget, list_of_db_pref: dict, config_dict: dict, pref: dict):
+    def __init__(self, main_gui_widget, list_of_db_pref: dict, config_dict: dict, pref: dict, dbService, logger_inst):
         super().__init__()
         self.setWindowModality(QtCore.Qt.ApplicationModal)
+        self.dbService = dbService
+        self.logger_inst = logger_inst
         self.main_gui = main_gui_widget
         self.config_dict = config_dict
         self.list_of_db_pref = list_of_db_pref
@@ -37,6 +41,8 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.lineEdit_dbpass.textChanged.connect(self.add_asterisc_dbpass)
         self.ui.lineEdit_dbbase.textChanged.connect(self.add_asterisc_dbbase)
         self.ui.lineEdit_dbport.textChanged.connect(self.add_asterisc_dbport)
+        self.ui.excelFileName.textChanged.connect(self.add_asterisc_label_receiver)
+        self.ui.comboBox_list_source_excel.currentIndexChanged.connect(self.add_asterisc_label_receiver)
         self.ui.checkBox_checkMode.stateChanged.connect(self.add_asterisc_checkBox_checkMode)
         self.ui.checkBox_Dictionary.stateChanged.connect(self.add_asterisc_checkBox_Dictionary)
         self.ui.comboBox_chose_loadMode.currentIndexChanged.connect(self.add_asterisc_loadMode)
@@ -114,6 +120,9 @@ class Pref_Window(QtWidgets.QWidget):
             else:
                 self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Unchecked)
 
+            self.ui.comboBox_list_source_excel.addItems([i for i in self.dbService.df.sheet_names])
+            self.ui.comboBox_list_source_excel.setCurrentIndex(int(self.config_dict['sheetNumber_value']))
+
 
     def add_asterisc_checkBox_Dictionary(self):
         if self.ui.checkBox_Dictionary.text()[0] != '*':
@@ -145,7 +154,7 @@ class Pref_Window(QtWidgets.QWidget):
 
     def add_asterisc_checkBox_checkMode(self):
         if self.ui.checkBox_checkMode.isChecked():
-            self.ui.label_2.setDisabled(True)
+            self.ui.label_check_mode.setDisabled(True)
             self.ui.open_excel_file_2.setDisabled(True)
             self.ui.target_table_name.setDisabled(True)
             self.ui.label_check_mode.setDisabled(False)
@@ -157,7 +166,7 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.checkBox_both.setDisabled(False)
 
         else:
-            self.ui.label_2.setDisabled(False)
+            self.ui.label_check_mode.setDisabled(False)
             self.ui.open_excel_file_2.setDisabled(False)
             self.ui.target_table_name.setDisabled(False)
             self.ui.label_check_mode.setDisabled(True)
@@ -176,6 +185,10 @@ class Pref_Window(QtWidgets.QWidget):
         if self.ui.label_loadMode.text()[0] != '*':
             self.ui.label_loadMode.setText(f"*{self.ui.label_loadMode.text()}")
 
+    def add_asterisc_label_receiver(self):
+        if self.ui.label_source.text()[0] != '*':
+            self.ui.label_source.setText(f"*{self.ui.label_source.text()}")
+
 
 
     def save_db_pref(self):
@@ -183,14 +196,7 @@ class Pref_Window(QtWidgets.QWidget):
         if self.pref:
             pass
         else:
-            self.pref['dbtype'] = self.ui.lineEdit_dbtype.currentText()
-            self.pref['dbHost'] = self.ui.lineEdit_dbhost.text()
-            self.pref['dbUser'] = self.ui.lineEdit_dbuser.text()
-            self.pref['dbPass'] = self.ui.lineEdit_dbpass.text()
-            self.pref['dbBase'] = self.ui.lineEdit_dbbase.text()
-            self.pref['dbPort'] = self.ui.lineEdit_dbport.text()
-            self.pref['checkBox_checkMode'] = bool(self.ui.checkBox_checkMode.checkState())
-            self.pref['comboBox_chose_loadMode'] = self.ui.comboBox_chose_loadMode.currentText()
+            pass
 
         if self.ui.label_dbtype.text()[0] == '*':
             self.ui.label_dbtype.setText(f"{self.ui.label_dbtype.text()[1:]}")
@@ -223,6 +229,10 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_loadMode.setText(f"{self.ui.label_loadMode.text()[1:]}")
             self.ui.label_loadMode.adjustSize()
 
+        if self.ui.label_source.text()[0] == '*':
+            self.ui.label_source.setText(f"{self.ui.label_source.text()[1:]}")
+            self.ui.label_source.adjustSize()
+
 
         if self.ui.checkBox_Dictionary.isChecked():
             self.main_gui.ui.actionDictionary.setChecked(True)
@@ -242,12 +252,24 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['compare_file'] = self.ui.compare_file
         self.pref['comboBox_set_list_checked'] = self.ui.comboBox_set_list_checked
         self.pref['checkBox_Dictionary'] = self.ui.checkBox_Dictionary
+        self.pref['excelFileName'] = self.ui.excelFileName
+        self.pref['comboBox_list_source_excel'] = self.ui.comboBox_list_source_excel
 
     def open_excel_folder(self):
         path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
                                                                  filter='*.xlsx')
         path = os.path.basename(path_name[0])
-        self.ui.excelFileName.setText(path)
+        if path:
+            self.ui.excelFileName.setText(path)
+            pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+                                       path)
+            self.df = pd.ExcelFile(pathToExcel)
+            self.ui.comboBox_list_source_excel.clear()
+            self.ui.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])
+            self.ui.excelFileName.textChanged.emit(path)
+            self.ui.comboBox_list_source_excel.currentIndexChanged.emit(0)
+
+
 
 class LinkedColumns(QtWidgets.QTreeWidgetItem):
     def __init__(self, target_columns, source_columns, tree_widget: QtWidgets.QTreeWidget, current_column=None, parent=None):
