@@ -7,7 +7,7 @@ def do_XML_parse(pathToFile, log, opts=None):
     importDict = {}  # словарь для каждой колонки
     colArrayDB = []  # массив с колонками в базе
 
-    pathToFile = os.path.join(os.path.join(os.getcwd(),'..', 'config'), pathToFile)
+    pathToFile = os.path.join(os.path.join(os.getcwd(), '..', 'config'), pathToFile)
 
     try:
         root = et.parse(pathToFile).getroot()
@@ -17,13 +17,13 @@ def do_XML_parse(pathToFile, log, opts=None):
     try:
         sheetNumber_value = int(root.find("importXml/sheetNumber").text) - 1
     except:
-        log.raiseError(3,"importXml/sheetNumber")
+        log.raiseError(3, "importXml/sheetNumber")
 
     if opts:
         try:
             testRunMode_value = opts.args.test_mode
         except:
-            log.raiseError(4,"test_mode")
+            log.raiseError(4, "test_mode")
     else:
         testRunMode_value='true'
 
@@ -35,17 +35,22 @@ def do_XML_parse(pathToFile, log, opts=None):
     try:
         dictMode= root.find("dict").text
     except:
-        log.raiseError(3,"dict")
+        log.raiseError(3, "dict")
 
     try:
         loadMode= root.find("loadMode").text
     except:
-        log.raiseError(3,"loadMode")
+        log.raiseError(3, "loadMode")
 
     try:
         checkMode_value = root.find("checkMode").text
     except:
         log.raiseError(4, "checkMode")
+
+    try:
+        db_schema = root.find("dbSchema").text
+    except:
+        log.raiseError(4, "dbSchema")
 
     try:
         importXml_path_value = root.find("importXml/path").text
@@ -54,9 +59,11 @@ def do_XML_parse(pathToFile, log, opts=None):
 
     if checkMode_value == 'false':
         try:
-            exportTableName_value = root.find("exportTable/path").text
+            exportTableName_value_text = root.find("exportTable/path").text
         except:
             log.raiseError(3, "exportTable/path")
+
+        exportTableName_value = f"[{db_schema}].[{exportTableName_value_text}]"
 
     try:
         dbHost = root.find("dbHost").text
@@ -93,11 +100,12 @@ def do_XML_parse(pathToFile, log, opts=None):
     except:
         log.raiseError(3, "exportTable")
 
-
+    importDict['db_schema'] = db_schema
     importDict['testRunMode_value'] = testRunMode_value
     importDict['checkMode_value'] = checkMode_value
     importDict['importXml_path_value'] = importXml_path_value
     if checkMode_value == 'false':
+        importDict['exportTableName_value_text'] = exportTableName_value_text
         importDict['exportTableName_value'] = exportTableName_value
     importDict['sheetNumber_value'] = sheetNumber_value
     importDict['dbHost'] = dbHost

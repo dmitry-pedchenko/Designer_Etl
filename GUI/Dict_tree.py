@@ -34,14 +34,17 @@ class DictTree(QtWidgets.QTreeWidget):
         self.actionDeleteReplace.triggered.connect(self.delete_replace)
 
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
-        if self.currentItem().text(0) == 'table':
-            self.context_menu_duplicate_row.exec(event.globalPos())
+        if self.currentItem():
+            if self.currentItem().text(0) == 'table':
+                self.context_menu_duplicate_row.exec(event.globalPos())
 
-        try:
-            if self.currentItem().checkBox_widget_for_replace_check.text() == 'replace':
-                self.context_menu_duplicate_replace.exec(event.globalPos())
-        except:
-            pass
+            try:
+                if self.currentItem().checkBox_widget_for_replace_check.text() == 'replace':
+                    self.context_menu_duplicate_replace.exec(event.globalPos())
+            except:
+                pass
+        else:
+            self.context_menu_duplicate_row.exec(event.globalPos())
 
     def duplicate_replace(self):
         replace = dict_column_editor_viewer.ReplaceRow(
@@ -82,7 +85,9 @@ class DictTree(QtWidgets.QTreeWidget):
     def add_column(self):
         create_dict_column(self.list_of_dict_pref,
                            parent=self,
-                           cur_column_pref=self.currentItem().cur_column_pref)
+                           # cur_column_pref=self.currentItem().cur_column_pref,
+                           cur_column_pref=None
+                           )
 
     def delete_column(self):
         cur_column = list(

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>651</width>
-    <height>626</height>
+    <height>582</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,7 +50,7 @@
       <height>351</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,0">
+    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,0,0,0">
      <property name="sizeConstraint">
       <enum>QLayout::SetNoConstraint</enum>
      </property>
@@ -66,14 +66,18 @@
         <widget class="QComboBox" name="lineEdit_dbtype"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_dbtype">
-         <property name="text">
-          <string>dbtype</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_17">
+         <item>
+          <widget class="QLabel" name="label_dbtype">
+           <property name="text">
+            <string>dbtype</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -83,11 +87,18 @@
         <widget class="QLineEdit" name="lineEdit_dbhost"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_dbHost">
-         <property name="text">
-          <string>dbHost</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_18">
+         <item>
+          <widget class="QLabel" name="label_dbHost">
+           <property name="text">
+            <string>dbHost</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -97,11 +108,18 @@
         <widget class="QLineEdit" name="lineEdit_dbuser"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_dbUser">
-         <property name="text">
-          <string>dbUser</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_19">
+         <item>
+          <widget class="QLabel" name="label_dbUser">
+           <property name="text">
+            <string>dbUser</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -111,11 +129,18 @@
         <widget class="QLineEdit" name="lineEdit_dbpass"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_dbPass">
-         <property name="text">
-          <string>dbPass</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_20">
+         <item>
+          <widget class="QLabel" name="label_dbPass">
+           <property name="text">
+            <string>dbPass</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -125,11 +150,39 @@
         <widget class="QLineEdit" name="lineEdit_dbbase"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_dbBase">
-         <property name="text">
-          <string>dbBase</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_21">
+         <item>
+          <widget class="QLabel" name="label_dbBase">
+           <property name="text">
+            <string>dbBase</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_16">
+       <item>
+        <widget class="QComboBox" name="comboBox_dbSchema"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_22">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>dbScheme</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -139,11 +192,18 @@
         <widget class="QLineEdit" name="lineEdit_dbport"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_dbPort">
-         <property name="text">
-          <string>dbPort</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_23">
+         <item>
+          <widget class="QLabel" name="label_dbPort">
+           <property name="text">
+            <string>dbPort</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -153,14 +213,18 @@
         <widget class="QComboBox" name="comboBox_chose_loadMode"/>
        </item>
        <item>
-        <widget class="QLabel" name="label_loadMode">
-         <property name="text">
-          <string>Load Mode</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_24">
+         <item>
+          <widget class="QLabel" name="label_loadMode">
+           <property name="text">
+            <string>Load Mode</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </item>
@@ -222,18 +286,7 @@
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
-      <widget class="QToolButton" name="open_excel_file_2">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="target_table_name">
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
+      <widget class="QComboBox" name="target_table_name"/>
      </item>
     </layout>
    </widget>

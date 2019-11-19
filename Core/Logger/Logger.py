@@ -2,8 +2,10 @@ import datetime
 import logging
 import os
 from string import Template
+import sys
 
-class Log_info:
+
+class Log_info(Exception):
     __instance = None
     __config = None
     debug_stat_dict = {}  # список дебага в формате сообщение : количество сообщений
@@ -88,7 +90,7 @@ class Log_info:
         if errNum == 3:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <{self.__config}>"""
         if errNum == 4:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find option <--{message[0]}> in command line"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <--{message[0]}> in XML"""
         if errNum == 5:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.__config}>"""
         if errNum == 6:
@@ -170,10 +172,15 @@ class Log_info:
         if errNum == 44:
             message_temp = f"""{dict_of_err_types.get(4)}: Message - <{message[0]}>"""
 
-
+        self.err_str = t.substitute(num=errNum, message=message_temp)
         self.logger.error(t.substitute(num=errNum, message=message_temp))
-        raise SystemExit(1)
+        if os.path.basename(sys.argv[0]) != 'gui_main_interface.py':
+            raise SystemExit(1)
+        else:
+            raise self
 
+    def __str__(self) -> str:
+        return self.err_str
 
     def raiseInfo(self, info_num, *message):
         message_temp = "default_info"

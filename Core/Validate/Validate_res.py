@@ -30,6 +30,24 @@ class Validate:
         self.connector.test_conn(3)
         return self.exec(query)
 
+    def queryForTableInDbList(self):
+        query = ''
+        if self.dbService.dictionary['dbtype'] == 'mssql':
+            query = f""" SELECT TABLE_NAME 
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE table_type='BASE TABLE' """
+        self.connector.test_conn(3)
+        return self.exec(query)
+
+    def queryForSchemasInDb(self):
+        query = ''
+        if self.dbService.dictionary['dbtype'] == 'mssql':
+            query = f""" SELECT * FROM sys.schemas"""
+        self.connector.test_conn(3)
+        return self.exec(query)
+
+
+
 
     def validate(self):
         excel_columns = [i["colName"] for i in self.dic["excelColumns"]]

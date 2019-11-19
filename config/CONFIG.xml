@@ -6,6 +6,7 @@
     <dbUser></dbUser> <!-- user -->
     <dbPass></dbPass> <!-- password -->
     <dbBase></dbBase> <!-- database name -->
+    <dbSchema></dbSchema> <!-- Schema in db -->
     <dbPort></dbPort> <!-- port -->
     <loadMode></loadMode> <!-- insert / update -->
     <dict></dict> <!-- true/ false -->

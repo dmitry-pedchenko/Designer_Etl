@@ -33,6 +33,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab_widget_config_editor = None
         self.tab_widget_loader = None
         self.tab_widget_dictionary = None
+        self.pref_gui = None
+        self.dbService = None
+        self.tables_in_receiver = None
+        self.schemas_in_db = None
 
         self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
@@ -105,8 +109,9 @@ class MainWindow(QtWidgets.QMainWindow):
             hlayout.addWidget(self.tree_dict)
             self.tab_widget_dictionary.setLayout(hlayout)
 
-            for row in self.config_dict['withDict']:
-                create_dict_column(self.list_of_dict_pref, parent=self.tree_dict, cur_column_pref=row)
+            if self.config_dict['dictMode'] == 'true':
+                for row in self.config_dict['withDict']:
+                    create_dict_column(self.list_of_dict_pref, parent=self.tree_dict, cur_column_pref=row)
 
         self.tabWidget.addTab(self.tab_widget_dictionary, 'Dictionary Editor')
 
@@ -161,8 +166,21 @@ class MainWindow(QtWidgets.QMainWindow):
         self.wizard.show()
 
     def show_pref(self):
-        self.pref_gui = gui_prefernces_controller.Pref_Window(self, self.list_of_db_pref, self.config_dict, self.pref, self.dbService, self.loggerInst)
-        self.pref_gui.show()
+        if self.pref_gui is not None:
+            # self.pref_gui.initialize()
+            self.pref_gui.show()
+        else:
+            self.pref_gui = gui_prefernces_controller.Pref_Window(main_gui_widget=self,
+                                                                  list_of_db_pref=self.list_of_db_pref,
+                                                                  config_dict=self.config_dict,
+                                                                  pref=self.pref,
+                                                                  dbService=self.dbService,
+                                                                  logger_inst=self.loggerInst,
+                                                                  tables_in_db=self.tables_in_receiver,
+                                                                  schemas_in_db=self.schemas_in_db,
+                                                                  parent=self
+                                                                  )
+            self.pref_gui.show()
 
     def show_open_config(self):
         path_name_config = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
@@ -175,7 +193,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.loggerInst = Logger.Log_info.getInstance(path, path)
             self.loggerInst.set_config(path)
 
-            self.config_dict = xml_parse(path, self.loggerInst)
+            try:
+                self.config_dict = xml_parse(path, self.loggerInst)
+            except Exception as e:
+                self.close_project_data()
+                dial_win = QtWidgets.QDialog(self)
+                lay = QtWidgets.QVBoxLayout()
+                lay.addWidget(QtWidgets.QLabel(e.__str__()))
+                dial_win.setLayout(lay)
+                dial_win.exec_()
+                return
 
             if self.config_dict['checkMode_value'] == 'false':
 
@@ -193,8 +220,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
                 self.columns_in_db = validator.queryForColumns()
                 self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
-
                 self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
+                self.tables_in_receiver = [i[0] for i in validator.queryForTableInDbList()]
+                self.schemas_in_db = [i[0] for i in validator.queryForSchemasInDb()]
 
                 for col in self.config_dict['excelColumns']:
                     source_column_editor_viewer.create_input_column(self.treeWidget_1,
@@ -209,14 +237,15 @@ class MainWindow(QtWidgets.QMainWindow):
                         col,
                         list_of_cols=self.list_of_receiver_cols_links
                     )
+            else:
+                self.dbService = xpc.XmlParser(path, self.loggerInst)
+                self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
+
             self.show_pref()
-
-
 
         if self.pref_gui.ui.checkBox_Dictionary.isChecked():
             self.ui.actionDictionary.setChecked(True)
             self.ui.actionDictionary.triggered.emit(1)
-
 
     def duplicateColumn(self):
         source_column_editor_viewer.create_input_column(self.treeWidget_1,
@@ -240,8 +269,6 @@ class MainWindow(QtWidgets.QMainWindow):
         print(self.list_of_source_cols_links,
               self.list_of_receiver_cols_links
               )
-
-
 
 
 if __name__ == '__main__':
