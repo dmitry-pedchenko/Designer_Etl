@@ -104,14 +104,17 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         else:
             self.tab_widget_dictionary = QtWidgets.QWidget()
-            self.tree_dict = Dict_tree.DictTree(self.list_of_dict_pref)
+            self.tree_dict = Dict_tree.DictTree(list_of_dict_pref=self.list_of_dict_pref, config=self.config_dict)
             hlayout = QtWidgets.QHBoxLayout()
             hlayout.addWidget(self.tree_dict)
             self.tab_widget_dictionary.setLayout(hlayout)
 
             if self.config_dict['dictMode'] == 'true':
                 for row in self.config_dict['withDict']:
-                    create_dict_column(self.list_of_dict_pref, parent=self.tree_dict, cur_column_pref=row)
+                    create_dict_column(pref=self.list_of_dict_pref,
+                                       parent=self.tree_dict,
+                                       cur_column_pref=row,
+                                       config=self.config_dict)
 
         self.tabWidget.addTab(self.tab_widget_dictionary, 'Dictionary Editor')
 

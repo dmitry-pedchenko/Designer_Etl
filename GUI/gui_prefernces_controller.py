@@ -51,9 +51,12 @@ class Pref_Window(QtWidgets.QWidget):
             # except Exception as e:
             #     raise Exception
                 # self.parent.close_project_data()
+        if self.ui.checkBox_checkMode.isChecked():
+            self.ui.target_table_name.setDisabled(True)
+        else:
+            self.ui.target_table_name.setDisabled(False)
 
         self.ui.button_save_pref.clicked.connect(self.save_db_pref)
-
 
         self.ui.lineEdit_dbtype.currentIndexChanged.connect(self.add_asterisc_dbtype)
         self.ui.lineEdit_dbhost.textChanged.connect(self.add_asterisc_dbhost)
@@ -127,7 +130,9 @@ class Pref_Window(QtWidgets.QWidget):
         else:
             target_column = None
 
-        print(self.df)
+        self.ui.comboBox_set_list_checked.clear()
+        self.ui.comboBox_set_list_checked.addItems([i for i in df_temp.sheet_names])
+        self.ui.comboBox_set_list_checked.setCurrentIndex(self.config_dict['linkedFileSheetNumber'])
         if self.dbService:
             source_column = [i for i in self.dbService.dataFrame.columns.values]
         else:
@@ -146,6 +151,7 @@ class Pref_Window(QtWidgets.QWidget):
             self.treeWidget_linked_columns.addTopLevelItem(row_check)
         self.pref['col_to_check'] = arr_of_col
 
+
     def initialize(self):
         self.ui.lineEdit_dbtype.setCurrentText(self.config_dict['dbtype'])
         self.ui.lineEdit_dbport.setText(self.config_dict['dbPort'])
@@ -156,7 +162,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.excelFileName.setText(self.config_dict['importXml_path_value'])
         self.ui.comboBox_chose_loadMode.setCurrentText(self.config_dict['loadMode'])
         if self.config_dict['checkMode_value'] == 'false':
-            self.ui.target_table_name.addItems(self.tables_in_db)
+            self.ui.target_table_name.addItems(sorted(self.tables_in_db))
             self.ui.target_table_name.setCurrentIndex(self.tables_in_db.index(self.config_dict['exportTableName_value_text']))
 
         if self.config_dict['checkMode_value'] == 'true':
@@ -181,6 +187,8 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.checkBox_both.setDisabled(True)
 
         if self.config_dict['dictMode'] == 'true':
+            self.ui.comboBox_dictTableName.addItems(sorted(self.tables_in_db))
+            self.ui.comboBox_dictTableName.setCurrentIndex(self.tables_in_db.index(self.config_dict['withDict'][0]['dictTableName']))
             self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Checked)
         else:
             self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Unchecked)
@@ -289,11 +297,6 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_source.adjustSize()
 
     def save_db_pref(self):
-
-        # if self.pref:
-        #     pass
-        # else:
-        #     pass
 
         if self.ui.label_dbtype.text()[0] == '*':
             self.ui.label_dbtype.setText(f"{self.ui.label_dbtype.text()[1:]}")

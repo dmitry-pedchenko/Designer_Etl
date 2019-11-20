@@ -211,11 +211,16 @@ class ColTypeRow(QtWidgets.QTreeWidgetItem):
         list_in_comboBox_colType = ['String', 'Integer']
         self.combo_box_colType.addItems(list_in_comboBox_colType)
 
-        self.combo_box_colType.setCurrentIndex(
-            list_in_comboBox_colType.index(
-                list(filter(lambda x: list_dict_to_comboBox_colType[x] == column_property['colType'],
-                            list_dict_to_comboBox_colType))[0])
-        )
+
+        if column_property['colType'] in ['str', 'int']:
+            self.combo_box_colType.setCurrentIndex(
+                list_in_comboBox_colType.index(
+                    list(filter(lambda x: list_dict_to_comboBox_colType[x] == column_property['colType'],
+                                list_dict_to_comboBox_colType))[0])
+            )
+        else:
+            self.combo_box_colType.addItem(column_property['colType'])
+            self.combo_box_colType.setCurrentText(column_property['colType'])
 
         tree_widget.setItemWidget(self, 1, self.combo_box_colType)
 

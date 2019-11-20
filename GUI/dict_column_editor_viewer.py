@@ -1,11 +1,11 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 
-def create_dict_column(pref, parent, cur_column_pref=None):
+def create_dict_column(pref, parent, config,cur_column_pref=None):
     dict_pref = {}
     dict_pref['columns'] = []
 
-    main_row = MainDictTableName(cur_column_pref, parent)
+    main_row = MainDictTableName(cur_column_pref=cur_column_pref, parent=parent, config=config)
     dict_pref_indxDbColumn = IndxDbColumn(cur_column_pref, parent=main_row, tree_widget=parent)
     dict_pref_indxColumnDic = IndxColumnDic(cur_column_pref, parent=main_row, tree_widget=parent)
 
@@ -113,10 +113,6 @@ def create_dict_column(pref, parent, cur_column_pref=None):
 
         dict_pref['columns'].append(temp_dict)
 
-
-
-
-
     dict_pref['dictTableName'] = main_row
     dict_pref['indxDbColumn'] = dict_pref_indxDbColumn
     dict_pref['indxColumnDic'] = dict_pref_indxColumnDic
@@ -125,11 +121,11 @@ def create_dict_column(pref, parent, cur_column_pref=None):
 
 
 class MainDictTableName(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_column_pref, parent):
+    def __init__(self, cur_column_pref, parent, config):
         super().__init__(parent, ['table', ])
         self.cur_column_pref = cur_column_pref
         # test data
-        list_combo_box_dictTableName = ['dic_1', 'dic_2']
+        list_combo_box_dictTableName = [i['dictTableName'] for i in config['withDict']]
         #
 
         self.combo_box_dictTableName = QtWidgets.QComboBox()

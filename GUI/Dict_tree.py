@@ -5,20 +5,21 @@ import gui_main_interface
 import dict_column_editor_viewer
 
 class DictTree(QtWidgets.QTreeWidget):
-    def __init__(self, list_of_dict_pref, parent=None):
+    def __init__(self, list_of_dict_pref, config,parent=None):
         super().__init__(parent)
         self.setColumnCount(2)
+        self.config = config
         self.list_of_dict_pref = list_of_dict_pref
         self.headerItem().setText(0, "Property")
         self.headerItem().setText(1, "Value")
 
         self.context_menu_duplicate_row = QtWidgets.QMenu()
-        self.actionDuplicateColumn = QtWidgets.QAction()
-        self.actionDeleteColumn = QtWidgets.QAction()
-        self.actionDuplicateColumn.setText("Add Column")
-        self.actionDeleteColumn.setText("Delete Column")
-        self.context_menu_duplicate_row.addAction(self.actionDuplicateColumn)
-        self.context_menu_duplicate_row.addAction(self.actionDeleteColumn)
+        self.actionDuplicateTableDict = QtWidgets.QAction()
+        self.actionDeleteTableDict = QtWidgets.QAction()
+        self.actionDuplicateTableDict.setText("Add Table")
+        self.actionDeleteTableDict.setText("Delete Table")
+        self.context_menu_duplicate_row.addAction(self.actionDuplicateTableDict)
+        self.context_menu_duplicate_row.addAction(self.actionDeleteTableDict)
 
         self.context_menu_duplicate_replace = QtWidgets.QMenu()
         self.actionDuplicateReplace = QtWidgets.QAction()
@@ -28,8 +29,8 @@ class DictTree(QtWidgets.QTreeWidget):
         self.context_menu_duplicate_replace.addAction(self.actionDuplicateReplace)
         self.context_menu_duplicate_replace.addAction(self.actionDeleteReplace)
 
-        self.actionDuplicateColumn.triggered.connect(self.add_column)
-        self.actionDeleteColumn.triggered.connect(self.delete_column)
+        self.actionDuplicateTableDict.triggered.connect(self.add_table_dict)
+        self.actionDeleteTableDict.triggered.connect(self.delete_table_dict)
         self.actionDuplicateReplace.triggered.connect(self.duplicate_replace)
         self.actionDeleteReplace.triggered.connect(self.delete_replace)
 
@@ -82,14 +83,14 @@ class DictTree(QtWidgets.QTreeWidget):
         element_in_list.remove(self.currentItem())
         self.currentItem().parent().takeChild(
             self.indexFromItem(self.currentItem()).row())
-    def add_column(self):
+    def add_table_dict(self):
         create_dict_column(self.list_of_dict_pref,
                            parent=self,
-                           # cur_column_pref=self.currentItem().cur_column_pref,
-                           cur_column_pref=None
+                           cur_column_pref=None,
+                           config=self.config
                            )
 
-    def delete_column(self):
+    def delete_table_dict(self):
         cur_column = list(
             filter(lambda x: x['dictTableName'].combo_box_dictTableName.currentText() == self.currentItem().combo_box_dictTableName.currentText(),
                    self.list_of_dict_pref)
