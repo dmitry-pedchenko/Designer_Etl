@@ -1,21 +1,44 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 
-def create_dict_column(pref, parent, config,cur_column_pref=None):
+
+def create_dict_column(pref, parent, config, validator, tables_in_receiver, columns_names_source, cur_dic_table_pref):
     dict_pref = {}
     dict_pref['columns'] = []
+    columns_in_receiver = validator.queryForColumns()
+    columns_in_db_dict = validator.queryForColumnsInDict(cur_dic_table_pref['dictTableName'])
+    main_row = MainDictTableName(
+        cur_dic_table_pref=cur_dic_table_pref,
+        parent=parent,
+        config=config,
+        tables_in_receiver=tables_in_receiver
+    )
+    dict_pref_indxDbColumn = IndxDbColumn(
+        cur_dic_table_pref=cur_dic_table_pref,
+        parent=main_row,
+        tree_widget=parent,
+        config=config,
+        columns_in_receiver=columns_in_receiver
+    )
+    dict_pref_indxColumnDic = IndxColumnDic(
+        cur_dic_table_pref=cur_dic_table_pref,
+        parent=main_row,
+        tree_widget=parent,
+        config=config,
+        col_names_in_db_dict=columns_in_db_dict
+    )
 
-    main_row = MainDictTableName(cur_column_pref=cur_column_pref, parent=parent, config=config)
-    dict_pref_indxDbColumn = IndxDbColumn(cur_column_pref, parent=main_row, tree_widget=parent)
-    dict_pref_indxColumnDic = IndxColumnDic(cur_column_pref, parent=main_row, tree_widget=parent)
-
-    if cur_column_pref:
-        for row in cur_column_pref['arrOfDictColumns']:
+    if cur_dic_table_pref['arrOfDictColumns']:
+        for row in cur_dic_table_pref['arrOfDictColumns']:
             temp_dict = {}
             temp_dict['replace_box'] = []
 
-            colNameRow = ColumnNameRow(row, main_row,parent)
-            colNameDbRow = ColumnNameDbRow(row, colNameRow, parent)
+            colNameRow = ColumnNameRow(
+                column_property=row,
+                parent=main_row,
+                tree_widget=parent,
+                columns_names_source=columns_names_source)
+            colNameDbRow = ColumnNameDbRow(row, colNameRow, parent, columns_in_receiver=columns_in_receiver)
             colTypeRow = ColTypeRow(row, colNameRow, tree_widget=parent)
             cropEndRow = CropEndRow(row, parent, colNameRow)
             addValueEndRow = AddValueEndRow(row, parent, colNameRow)
@@ -78,20 +101,20 @@ def create_dict_column(pref, parent, config,cur_column_pref=None):
         temp_dict = {}
         temp_dict['replace_box'] = []
 
-        colNameRow = ColumnNameRow(None, main_row, parent)
-        colNameDbRow = ColumnNameDbRow(None, colNameRow, parent)
-        colTypeRow = ColTypeRow(None, colNameRow, tree_widget=parent)
-        cropEndRow = CropEndRow(None, parent, colNameRow)
-        addValueEndRow = AddValueEndRow(None, parent, colNameRow)
-        takeFromBeginRow = TakeFromBeginRow(None, parent, colNameRow)
-        cropBeginRow = CropBeginRow(None, parent, colNameRow)
-        addValueBeginRow = CropBeginRow(None, parent, colNameRow)
-        addValueBothRow = AddValueBothRow(None, parent, colNameRow)
+        colNameRow = ColumnNameRow(cur_dic_table_pref, main_row, parent,columns_names_source=columns_names_source)
+        colNameDbRow = ColumnNameDbRow(cur_dic_table_pref, colNameRow, parent, columns_in_receiver=columns_in_receiver)
+        colTypeRow = ColTypeRow(cur_dic_table_pref, colNameRow, tree_widget=parent)
+        cropEndRow = CropEndRow(cur_dic_table_pref, parent, colNameRow)
+        addValueEndRow = AddValueEndRow(cur_dic_table_pref, parent, colNameRow)
+        takeFromBeginRow = TakeFromBeginRow(cur_dic_table_pref, parent, colNameRow)
+        cropBeginRow = CropBeginRow(cur_dic_table_pref, parent, colNameRow)
+        addValueBeginRow = CropBeginRow(cur_dic_table_pref, parent, colNameRow)
+        addValueBothRow = AddValueBothRow(cur_dic_table_pref, parent, colNameRow)
 
 
         replace_box = ReplaceRow(
             row=None,
-            column_property=None,
+            column_property=cur_dic_table_pref,
             parent=parent,
             parent_widget=colNameRow,
             after_widget=addValueBothRow,
@@ -121,35 +144,43 @@ def create_dict_column(pref, parent, config,cur_column_pref=None):
 
 
 class MainDictTableName(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_column_pref, parent, config):
+    def __init__(self, cur_dic_table_pref, parent, config, tables_in_receiver):
         super().__init__(parent, ['table', ])
-        self.cur_column_pref = cur_column_pref
-        # test data
-        list_combo_box_dictTableName = [i['dictTableName'] for i in config['withDict']]
-        #
-
+        self.cur_dic_table_pref = cur_dic_table_pref
+        list_combo_box_dictTableName = tables_in_receiver
         self.combo_box_dictTableName = QtWidgets.QComboBox()
-        self.combo_box_dictTableName.addItems(list_combo_box_dictTableName)
-        if cur_column_pref:
-            self.combo_box_dictTableName.setCurrentIndex(list_combo_box_dictTableName.index(cur_column_pref['dictTableName']))
+        self.combo_box_dictTableName.addItems(sorted(list_combo_box_dictTableName))
+        if cur_dic_table_pref['dictTableName']:
+            self.combo_box_dictTableName.setCurrentIndex(sorted(list_combo_box_dictTableName).index(cur_dic_table_pref['dictTableName']))
         parent.setItemWidget(self, 1, self.combo_box_dictTableName)
 
 
 class IndxDbColumn(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_column_pref, parent, tree_widget):
+    def __init__(self, cur_dic_table_pref, parent, tree_widget, config, columns_in_receiver):
         super().__init__(parent, ['indxDbColumn', ])
-        # test data
-        list_indxDbColumn = ['indx_1', 'indx_2']
-        #
+        list_indxDbColumn = [i[0] for i in columns_in_receiver]
         combo_box_indxDbColumn = QtWidgets.QComboBox()
         combo_box_indxDbColumn.addItems(list_indxDbColumn)
-        if cur_column_pref:
-            combo_box_indxDbColumn.setCurrentIndex(list_indxDbColumn.index(cur_column_pref['indxDbColumn']))
+        if cur_dic_table_pref['indxDbColumn']:
+            combo_box_indxDbColumn.setCurrentIndex(list_indxDbColumn.index(cur_dic_table_pref['indxDbColumn']))
         tree_widget.setItemWidget(self, 1, combo_box_indxDbColumn)
 
 
+class IndxColumnDic(QtWidgets.QTreeWidgetItem):
+    def __init__(self, cur_dic_table_pref, parent, tree_widget, config, col_names_in_db_dict):
+        super().__init__(parent, ['indxColumnDic', ])
+        #
+        list_indxColumnDic = [i[0] for i in col_names_in_db_dict]
+        #
+        combo_box_indxColumnDic = QtWidgets.QComboBox()
+        combo_box_indxColumnDic.addItems(list_indxColumnDic)
+        if cur_dic_table_pref['indxColumnDic']:
+            combo_box_indxColumnDic.setCurrentIndex(list_indxColumnDic.index(cur_dic_table_pref['indxColumnDic']))
+        tree_widget.setItemWidget(self, 1, combo_box_indxColumnDic)
+
+
 class ColTypeRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_column_pref, parent, tree_widget):
+    def __init__(self, cur_dic_table_pref, parent, tree_widget):
         super().__init__(parent, ['colType', ])
 
         list_of_types_dict_to_comboBox = {'String': 'str', 'Float': 'float', 'Integer': 'int', 'Date': 'date'}
@@ -160,53 +191,32 @@ class ColTypeRow(QtWidgets.QTreeWidgetItem):
 
         tree_widget.setItemWidget(self, 1, self.combo_box_colType)
 
-        if cur_column_pref:
+        if cur_dic_table_pref['colType']:
             self.combo_box_colType.setCurrentIndex(
                 list_of_coltypes_in_comboBox.index(
-                    list(filter(lambda x: list_of_types_dict_to_comboBox[x] == cur_column_pref['colType'],
+                    list(filter(lambda x: list_of_types_dict_to_comboBox[x] == cur_dic_table_pref['colType'],
                                 list_of_types_dict_to_comboBox))[0]))
 
 
-class IndxColumnDic(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_column_pref, parent, tree_widget):
-        super().__init__(parent, ['indxColumnDic', ])
-        #
-        list_indxColumnDic = ['indx']
-        #
-        combo_box_indxColumnDic = QtWidgets.QComboBox()
-        combo_box_indxColumnDic.addItems(list_indxColumnDic)
-        if cur_column_pref:
-            combo_box_indxColumnDic.setCurrentIndex(list_indxColumnDic.index(cur_column_pref['indxColumnDic']))
-        tree_widget.setItemWidget(self, 1, combo_box_indxColumnDic)
-
-
-#
-#
 class ColumnNameRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property, parent, tree_widget):
-        # super().__init__(parent, ["colName", column_property['colName']])
+    def __init__(self, column_property, parent, tree_widget, columns_names_source):
         super().__init__(parent, ["colName", ])
-        # test data
-        list_combo_box_dictTableName = ['dict_1_1', 'dict_1_2', 'dict_1_3','dict_2_1', 'dict_2_2', 'dict_2_3']
-        #
+        list_combo_box_dictTableName = columns_names_source
         self.combo_box = QtWidgets.QComboBox()
         self.combo_box.addItems(list_combo_box_dictTableName)
-        if column_property:
+        if column_property['colName']:
             self.combo_box.setCurrentIndex(list_combo_box_dictTableName.index(column_property['colName']))
         self.column_property = column_property
         tree_widget.setItemWidget(self, 1, self.combo_box)
 
 
 class ColumnNameDbRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property, parent, tree_widget):
-        # super().__init__(parent, ["colNameDb", column_property['colNameDb']])
+    def __init__(self, column_property, parent, tree_widget, columns_in_receiver):
         super().__init__(parent, ["colNameDb", ])
-        #
-        list_colname_in_db_dict = ['col_1', 'col_2', 'col_3']
-        #
+        list_colname_in_db_dict = [i[0] for i in columns_in_receiver]
         self.combo_box_colnameDb = QtWidgets.QComboBox()
         self.combo_box_colnameDb.addItems(list_colname_in_db_dict)
-        if column_property:
+        if column_property['colNameDb']:
             self.combo_box_colnameDb.setCurrentIndex(list_colname_in_db_dict.index(column_property['colNameDb']))
         tree_widget.setItemWidget(self, 1, self.combo_box_colnameDb)
 
@@ -234,7 +244,7 @@ class CropEndRow(QtWidgets.QTreeWidgetItem):
             self.spin_box_cropEnd.setDisabled(True)
 
     def initialize(self):
-        if self.column_property:
+        if self.column_property['cropEnd_mode']:
             if self.column_property['cropEnd_mode'] != 'false':
                 self.spin_box_cropEnd.setValue(int(self.column_property['cropEnd']))
                 self.checkBox_widget_for_cropEnd_check.setCheckState(QtCore.Qt.Checked)
@@ -258,7 +268,7 @@ class AddValueEndRow(QtWidgets.QTreeWidgetItem):
         self.checkBox_widget_for_addValueEnd_check.stateChanged.connect(self.state_change)
 
     def initialize(self):
-        if self.column_property:
+        if self.column_property['addValueEnd_mode']:
             if self.column_property['addValueEnd_mode'] != 'false':
                 self.line_edit_addValueEnd.setText(self.column_property['addValueEnd'])
                 self.checkBox_widget_for_addValueEnd_check.setCheckState(QtCore.Qt.Checked)
@@ -290,7 +300,7 @@ class TakeFromBeginRow(QtWidgets.QTreeWidgetItem):
         self.checkBox_widget_for_takeFromBegin_check.stateChanged.connect(self.state_change)
 
     def initialize(self):
-        if self.column_property:
+        if self.column_property['takeFromBegin_mode'] :
             if self.column_property['takeFromBegin_mode'] != 'false':
                 self.spin_box_takeFromBegin.setValue(int(self.column_property['takeFromBegin']))
                 self.checkBox_widget_for_takeFromBegin_check.setCheckState(QtCore.Qt.Checked)
@@ -321,7 +331,7 @@ class CropBeginRow(QtWidgets.QTreeWidgetItem):
         self.checkBox_widget_for_cropBegin_check.stateChanged.connect(self.state_change)
 
     def initialize(self):
-        if self.column_property:
+        if self.column_property['cropBegin_mode']:
             if self.column_property['cropBegin_mode'] != 'false':
                 self.spin_box_cropBegin.setValue(int(self.column_property['cropBegin']))
                 self.checkBox_widget_for_cropBegin_check.setCheckState(QtCore.Qt.Checked)
@@ -352,7 +362,7 @@ class AddValueBeginRow(QtWidgets.QTreeWidgetItem):
         self.checkBox_widget_for_addValueBegin_check.stateChanged.connect(self.state_change)
 
     def initialize(self):
-        if self.column_property:
+        if self.column_property['addValueBegin_mode'] :
             if self.column_property['addValueBegin_mode'] != 'false':
                 self.line_edit_addValueBegin.setText(self.column_property['addValueBegin'])
                 self.checkBox_widget_for_addValueBegin_check.setCheckState(QtCore.Qt.Checked)
@@ -394,7 +404,7 @@ class AddValueBothRow(QtWidgets.QTreeWidgetItem):
         self.checkBox_widget_for_addValueBoth_check.stateChanged.connect(self.state_change)
 
     def initialize(self):
-        if self.column_property:
+        if self.column_property['addValueBoth_mode']:
             if self.column_property['addValueBoth_mode'] != 'false':
                 self.line_edit_addBegin_Both_filter.setText(self.column_property['addValueBoth'].split(',')[0])
                 self.line_edit_addEnd_Both_filter.setText(self.column_property['addValueBoth'].split(',')[1])
@@ -439,7 +449,7 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
         self.checkBox_widget_for_replace_check.stateChanged.connect(self.state_change)
 
     def initialize(self):
-        if self.column_property:
+        if self.column_property['replace_mode']:
             if self.row:
                 if self.column_property['replace_mode'] != 'false':
                     self.line_edit_addBegin_Both.setText(self.row['replaceValue'])

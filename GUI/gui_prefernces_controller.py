@@ -188,7 +188,7 @@ class Pref_Window(QtWidgets.QWidget):
 
         if self.config_dict['dictMode'] == 'true':
             self.ui.comboBox_dictTableName.addItems(sorted(self.tables_in_db))
-            self.ui.comboBox_dictTableName.setCurrentIndex(self.tables_in_db.index(self.config_dict['withDict'][0]['dictTableName']))
+            self.ui.comboBox_dictTableName.setCurrentIndex(sorted(self.tables_in_db).index(self.config_dict['withDict'][0]['dictTableName']))
             self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Checked)
         else:
             self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Unchecked)

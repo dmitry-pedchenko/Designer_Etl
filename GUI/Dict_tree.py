@@ -5,8 +5,12 @@ import gui_main_interface
 import dict_column_editor_viewer
 
 class DictTree(QtWidgets.QTreeWidget):
-    def __init__(self, list_of_dict_pref, config,parent=None):
+    def __init__(self, list_of_dict_pref, config, validator, tables_in_receiver, columns_names_source, window_pref, parent=None):
         super().__init__(parent)
+        self.window_pref = window_pref
+        self.columns_names_source = columns_names_source
+        self.tables_in_receiver = tables_in_receiver
+        self.validator=validator
         self.setColumnCount(2)
         self.config = config
         self.list_of_dict_pref = list_of_dict_pref
@@ -84,10 +88,30 @@ class DictTree(QtWidgets.QTreeWidget):
         self.currentItem().parent().takeChild(
             self.indexFromItem(self.currentItem()).row())
     def add_table_dict(self):
-        create_dict_column(self.list_of_dict_pref,
+        dict_pref = {
+            'dictTableName': f'{self.window_pref.ui.comboBox_dictTableName.currentText()}',
+            'indxDbColumn': None,
+            'indxColumnDic': None,
+            'colType': None,
+            'arrOfDictColumns': None,
+            'colName': None,
+            'colNameDb': None,
+            'cropEnd_mode': 'false',
+            'addValueEnd_mode': 'false',
+            'takeFromBegin_mode': 'false',
+            'cropBegin_mode': 'false',
+            'addValueBegin_mode': 'false',
+            'addValueBoth_mode': 'false',
+            'replace_mode': 'false',
+
+        }
+        create_dict_column(pref=self.list_of_dict_pref,
                            parent=self,
-                           cur_column_pref=None,
-                           config=self.config
+                           cur_dic_table_pref=dict_pref,
+                           config=self.config,
+                           validator=self.validator,
+                           tables_in_receiver=self.tables_in_receiver,
+                           columns_names_source=self.columns_names_source
                            )
 
     def delete_table_dict(self):

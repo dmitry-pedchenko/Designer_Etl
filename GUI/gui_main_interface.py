@@ -104,7 +104,14 @@ class MainWindow(QtWidgets.QMainWindow):
             pass
         else:
             self.tab_widget_dictionary = QtWidgets.QWidget()
-            self.tree_dict = Dict_tree.DictTree(list_of_dict_pref=self.list_of_dict_pref, config=self.config_dict)
+            self.tree_dict = Dict_tree.DictTree(
+                                                list_of_dict_pref=self.list_of_dict_pref,
+                                                config=self.config_dict,
+                                                validator=self.validator,
+                                                tables_in_receiver=self.tables_in_receiver,
+                                                columns_names_source=self.columns_in_source,
+                                                window_pref=self.pref_gui
+                                                )
             hlayout = QtWidgets.QHBoxLayout()
             hlayout.addWidget(self.tree_dict)
             self.tab_widget_dictionary.setLayout(hlayout)
@@ -113,8 +120,12 @@ class MainWindow(QtWidgets.QMainWindow):
                 for row in self.config_dict['withDict']:
                     create_dict_column(pref=self.list_of_dict_pref,
                                        parent=self.tree_dict,
-                                       cur_column_pref=row,
-                                       config=self.config_dict)
+                                       cur_dic_table_pref=row,
+                                       config=self.config_dict,
+                                       validator=self.validator,
+                                       tables_in_receiver=self.tables_in_receiver,
+                                       columns_names_source=self.columns_in_source
+                                       )
 
         self.tabWidget.addTab(self.tab_widget_dictionary, 'Dictionary Editor')
 
@@ -181,7 +192,7 @@ class MainWindow(QtWidgets.QMainWindow):
                                                                   logger_inst=self.loggerInst,
                                                                   tables_in_db=self.tables_in_receiver,
                                                                   schemas_in_db=self.schemas_in_db,
-                                                                  parent=self
+                                                                  parent=self.pref_gui
                                                                   )
             self.pref_gui.show()
 
@@ -210,22 +221,36 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.config_dict['checkMode_value'] == 'false':
 
                 con = db_con.Connection.get_instance(self.loggerInst)
-                con.connectToTheDB(host=self.config_dict['dbHost'],
-                                   user=self.config_dict['dbUser'],
-                                   password=self.config_dict['dbPass'],
-                                   dbname=self.config_dict['dbBase'],
-                                   port=int(self.config_dict['dbPort']),
-                                   dbtype=self.config_dict['dbtype']
-                                   )
-                con.test_conn()
+                try:
+                    con.connectToTheDB(host=self.config_dict['dbHost'],
+                                       user=self.config_dict['dbUser'],
+                                       password=self.config_dict['dbPass'],
+                                       dbname=self.config_dict['dbBase'],
+                                       port=int(self.config_dict['dbPort']),
+                                       dbtype=self.config_dict['dbtype']
+                                       )
+                    con.test_conn()
+                except Exception as e:
+                    self.close_project_data()
+                    dial_win = QtWidgets.QDialog(self)
+                    lay = QtWidgets.QVBoxLayout()
+                    lay.addWidget(QtWidgets.QLabel(e.__str__()))
+                    dial_win.setLayout(lay)
+                    dial_win.exec_()
+                    return
+
+
+
+
+
                 connector = con.get_instance(self.loggerInst)
                 self.dbService = xpc.XmlParser(path, self.loggerInst)
-                validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
-                self.columns_in_db = validator.queryForColumns()
+                self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
+                self.columns_in_db = self.validator.queryForColumns()
                 self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
                 self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
-                self.tables_in_receiver = [i[0] for i in validator.queryForTableInDbList()]
-                self.schemas_in_db = [i[0] for i in validator.queryForSchemasInDb()]
+                self.tables_in_receiver = [i[0] for i in self.validator.queryForTableInDbList()]
+                self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
 
                 for col in self.config_dict['excelColumns']:
                     source_column_editor_viewer.create_input_column(self.treeWidget_1,

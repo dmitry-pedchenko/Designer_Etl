@@ -30,6 +30,15 @@ class Validate:
         self.connector.test_conn(3)
         return self.exec(query)
 
+    def queryForColumnsInDict(self, dict_table_name):
+        query = ''
+        if self.dbService.dictionary['dbtype'] == 'mssql':
+            query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{dict_table_name}'); """
+        if self.dbService.dictionary['dbtype'] == 'mysql':
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{dict_table_name}';"""
+        self.connector.test_conn(3)
+        return self.exec(query)
+
     def queryForTableInDbList(self):
         query = ''
         if self.dbService.dictionary['dbtype'] == 'mssql':
