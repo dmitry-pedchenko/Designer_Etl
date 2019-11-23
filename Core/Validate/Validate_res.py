@@ -26,7 +26,7 @@ class Validate:
         if self.dbService.dictionary['dbtype'] == 'mssql':
             query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{self.dic["exportTableName_value"]}'); """
         if self.dbService.dictionary['dbtype'] == 'mysql':
-            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{self.dic["exportTableName_value"]}';"""
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{self.dic["exportTableName_value_text"]}';"""
         self.connector.test_conn(3)
         return self.exec(query)
 
@@ -45,6 +45,12 @@ class Validate:
             query = f""" SELECT TABLE_NAME 
                         FROM INFORMATION_SCHEMA.TABLES
                         WHERE table_type='BASE TABLE' """
+
+        if self.dbService.dictionary['dbtype'] == 'mysql':
+            query = f""" SELECT TABLE_NAME 
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE table_type='BASE TABLE' """
+
         self.connector.test_conn(3)
         return self.exec(query)
 
@@ -52,6 +58,10 @@ class Validate:
         query = ''
         if self.dbService.dictionary['dbtype'] == 'mssql':
             query = f""" SELECT * FROM sys.schemas"""
+        if self.dbService.dictionary['dbtype'] == 'mysql':
+            query = f""" select schema_name as database_name
+                            from information_schema.schemata
+                            order by schema_name;"""
         self.connector.test_conn(3)
         return self.exec(query)
 

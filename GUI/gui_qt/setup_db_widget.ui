@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>651</width>
-    <height>582</height>
+    <height>462</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -426,7 +426,7 @@
      <x>10</x>
      <y>410</y>
      <width>281</width>
-     <height>81</height>
+     <height>31</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -451,28 +451,6 @@
         <string>Dictionary</string>
        </property>
       </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_10">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>261</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_25">
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>dictTableName</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboBox_dictTableName"/>
      </item>
     </layout>
    </widget>

@@ -63,7 +63,10 @@ def do_XML_parse(pathToFile, log, opts=None):
         except:
             log.raiseError(3, "exportTable/path")
 
-        exportTableName_value = f"[{db_schema}].[{exportTableName_value_text}]"
+        if dbtype == 'mssql':
+            exportTableName_value = f"[{db_schema}].[{exportTableName_value_text}]"
+        elif dbtype == 'mysql':
+            exportTableName_value = f"{db_schema}.{exportTableName_value_text}"
 
     try:
         dbHost = root.find("dbHost").text
@@ -352,8 +355,6 @@ def do_XML_parse(pathToFile, log, opts=None):
                 filterDict["filterMode"] = filterMode
                 filterDict["filterValue"] = filterValue
                 postfilterArr.append(filterDict)
-
-
 
         if cropEnd_mode == 'true':
             try:

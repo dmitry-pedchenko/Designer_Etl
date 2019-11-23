@@ -6,12 +6,16 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
     dict_pref = {}
     dict_pref['columns'] = []
     columns_in_receiver = validator.queryForColumns()
-    columns_in_db_dict = validator.queryForColumnsInDict(cur_dic_table_pref['dictTableName'])
+    if cur_dic_table_pref['dictTableName']:
+        columns_in_db_dict = validator.queryForColumnsInDict(cur_dic_table_pref['dictTableName'])
+    else:
+        columns_in_db_dict = None
+
     main_row = MainDictTableName(
         cur_dic_table_pref=cur_dic_table_pref,
         parent=parent,
         config=config,
-        tables_in_receiver=tables_in_receiver
+        tables_in_receiver=tables_in_receiver,
     )
     dict_pref_indxDbColumn = IndxDbColumn(
         cur_dic_table_pref=cur_dic_table_pref,
@@ -25,7 +29,10 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
         parent=main_row,
         tree_widget=parent,
         config=config,
-        col_names_in_db_dict=columns_in_db_dict
+        col_names_in_db_dict=columns_in_db_dict,
+        table_name=main_row.combo_box_dictTableName,
+        validator=validator
+
     )
 
     if cur_dic_table_pref['arrOfDictColumns']:
@@ -150,9 +157,16 @@ class MainDictTableName(QtWidgets.QTreeWidgetItem):
         list_combo_box_dictTableName = tables_in_receiver
         self.combo_box_dictTableName = QtWidgets.QComboBox()
         self.combo_box_dictTableName.addItems(sorted(list_combo_box_dictTableName))
+        self.combo_box_dictTableName.addItem('---')
+
         if cur_dic_table_pref['dictTableName']:
             self.combo_box_dictTableName.setCurrentIndex(sorted(list_combo_box_dictTableName).index(cur_dic_table_pref['dictTableName']))
+        else:
+            self.combo_box_dictTableName.setCurrentText('---')
         parent.setItemWidget(self, 1, self.combo_box_dictTableName)
+
+
+
 
 
 class IndxDbColumn(QtWidgets.QTreeWidgetItem):
@@ -167,16 +181,34 @@ class IndxDbColumn(QtWidgets.QTreeWidgetItem):
 
 
 class IndxColumnDic(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_dic_table_pref, parent, tree_widget, config, col_names_in_db_dict):
+    def __init__(self, cur_dic_table_pref, parent, tree_widget, config, col_names_in_db_dict, table_name,validator):
         super().__init__(parent, ['indxColumnDic', ])
         #
-        list_indxColumnDic = [i[0] for i in col_names_in_db_dict]
+        self.validator = validator
+        self.table_name=table_name
+        if col_names_in_db_dict:
+            list_indxColumnDic = [i[0] for i in col_names_in_db_dict]
+        else:
+            list_indxColumnDic = '---'
         #
-        combo_box_indxColumnDic = QtWidgets.QComboBox()
-        combo_box_indxColumnDic.addItems(list_indxColumnDic)
+        self.combo_box_indxColumnDic = QtWidgets.QComboBox()
+        if col_names_in_db_dict:
+            self.combo_box_indxColumnDic.addItems(list_indxColumnDic)
+        else:
+            self.combo_box_indxColumnDic.addItem(list_indxColumnDic)
         if cur_dic_table_pref['indxColumnDic']:
-            combo_box_indxColumnDic.setCurrentIndex(list_indxColumnDic.index(cur_dic_table_pref['indxColumnDic']))
-        tree_widget.setItemWidget(self, 1, combo_box_indxColumnDic)
+            self.combo_box_indxColumnDic.setCurrentIndex(list_indxColumnDic.index(cur_dic_table_pref['indxColumnDic']))
+        tree_widget.setItemWidget(self, 1, self.combo_box_indxColumnDic)
+
+        self.table_name.currentTextChanged.connect(self.cur_table_change)
+
+    def cur_table_change(self, name):
+        col_names_in_db_dict = self.validator.queryForColumnsInDict(f'{name}')
+        list_indxColumnDic = [i[0] for i in col_names_in_db_dict]
+
+        while self.combo_box_indxColumnDic.count()>0:
+            self.combo_box_indxColumnDic.removeItem(0)
+        self.combo_box_indxColumnDic.addItems(list_indxColumnDic)
 
 
 class ColTypeRow(QtWidgets.QTreeWidgetItem):

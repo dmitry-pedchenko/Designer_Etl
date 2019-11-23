@@ -38,6 +38,10 @@ class DictTree(QtWidgets.QTreeWidget):
         self.actionDuplicateReplace.triggered.connect(self.duplicate_replace)
         self.actionDeleteReplace.triggered.connect(self.delete_replace)
 
+
+
+
+
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         if self.currentItem():
             if self.currentItem().text(0) == 'table':
@@ -89,7 +93,7 @@ class DictTree(QtWidgets.QTreeWidget):
             self.indexFromItem(self.currentItem()).row())
     def add_table_dict(self):
         dict_pref = {
-            'dictTableName': f'{self.window_pref.ui.comboBox_dictTableName.currentText()}',
+            'dictTableName': None,
             'indxDbColumn': None,
             'indxColumnDic': None,
             'colType': None,

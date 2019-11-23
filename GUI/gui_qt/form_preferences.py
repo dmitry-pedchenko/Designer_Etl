@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(651, 582)
+        Form.resize(651, 462)
         self.button_save_pref = QtWidgets.QPushButton(Form)
         self.button_save_pref.setGeometry(QtCore.QRect(520, 410, 112, 41))
         self.button_save_pref.setObjectName("button_save_pref")
@@ -227,7 +227,7 @@ class Ui_Form(object):
         self.label_check_mode.setObjectName("label_check_mode")
         self.horizontalLayout_15.addWidget(self.label_check_mode)
         self.frame_3 = QtWidgets.QFrame(Form)
-        self.frame_3.setGeometry(QtCore.QRect(10, 410, 281, 81))
+        self.frame_3.setGeometry(QtCore.QRect(10, 410, 281, 31))
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_3.setObjectName("frame_3")
@@ -240,18 +240,6 @@ class Ui_Form(object):
         self.checkBox_Dictionary = QtWidgets.QCheckBox(self.horizontalLayoutWidget_2)
         self.checkBox_Dictionary.setObjectName("checkBox_Dictionary")
         self.horizontalLayout_12.addWidget(self.checkBox_Dictionary)
-        self.horizontalLayoutWidget_10 = QtWidgets.QWidget(self.frame_3)
-        self.horizontalLayoutWidget_10.setGeometry(QtCore.QRect(10, 30, 261, 31))
-        self.horizontalLayoutWidget_10.setObjectName("horizontalLayoutWidget_10")
-        self.horizontalLayout_25 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_10)
-        self.horizontalLayout_25.setContentsMargins(0, 0, 0, 0)
-        self.horizontalLayout_25.setObjectName("horizontalLayout_25")
-        self.label_2 = QtWidgets.QLabel(self.horizontalLayoutWidget_10)
-        self.label_2.setObjectName("label_2")
-        self.horizontalLayout_25.addWidget(self.label_2)
-        self.comboBox_dictTableName = QtWidgets.QComboBox(self.horizontalLayoutWidget_10)
-        self.comboBox_dictTableName.setObjectName("comboBox_dictTableName")
-        self.horizontalLayout_25.addWidget(self.comboBox_dictTableName)
         self.frame_2.raise_()
         self.frame.raise_()
         self.button_save_pref.raise_()
@@ -280,7 +268,6 @@ class Ui_Form(object):
         self.label_receiver.setText(_translate("Form", "Target table name:"))
         self.label_check_mode.setText(_translate("Form", "Check table name:"))
         self.checkBox_Dictionary.setText(_translate("Form", "Dictionary"))
-        self.label_2.setText(_translate("Form", "dictTableName"))
 
 
 if __name__ == "__main__":
