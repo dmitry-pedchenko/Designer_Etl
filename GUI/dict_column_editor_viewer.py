@@ -44,7 +44,9 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
                 column_property=row,
                 parent=main_row,
                 tree_widget=parent,
-                columns_names_source=columns_names_source)
+                columns_names_source=columns_names_source,
+                after_widget=dict_pref_indxColumnDic
+            )
             colNameDbRow = ColumnNameDbRow(row, colNameRow, parent, columns_in_receiver=columns_in_receiver)
             colTypeRow = ColTypeRow(row, colNameRow, tree_widget=parent)
             cropEndRow = CropEndRow(row, parent, colNameRow)
@@ -108,7 +110,12 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
         temp_dict = {}
         temp_dict['replace_box'] = []
 
-        colNameRow = ColumnNameRow(cur_dic_table_pref, main_row, parent,columns_names_source=columns_names_source)
+        colNameRow = ColumnNameRow(
+            column_property=cur_dic_table_pref,
+            parent=main_row,
+            tree_widget=parent,
+            columns_names_source=columns_names_source,
+            after_widget=dict_pref_indxColumnDic)
         colNameDbRow = ColumnNameDbRow(cur_dic_table_pref, colNameRow, parent, columns_in_receiver=columns_in_receiver)
         colTypeRow = ColTypeRow(cur_dic_table_pref, colNameRow, tree_widget=parent)
         cropEndRow = CropEndRow(cur_dic_table_pref, parent, colNameRow)
@@ -231,15 +238,21 @@ class ColTypeRow(QtWidgets.QTreeWidgetItem):
 
 
 class ColumnNameRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property, parent, tree_widget, columns_names_source):
-        super().__init__(parent, ["colName", ])
+    def __init__(self, column_property, parent, tree_widget, columns_names_source, after_widget=None):
+        super().__init__(parent, after_widget)
+        self.label = QtWidgets.QLabel('colName')
         list_combo_box_dictTableName = columns_names_source
         self.combo_box = QtWidgets.QComboBox()
         self.combo_box.addItems(list_combo_box_dictTableName)
+
         if column_property['colName']:
             self.combo_box.setCurrentIndex(list_combo_box_dictTableName.index(column_property['colName']))
+        else:
+            self.combo_box.addItem('---')
+            self.combo_box.setCurrentText('---')
         self.column_property = column_property
         tree_widget.setItemWidget(self, 1, self.combo_box)
+        tree_widget.setItemWidget(self, 0, self.label)
 
 
 class ColumnNameDbRow(QtWidgets.QTreeWidgetItem):

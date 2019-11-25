@@ -163,7 +163,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.comboBox_chose_loadMode.setCurrentText(self.config_dict['loadMode'])
         if self.config_dict['checkMode_value'] == 'false':
             self.ui.target_table_name.addItems(sorted(self.tables_in_db))
-            self.ui.target_table_name.setCurrentIndex(self.tables_in_db.index(self.config_dict['exportTableName_value_text']))
+            self.ui.target_table_name.setCurrentIndex(sorted(self.tables_in_db).index(self.config_dict['exportTableName_value_text']))
 
         if self.config_dict['checkMode_value'] == 'true':
             self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Checked)
