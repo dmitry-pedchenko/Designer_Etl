@@ -15,15 +15,14 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
     dic['replace_box'] = []
 
     combo_box_colType = QtWidgets.QComboBox()
-    list_of_types_dict_to_comboBox = {'String': 'str', 'Float': 'float', 'Integer': 'int', 'Date': 'date'}
-    list_of_coltypes_in_comboBox = ['String', 'Float', 'Integer', 'Date']
+    list_of_types_dict_to_comboBox = {'String': 'str', 'Float': 'float', 'Integer': 'int', 'Date': 'date', '---': '---'}
+    list_of_coltypes_in_comboBox = ['String', 'Float', 'Integer', 'Date', '---']
     combo_box_colType.addItems(list_of_coltypes_in_comboBox)
-
     list_of_state_dict_isPk = {'True': 'true', 'False': 'false'}
-
     combo_box_isPk = QtWidgets.QCheckBox()
     state = list(filter(lambda x: list_of_state_dict_isPk[x] == column_property['isPK'],
                                              list_of_state_dict_isPk))[0]
+
 
     combo_box_dbName = QtWidgets.QComboBox()
 
@@ -40,14 +39,21 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
 
     #
     # create tree widget item
+    if column_property['colNameDb']:
+        combo_box_dbName.setCurrentIndex(db_colnames.index(column_property['colNameDb']))
+    else:
+        combo_box_dbName.addItem('---')
+        combo_box_dbName.setCurrentText('---')
+    if column_property['colType']:
+        combo_box_colType.setCurrentIndex(
+            list_of_coltypes_in_comboBox.index(
+                list(filter(lambda x: list_of_types_dict_to_comboBox[x] == column_property['colType'],
+                            list_of_types_dict_to_comboBox))[0]))
 
-    combo_box_dbName.setCurrentIndex(db_colnames.index(column_property['colNameDb']))
-    combo_box_colType.setCurrentIndex(
-        list_of_coltypes_in_comboBox.index(
-            list(filter(lambda x: list_of_types_dict_to_comboBox[x] == column_property['colType'],
-                        list_of_types_dict_to_comboBox))[0]))
-
-    colName_box = ColumnNameRow(column_property, source_columnes, tree_table)
+    colName_box = ColumnNameRow(
+        column_property=column_property,
+        arr_of_db_columns=source_columnes,
+        tree_widget=tree_table)
     colNameDb_box = QtWidgets.QTreeWidgetItem(colName_box, ['colNameDb', ])
     colType_box = QtWidgets.QTreeWidgetItem(colName_box, ['colType', ])
     isPK_box = QtWidgets.QTreeWidgetItem(colName_box, ['isPK', ])
@@ -87,7 +93,6 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
                 column_property=column_property,
                 parent=tree_table,
                 parent_widget=colName_box,
-                # after_widget=addValueBoth_box
                 after_widget=addValueBoth_box
             )
 
@@ -132,12 +137,21 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
         super().__init__(tree_widget, ["colName", ])
         self.combo_box_name = QtWidgets.QComboBox()
         self.combo_box_name.addItems(arr_of_db_columns)
+        self.combo_box_name.addItem('---')
 
-        self.combo_box_name.setCurrentIndex(arr_of_db_columns.index(column_property['colName']))
+        if column_property['colName']:
+            self.combo_box_name.setCurrentIndex(arr_of_db_columns.index(column_property['colName']))
+        else:
+            self.combo_box_name.setCurrentText('---')
+
         tree_widget.setItemWidget(self, 1, self.combo_box_name)
 
-        self.col_name = column_property['colName']
-        self.column_property = column_property
+        # if column_property['colName']:
+        #     self.col_name = column_property['colName']
+        # else:
+        #     self.combo_box_name.addItem('---')
+        #
+        # self.column_property = column_property
 
 
 class CropEndRow(QtWidgets.QTreeWidgetItem):
@@ -422,8 +436,6 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         hbox_layout_both_filter.addWidget(self.line_edit_addEnd_Both_filter)
         self.widget_for_add_both_filter.setLayout(hbox_layout_both_filter)
 
-        #
-
         self.filter_box_sub_f_cropEnd = QtWidgets.QTreeWidgetItem(self, ['', ])
         self.filter_box_sub_f_addValueEnd = QtWidgets.QTreeWidgetItem(self, ['', ])
         self.filter_box_sub_f_takeFromBegin = QtWidgets.QTreeWidgetItem(self, ['', ])
@@ -445,8 +457,6 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         parent.setItemWidget(self.filter_box_sub_f_cropBegin, 1, self.spin_box_f_cropBegin)
         parent.setItemWidget(self.filter_box_sub_f_addValueBegin, 1, self.line_edit_f_addValueBegin)
         parent.setItemWidget(self.filter_box_sub_f_addValueBoth, 1, self.widget_for_add_both_filter)
-
-        #         -----
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_filter_check)
         parent.setItemWidget(self.filter_box_sub_f_cropEnd, 0, self.checkBox_widget_f_cropEnd_check)
@@ -517,7 +527,7 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                 self.line_edit_addBegin_Both_filter.setDisabled(True)
                 self.line_edit_addEnd_Both_filter.setDisabled(True)
                 self.widget_for_add_both_filter.setDisabled(True)
-            # --------
+
             if self.column_property['colType'] == 'str':
                 self.line_edit_addEnd_filter = QtWidgets.QLineEdit()
                 self.line_edit_addEnd_filter.setText(self.column_property['filterArr'][0]['filterValue'])
@@ -545,8 +555,6 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                 self.list_of_types_equals_for_filter = ['!=', '=']
                 self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
 
-            #
-            #
             self.widget_for_filter = QtWidgets.QWidget()
             hbox_layout_filter = QtWidgets.QHBoxLayout()
             text_begin_for_addBegin_filter = QtWidgets.QLabel('Condition')
@@ -559,12 +567,8 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
 
             self.parent.setItemWidget(self.filter_box_sub_filter_state, 1, self.widget_for_filter)
 
-            # ---------------
-
             self.combo_box_filter_condition.setCurrentIndex(
                 self.list_of_types_equals_for_filter.index(self.column_property['filterArr'][0]['filterMode']))
-
-
 
         else:
             self.checkBox_widget_for_filter_check.setCheckState(QtCore.Qt.Unchecked)
@@ -581,6 +585,9 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                 self.line_edit_addEnd_filter = QtWidgets.QDateEdit()
                 self.line_edit_addEnd_filter.setDisplayFormat("yyyy.MM.dd")
                 self.line_edit_addEnd_filter.setCalendarPopup(True)
+            if self.column_property['colType'] == '---':
+                self.line_edit_addEnd_filter = QtWidgets.QLineEdit()
+                self.line_edit_addEnd_filter.setText('---')
 
             if self.column_property['colType'] != 'str':
                 self.combo_box_filter_condition = QtWidgets.QComboBox()
@@ -590,9 +597,11 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                 self.combo_box_filter_condition = QtWidgets.QComboBox()
                 self.list_of_types_equals_for_filter = ['!=', '=']
                 self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
+            if self.column_property['colType'] == '---':
+                self.combo_box_filter_condition = QtWidgets.QComboBox()
+                list_of_types_equals_for_filter = ['---']
+                self.combo_box_filter_condition.addItems(list_of_types_equals_for_filter)
 
-            #
-            #
             self.widget_for_filter = QtWidgets.QWidget()
             hbox_layout_filter = QtWidgets.QHBoxLayout()
             text_begin_for_addBegin_filter = QtWidgets.QLabel('Condition')
@@ -690,6 +699,9 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
             self.line_edit_addEnd_filter = QtWidgets.QDateEdit()
             self.line_edit_addEnd_filter.setDisplayFormat("yyyy.MM.dd")
             self.line_edit_addEnd_filter.setCalendarPopup(True)
+        if self.coltypes[index] == '---':
+            self.line_edit_addEnd_filter = QtWidgets.QLineEdit()
+            self.line_edit_addEnd_filter.setText('---')
 
         if self.coltypes[index] != 'String':
             self.combo_box_filter_condition = QtWidgets.QComboBox()
@@ -699,6 +711,10 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
             self.combo_box_filter_condition = QtWidgets.QComboBox()
             self.list_of_types_equals_for_filter = ['!=', '=']
             self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
+        if self.coltypes[index] == '---':
+            self.combo_box_filter_condition = QtWidgets.QComboBox()
+            list_of_types_equals_for_filter = ['---']
+            self.combo_box_filter_condition.addItems(list_of_types_equals_for_filter)
 
         #
         #
@@ -729,6 +745,10 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
             self.combo_box_post_filter_condition = QtWidgets.QComboBox()
             list_of_post_filter_conditions = ['!=', '=']
             self.combo_box_post_filter_condition.addItems(list_of_post_filter_conditions)
+        if self.column_property['colType'] == '---':
+            self.combo_box_post_filter_condition = QtWidgets.QComboBox()
+            list_of_post_filter_conditions = ['---']
+            self.combo_box_post_filter_condition.addItems(list_of_post_filter_conditions)
 
         if self.column_property['colType'] == 'str':
             self.line_edit_post_filter = QtWidgets.QLineEdit()
@@ -742,6 +762,9 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
             self.line_edit_post_filter = QtWidgets.QDateEdit()
             self.line_edit_post_filter.setDisplayFormat("yyyy.MM.dd")
             self.line_edit_post_filter.setCalendarPopup(True)
+        if self.column_property['colType'] == '---':
+            self.line_edit_post_filter = QtWidgets.QLineEdit()
+            self.line_edit_post_filter.setText('---')
 
         self.widget_for_post_filter = QtWidgets.QWidget()
         hbox_layout_post_filter = QtWidgets.QHBoxLayout()
@@ -804,6 +827,9 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
             self.line_edit_post_filter = QtWidgets.QDateEdit()
             self.line_edit_post_filter.setDisplayFormat("yyyy.MM.dd")
             self.line_edit_post_filter.setCalendarPopup(True)
+        if self.coltypes[index] == '---':
+            self.line_edit_post_filter = QtWidgets.QLineEdit()
+            self.line_edit_post_filter.setText('---')
 
         if self.coltypes[index] != 'String':
             self.combo_box_post_filter_condition = QtWidgets.QComboBox()
@@ -813,6 +839,10 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
             self.combo_box_post_filter_condition = QtWidgets.QComboBox()
             self.list_of_types_equals_for_filter = ['!=', '=']
             self.combo_box_post_filter_condition.addItems(self.list_of_types_equals_for_filter)
+        if self.coltypes[index] == '---':
+            self.combo_box_post_filter_condition = QtWidgets.QComboBox()
+            list_of_post_filter_conditions = ['---']
+            self.combo_box_post_filter_condition.addItems(list_of_post_filter_conditions)
 
         self.widget_for_post_filter = QtWidgets.QWidget()
         hbox_layout_post_filter = QtWidgets.QHBoxLayout()

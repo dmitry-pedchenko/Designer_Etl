@@ -98,7 +98,7 @@ class DictTree(QtWidgets.QTreeWidget):
         if len(cur_table) == 1:
             dial_win = QtWidgets.QDialog(self)
             lay = QtWidgets.QVBoxLayout()
-            lay.addWidget(QtWidgets.QLabel("You can't delete last column !!!"))
+            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
             dial_win.setLayout(lay)
             dial_win.exec_()
             return
@@ -241,10 +241,18 @@ class DictTree(QtWidgets.QTreeWidget):
                            )
 
     def delete_table_dict(self):
-        cur_column = list(
-            filter(lambda x: x['dictTableName'].combo_box_dictTableName.currentText() == self.currentItem().combo_box_dictTableName.currentText(),
-                   self.list_of_dict_pref)
-        )[0]
+        if len(self.list_of_dict_pref) > 1:
+            cur_column = list(
+                filter(lambda x: x['dictTableName'].combo_box_dictTableName.currentText() == self.currentItem().combo_box_dictTableName.currentText(),
+                       self.list_of_dict_pref)
+            )[0]
+        else:
+            dial_win = QtWidgets.QDialog(self)
+            lay = QtWidgets.QVBoxLayout()
+            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
+            dial_win.setLayout(lay)
+            dial_win.exec_()
+            return
         self.list_of_dict_pref.remove(cur_column)
         self.takeTopLevelItem(self.indexFromItem(self.currentItem()).row())
 

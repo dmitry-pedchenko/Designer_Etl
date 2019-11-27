@@ -94,10 +94,16 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.comboBox_set_list_checked.currentIndexChanged.emit(0)
 
     def add_link_col(self):
+        if self.df_compare:
+            target_column = [i for i in self.df_compare.sheet_names]
+        else:
+            dial_win = QtWidgets.QDialog(self)
+            lay = QtWidgets.QVBoxLayout()
+            lay.addWidget(QtWidgets.QLabel("Choose a file !!!"))
+            dial_win.setLayout(lay)
+            dial_win.exec_()
+            return
 
-        # target_column = [x['linkedColName'] for x in self.config_dict['linkedColumns']]
-        target_column = [i for i in self.df_compare.sheet_names]
-        # source_column = [x['colNameInSource'] for x in self.config_dict['linkedColumns']]
         source_column = [i for i in self.df.sheet_names]
 
         row_check = LinkedColumns(

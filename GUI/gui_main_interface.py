@@ -30,6 +30,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = main_window.Ui_MainWindow()
         self.ui.setupUi(self)
 
+        self.dict_pref = {
+            'dictTableName': None,
+            'indxDbColumn': None,
+            'indxColumnDic': None,
+            'colType': '---',
+            'arrOfDictColumns': None,
+            'colName': None,
+            'colNameDb': None,
+            'cropEnd_mode': 'false',
+            'addValueEnd_mode': 'false',
+            'takeFromBegin_mode': 'false',
+            'cropBegin_mode': 'false',
+            'addValueBegin_mode': 'false',
+            'addValueBoth_mode': 'false',
+            'replace_mode': 'false',
+            'isPK': 'false',
+            'filter_mode': 'false',
+            'post_filter_mode': 'false'
+        }
+
         self.tab_widget_config_editor = None
         self.tab_widget_loader = None
         self.tab_widget_dictionary = None
@@ -85,17 +105,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_widget_config_editor = QtWidgets.QWidget()
             self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
             self.splitter.setChildrenCollapsible(False)
-            self.treeWidget_1 = Source_tree.Source_tree()
-            self.treeWidget_2 = Receiver_tree.Receiver_tree()
-            self.splitter.addWidget(self.treeWidget_1)
-            self.splitter.addWidget(self.treeWidget_2)
+            self.treeWidget_of_Source = Source_tree.Source_tree()
+            self.treeWidget_of_Receiver = Receiver_tree.Receiver_tree()
+            self.splitter.addWidget(self.treeWidget_of_Source)
+            self.splitter.addWidget(self.treeWidget_of_Receiver)
             self.horizontalLayout = QtWidgets.QHBoxLayout()
             self.horizontalLayout.addWidget(self.splitter)
             self.tab_widget_config_editor.setLayout(self.horizontalLayout)
-            self.treeWidget_1.actionDuplicateColumn.triggered.connect(self.duplicateColumn)
-            self.treeWidget_1.actionDuplicateReplace.triggered.connect(self.duplicateReplace)
-            self.treeWidget_1.actionDeleteColumn.triggered.connect(self.deleteColumn)
-            self.treeWidget_1.actionDeleteReplace.triggered.connect(self.deleteReplace)
+            self.treeWidget_of_Source.actionDuplicateColumn.triggered.connect(self.addColumnField)
+            self.treeWidget_of_Source.actionDuplicateReplace.triggered.connect(self.duplicateReplace)
+            self.treeWidget_of_Source.actionDeleteColumn.triggered.connect(self.deleteColumn)
+            self.treeWidget_of_Source.actionDeleteReplace.triggered.connect(self.deleteReplace)
 
         self.tabWidget.addTab(self.tab_widget_config_editor, 'Config Editor')
 
@@ -166,14 +186,31 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tabWidget.removeTab(self.tabWidget.indexOf(self.tab_widget_loader))
 
     def deleteColumn(self):
-        element = list(filter(lambda x: x['colName'].col_name == self.treeWidget_1.currentItem().col_name, self.list_of_source_cols_links))[0]
-        self.list_of_source_cols_links.remove(element)
-        self.treeWidget_1.takeTopLevelItem(self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
+        if len(self.list_of_source_cols_links) > 1:
+            element = list(filter(lambda x: x['colName'].combo_box_name.currentText() == self.treeWidget_of_Source.currentItem().combo_box_name.currentText(), self.list_of_source_cols_links))[0]
+            self.list_of_source_cols_links.remove(element)
+            self.treeWidget_of_Source.takeTopLevelItem(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
+        else:
+            dial_win = QtWidgets.QDialog(self)
+            lay = QtWidgets.QVBoxLayout()
+            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
+            dial_win.setLayout(lay)
+            dial_win.exec_()
+            return
 
     def deleteReplace(self):
-        cur_column = list(filter(lambda x: x['colName'].col_name == self.treeWidget_1.currentItem().parent().col_name, self.list_of_source_cols_links))[0]
-        cur_column['replace_box'].remove(self.treeWidget_1.currentItem())
-        self.treeWidget_1.currentItem().parent().takeChild(self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row())
+        cur_column = list(filter(lambda x: x['colName'].combo_box_name.currentText() == self.treeWidget_of_Source.currentItem().parent().combo_box_name.currentText(), self.list_of_source_cols_links))[0]
+        if len(cur_column['replace_box']) > 1:
+            cur_column['replace_box'].remove(self.treeWidget_of_Source.currentItem())
+        else:
+            dial_win = QtWidgets.QDialog(self)
+            lay = QtWidgets.QVBoxLayout()
+            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
+            dial_win.setLayout(lay)
+            dial_win.exec_()
+            return
+
+        self.treeWidget_of_Source.currentItem().parent().takeChild(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
 
     def show_wizrd(self):
         self.wizard = wizard_configuration.WizardConfig()
@@ -239,10 +276,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     dial_win.exec_()
                     return
 
-
-
-
-
                 connector = con.get_instance(self.loggerInst)
                 self.dbService = xpc.XmlParser(path, self.loggerInst)
                 self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
@@ -253,15 +286,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
 
                 for col in self.config_dict['excelColumns']:
-                    source_column_editor_viewer.create_input_column(self.treeWidget_1,
-                                                                self.colnames_of_receiver,
-                                                                col,
-                                                                list_of_cols=self.list_of_source_cols_links,
-                                                                source_columnes=self.columns_in_source
+                    source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
+                                                                    self.colnames_of_receiver,
+                                                                    col,
+                                                                    list_of_cols=self.list_of_source_cols_links,
+                                                                    source_columnes=self.columns_in_source
                                                                     )
                 for col in self.config_dict['dbColumns']:
                     target_column_editor_viewer.create_receiver_column(
-                        self.treeWidget_2,
+                        self.treeWidget_of_Receiver,
                         col,
                         list_of_cols=self.list_of_receiver_cols_links
                     )
@@ -275,23 +308,26 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.actionDictionary.setChecked(True)
             self.ui.actionDictionary.triggered.emit(1)
 
-    def duplicateColumn(self):
-        source_column_editor_viewer.create_input_column(self.treeWidget_1,
-                                                        self.colnames_of_receiver,
-                                                        self.treeWidget_1.currentItem().column_property,
-                                                        list_of_cols=self.list_of_source_cols_links,
-                                                        indx=self.treeWidget_1.indexFromItem(self.treeWidget_1.currentItem()).row(),
-                                                        source_columnes=self.columns_in_source
-                                                        )
+    def addColumnField(self):
+        source_column_editor_viewer.create_input_column(
+            tree_table=self.treeWidget_of_Source,
+            db_colnames=self.colnames_of_receiver,
+            column_property=self.dict_pref,
+            list_of_cols=self.list_of_source_cols_links,
+            indx=self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row(),
+            source_columnes=self.columns_in_source
+            )
 
     def duplicateReplace(self):
-        replace = source_column_editor_viewer.ReplaceRow(self.treeWidget_1.currentItem().column_property,
-                                                         self.treeWidget_1,
-                                                         self.treeWidget_1.currentItem().parent(),
-                                                         after_widget=self.treeWidget_1.currentItem())
+        replace = source_column_editor_viewer.ReplaceRow(column_property=self.dict_pref,
+                                                         parent=self.treeWidget_of_Source,
+                                                         parent_widget=self.treeWidget_of_Source.currentItem().parent(),
+                                                         after_widget=self.treeWidget_of_Source.currentItem())
 
-        self.treeWidget_1.addTopLevelItem(replace)
-        list(filter(lambda x: x['colName'].col_name == self.treeWidget_1.currentItem().parent().col_name, self.list_of_source_cols_links))[0]['replace_box'].append(replace)
+        self.treeWidget_of_Source.addTopLevelItem(replace)
+        list(filter(lambda x: x['colName'].combo_box_name.currentText() ==
+                              self.treeWidget_of_Source.currentItem().parent().combo_box_name.currentText(),
+                    self.list_of_source_cols_links))[0]['replace_box'].append(replace)
 
     def save_configuration(self):
         print(self.list_of_source_cols_links,

@@ -1,0 +1,21 @@
+<languages>
+    <rus>
+        <pref_window>
+            <dbtype></dbtype>
+            <dbHost></dbHost>
+            <dbUser></dbUser>
+            <dbPass></dbPass>
+            <dbBase></dbBase>
+            <dbScheme></dbScheme>
+            <dbPort></dbPort>
+            <Load_Mode></Load_Mode>
+            <Source_excel_file_name></Source_excel_file_name>
+            <Target_table_name></Target_table_name>
+            <Check_mode></Check_mode>
+            <Check_table_name></Check_table_name>
+            <Both></Both>
+            <Dictionary></Dictionary>
+            <SAVE></SAVE>
+        </pref_window>
+    </rus>
+</languages>
