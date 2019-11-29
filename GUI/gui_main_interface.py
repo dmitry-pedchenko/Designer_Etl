@@ -93,6 +93,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.pref = {}
         self.list_of_dict_pref = []
 
+
+        self.pref_gui = None
+        self.dbService = None
+        self.tables_in_receiver = None
+        self.schemas_in_db = None
+
         self.tab_widget_config_editor = None
         self.tab_widget_loader = None
         self.tab_widget_dictionary = None
@@ -217,8 +223,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.wizard.show()
 
     def show_pref(self):
-        if self.pref_gui is not None:
-            # self.pref_gui.initialize()
+        if self.pref_gui:
             self.pref_gui.show()
         else:
             self.pref_gui = gui_prefernces_controller.Pref_Window(main_gui_widget=self,
@@ -234,7 +239,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.pref_gui.show()
 
     def show_open_config(self):
-        path_name_config = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+        path_name_config = QtWidgets.QFileDialog.getOpenFileName(
+            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml'
+        )
         path = os.path.basename(path_name_config[0])
 
         if path:

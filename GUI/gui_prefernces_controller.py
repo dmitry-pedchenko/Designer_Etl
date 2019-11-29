@@ -319,6 +319,7 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.compare_file.setDisabled(False)
             self.comboBox_set_list_checked.setDisabled(False)
             self.ui.checkBox_Dictionary.setDisabled(True)
+            self.ui.checkBox_Dictionary.setChecked(False)
             self.treeWidget_linked_columns.setDisabled(False)
             self.ui.checkBox_both.setDisabled(False)
 
@@ -392,6 +393,10 @@ class Pref_Window(QtWidgets.QWidget):
         if self.ui.checkBox_Dictionary.isChecked():
             self.main_gui.ui.actionDictionary.setChecked(True)
             self.main_gui.ui.actionDictionary.triggered.emit(1)
+        else:
+            self.main_gui.ui.actionDictionary.setChecked(False)
+            self.main_gui.ui.actionDictionary.triggered.emit(0)
+
 
         self.pref['dbtype'] = self.ui.lineEdit_dbtype.currentText()
         self.pref['dbHost'] = self.ui.lineEdit_dbhost.text()
@@ -497,8 +502,6 @@ class comboBox_list_source_excel(QtWidgets.QComboBox):
 class ev_filt(QtCore.QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
-        print(self.parent().check_widget)
-
 
     def eventFilter(self, a0, a1) -> bool:
         if a1.type() == QtCore.QEvent.MouseButtonPress:
