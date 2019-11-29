@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 import sys
+from PyQt5.QtWidgets import QApplication
 from gui_qt import main_window
 from gui_qt import form_preferences
 import os
@@ -34,10 +35,29 @@ class Pref_Window(QtWidgets.QWidget):
         self.list_of_db_pref = list_of_db_pref
         self.ui = form_preferences.Ui_Form()
         self.ui.setupUi(self)
-        self.treeWidget_linked_columns = TreeWidgetLinkedColumns()
+
+        self.treeWidget_linked_columns = TreeWidgetLinkedColumns(widget_sighal=self.ui.excelFileName)
         self.ui.tree_widget_box.addWidget(self.treeWidget_linked_columns)
         self.treeWidget_linked_columns.setHeaderLabels(['Linked Columns', 'Target columns'])
         self.treeWidget_linked_columns.setColumnCount(2)
+
+        self.comboBox_list_source_excel = comboBox_list_source_excel(
+            self.ui.horizontalLayoutWidget_3,
+            check_widget=self.treeWidget_linked_columns
+        )
+
+        self.comboBox_list_source_excel.setObjectName("comboBox_list_source_excel")
+        self.ui.horizontalLayout_3.addWidget(self.comboBox_list_source_excel)
+        self.comboBox_list_source_excel.installEventFilter(ev_filt(parent=self.comboBox_list_source_excel))
+
+        self.comboBox_set_list_checked = comboBox_list_source_excel(
+            self.ui.horizontalLayoutWidget_5,
+            check_widget=self.treeWidget_linked_columns
+        )
+
+        self.comboBox_set_list_checked.setObjectName("comboBox_set_list_checked")
+        self.ui.horizontalLayout_5.addWidget(self.comboBox_set_list_checked)
+        self.comboBox_set_list_checked.installEventFilter(ev_filt(parent=self.comboBox_set_list_checked))
 
         self.ui.comboBox_chose_loadMode.insertItem(0, 'insert')
         self.ui.comboBox_chose_loadMode.insertItem(1, 'update')
@@ -65,10 +85,10 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.lineEdit_dbbase.textChanged.connect(self.add_asterisc_dbbase)
         self.ui.lineEdit_dbport.textChanged.connect(self.add_asterisc_dbport)
         self.ui.excelFileName.textChanged.connect(self.add_asterisc_label_receiver)
-        self.ui.comboBox_list_source_excel.currentIndexChanged.connect(self.add_asterisc_label_receiver)
+        self.comboBox_list_source_excel.currentIndexChanged.connect(self.add_asterisc_label_receiver)
 
         self.ui.compare_file.textChanged.connect(self.add_asterisc_checkMode)
-        self.ui.comboBox_set_list_checked.currentIndexChanged.connect(self.add_asterisc_checkMode)
+        self.comboBox_set_list_checked.currentIndexChanged.connect(self.add_asterisc_checkMode)
 
         self.ui.checkBox_checkMode.stateChanged.connect(self.add_asterisc_checkBox_checkMode)
         self.ui.checkBox_Dictionary.stateChanged.connect(self.add_asterisc_checkBox_Dictionary)
@@ -79,23 +99,45 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.open_excel_compare_file.clicked.connect(self.open_excel_compare_folder)
 
 
+
     def open_excel_compare_folder(self):
+
         path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
                                                           filter='*.xlsx')
         path = os.path.basename(path_name[0])
+
         if path:
-            self.ui.compare_file.setText(path)
-            pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
-                                       path)
-            self.df_compare = pd.ExcelFile(pathToExcel)
-            self.ui.comboBox_set_list_checked.clear()
-            self.ui.comboBox_set_list_checked.addItems([i for i in self.df_compare.sheet_names])
-            self.ui.compare_file.textChanged.emit(path)
-            self.ui.comboBox_set_list_checked.currentIndexChanged.emit(0)
+
+            if self.treeWidget_linked_columns.topLevelItemCount() > 0:
+                result = QtWidgets.QMessageBox.question(self,
+                                                                "Change file ?",
+                                                                "Change file ? Linked columns will remove",
+                                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                                QtWidgets.QMessageBox.No
+                                                                )
+
+                if result == QtWidgets.QMessageBox.Yes:
+                    self.ui.compare_file.setText(path)
+                    pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+                                               path)
+                    self.df_compare = pd.ExcelFile(pathToExcel)
+                    self.comboBox_set_list_checked.clear()
+                    self.comboBox_set_list_checked.addItems([i for i in self.df_compare.sheet_names])
+                    self.ui.compare_file.textChanged.emit(path)
+                    self.comboBox_set_list_checked.currentIndexChanged.emit(0)
+            else:
+                self.ui.compare_file.setText(path)
+                pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+                                           path)
+                self.df_compare = pd.ExcelFile(pathToExcel)
+                self.comboBox_set_list_checked.clear()
+                self.comboBox_set_list_checked.addItems([i for i in self.df_compare.sheet_names])
+                self.ui.compare_file.textChanged.emit(path)
+                self.comboBox_set_list_checked.currentIndexChanged.emit(0)
 
     def add_link_col(self):
         if self.df_compare:
-            target_column = [i for i in self.df_compare.sheet_names]
+            target_column = [i for i in self.df_compare.parse(self.comboBox_set_list_checked.currentIndex()).columns.values]
         else:
             dial_win = QtWidgets.QDialog(self)
             lay = QtWidgets.QVBoxLayout()
@@ -104,7 +146,7 @@ class Pref_Window(QtWidgets.QWidget):
             dial_win.exec_()
             return
 
-        source_column = [i for i in self.df.sheet_names]
+        source_column = [i for i in self.df.parse(self.comboBox_list_source_excel.currentIndex()).columns.values]
 
         row_check = LinkedColumns(
             tree_widget=self.treeWidget_linked_columns,
@@ -136,9 +178,9 @@ class Pref_Window(QtWidgets.QWidget):
         else:
             target_column = None
 
-        self.ui.comboBox_set_list_checked.clear()
-        self.ui.comboBox_set_list_checked.addItems([i for i in df_temp.sheet_names])
-        self.ui.comboBox_set_list_checked.setCurrentIndex(self.config_dict['linkedFileSheetNumber'])
+        self.comboBox_set_list_checked.clear()
+        self.comboBox_set_list_checked.addItems([i for i in df_temp.sheet_names])
+        self.comboBox_set_list_checked.setCurrentIndex(self.config_dict['linkedFileSheetNumber'])
         if self.dbService:
             source_column = [i for i in self.dbService.dataFrame.columns.values]
         else:
@@ -180,15 +222,15 @@ class Pref_Window(QtWidgets.QWidget):
             self.df_compare = pd.ExcelFile(pathToExcel)
 
             self.ui.compare_file.setText(self.config_dict['pathToLinkFile'])
-            self.ui.comboBox_list_source_excel.addItems([i for i in self.dbService.df.sheet_names])
-            self.ui.comboBox_list_source_excel.setCurrentIndex(int(self.config_dict['linkedFileSheetNumber']))
+            self.comboBox_list_source_excel.addItems([i for i in self.dbService.df.sheet_names])
+            self.comboBox_list_source_excel.setCurrentIndex(int(self.config_dict['linkedFileSheetNumber']))
 
         else:
             self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Unchecked)
             self.ui.label_check_mode.setDisabled(True)
             self.ui.open_excel_compare_file.setDisabled(True)
             self.ui.compare_file.setDisabled(True)
-            self.ui.comboBox_set_list_checked.setDisabled(True)
+            self.comboBox_set_list_checked.setDisabled(True)
             self.treeWidget_linked_columns.setDisabled(True)
             self.ui.checkBox_both.setDisabled(True)
 
@@ -197,8 +239,8 @@ class Pref_Window(QtWidgets.QWidget):
         else:
             self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Unchecked)
 
-        self.ui.comboBox_list_source_excel.addItems([i for i in self.dbService.df.sheet_names])
-        self.ui.comboBox_list_source_excel.setCurrentIndex(int(self.config_dict['sheetNumber_value']))
+        self.comboBox_list_source_excel.addItems([i for i in self.dbService.df.sheet_names])
+        self.comboBox_list_source_excel.setCurrentIndex(int(self.config_dict['sheetNumber_value']))
 
         if self.config_dict['checkMode_value'] == 'false':
             self.ui.comboBox_dbSchema.addItems(self.schemas_in_db)
@@ -213,11 +255,11 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['dbSchema'] = self.ui.comboBox_dbSchema.currentText()
         self.pref['Load Mode'] = self.ui.comboBox_chose_loadMode.currentText()
         self.pref['excelFileName'] = self.ui.excelFileName.text()
-        self.pref['comboBox_list_source_excel'] = self.ui.comboBox_list_source_excel.currentText()
+        self.pref['comboBox_list_source_excel'] = self.comboBox_list_source_excel.currentText()
         self.pref['target_table_name'] = self.ui.target_table_name.currentText()
         self.pref['checkBox_checkMode'] = self.ui.checkBox_checkMode.isChecked()
         self.pref['compare_file'] = self.ui.compare_file.text()
-        self.pref['comboBox_set_list_checked'] = self.ui.comboBox_set_list_checked.currentText()
+        self.pref['comboBox_set_list_checked'] = self.comboBox_set_list_checked.currentText()
         self.pref['checkBox_Dictionary'] = self.ui.checkBox_Dictionary.isChecked()
         self.pref['checkBox_both'] = self.ui.checkBox_both.isChecked()
 
@@ -234,6 +276,11 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_dbtype.adjustSize()
 
     def add_asterisc_checkMode(self):
+
+        while self.treeWidget_linked_columns.topLevelItemCount() > 0:
+            self.treeWidget_linked_columns.takeTopLevelItem(0)
+
+
         if self.ui.checkBox_checkMode.text()[0] != '*':
             self.ui.checkBox_checkMode.setText(f"*{self.ui.checkBox_checkMode.text()}")
             self.ui.checkBox_checkMode.adjustSize()
@@ -270,7 +317,7 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_check_mode.setDisabled(False)
             self.ui.open_excel_compare_file.setDisabled(False)
             self.ui.compare_file.setDisabled(False)
-            self.ui.comboBox_set_list_checked.setDisabled(False)
+            self.comboBox_set_list_checked.setDisabled(False)
             self.ui.checkBox_Dictionary.setDisabled(True)
             self.treeWidget_linked_columns.setDisabled(False)
             self.ui.checkBox_both.setDisabled(False)
@@ -281,7 +328,7 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_check_mode.setDisabled(True)
             self.ui.open_excel_compare_file.setDisabled(True)
             self.ui.compare_file.setDisabled(True)
-            self.ui.comboBox_set_list_checked.setDisabled(True)
+            self.comboBox_set_list_checked.setDisabled(True)
             self.ui.checkBox_Dictionary.setDisabled(False)
             self.treeWidget_linked_columns.setDisabled(True)
             self.ui.checkBox_both.setDisabled(True)
@@ -296,9 +343,13 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_loadMode.adjustSize()
 
     def add_asterisc_label_receiver(self):
+        while self.treeWidget_linked_columns.topLevelItemCount() > 0:
+            self.treeWidget_linked_columns.takeTopLevelItem(0)
+
         if self.ui.label_source.text()[0] != '*':
             self.ui.label_source.setText(f"*{self.ui.label_source.text()}")
             self.ui.label_source.adjustSize()
+
 
     def save_db_pref(self):
 
@@ -351,27 +402,45 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['dbSchema'] = self.ui.comboBox_dbSchema.currentText()
         self.pref['Load Mode'] = self.ui.comboBox_chose_loadMode.currentText()
         self.pref['excelFileName'] = self.ui.excelFileName.text()
-        self.pref['comboBox_list_source_excel'] = self.ui.comboBox_list_source_excel.currentText()
+        self.pref['comboBox_list_source_excel'] = self.comboBox_list_source_excel.currentText()
         self.pref['target_table_name'] = self.ui.target_table_name.currentText()
         self.pref['checkBox_checkMode'] = self.ui.checkBox_checkMode.isChecked()
         self.pref['compare_file'] = self.ui.compare_file.text()
-        self.pref['comboBox_set_list_checked'] = self.ui.comboBox_set_list_checked.currentText()
+        self.pref['comboBox_set_list_checked'] = self.comboBox_set_list_checked.currentText()
         self.pref['checkBox_Dictionary'] = self.ui.checkBox_Dictionary.isChecked()
         self.pref['checkBox_both'] = self.ui.checkBox_both.isChecked()
 
     def open_excel_folder(self):
+
         path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
-                                                                 filter='*.xlsx')
+                                                          filter='*.xlsx')
         path = os.path.basename(path_name[0])
         if path:
-            self.ui.excelFileName.setText(path)
-            pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
-                                       path)
-            self.df = pd.ExcelFile(pathToExcel)
-            self.ui.comboBox_list_source_excel.clear()
-            self.ui.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])
-            self.ui.excelFileName.textChanged.emit(path)
-            self.ui.comboBox_list_source_excel.currentIndexChanged.emit(0)
+
+            if self.treeWidget_linked_columns.topLevelItemCount() > 0:
+                result = QtWidgets.QMessageBox.question(self,
+                                                        "Change file ?",
+                                                        "Change file ? Linked columns will remove",
+                                                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                        QtWidgets.QMessageBox.No
+                                                        )
+
+                if result == QtWidgets.QMessageBox.Yes:
+                    self.ui.excelFileName.setText(path)
+                    pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), path)
+                    self.df = pd.ExcelFile(pathToExcel)
+                    self.comboBox_list_source_excel.clear()
+                    self.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])
+                    self.ui.excelFileName.textChanged.emit(path)
+                    self.comboBox_list_source_excel.currentIndexChanged.emit(0)
+            else:
+                self.ui.excelFileName.setText(path)
+                pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), path)
+                self.df = pd.ExcelFile(pathToExcel)
+                self.comboBox_list_source_excel.clear()
+                self.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])
+                self.ui.excelFileName.textChanged.emit(path)
+                self.comboBox_list_source_excel.currentIndexChanged.emit(0)
 
 
 class LinkedColumns(QtWidgets.QTreeWidgetItem):
@@ -393,9 +462,10 @@ class LinkedColumns(QtWidgets.QTreeWidgetItem):
 
 
 class TreeWidgetLinkedColumns(QtWidgets.QTreeWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, widget_sighal=None):
         super().__init__(parent)
 
+        self.widget_sighal = widget_sighal
         self.treeWidget_linked_columns = QtWidgets.QTreeWidget()
         self.treeWidget_linked_columns.setGeometry(QtCore.QRect(10, 260, 271, 101))
         self.treeWidget_linked_columns.setObjectName("treeWidget_linked_columns")
@@ -408,6 +478,49 @@ class TreeWidgetLinkedColumns(QtWidgets.QTreeWidget):
         self.actionDeleteColumn.setText("Delete Column")
         self.context_menu_add_row.addAction(self.actionAddColumn)
         self.context_menu_add_row.addAction(self.actionDeleteColumn)
+        self.widget_sighal.textChanged.connect(self.delete_columns)
 
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         self.context_menu_add_row.exec(event.globalPos())
+
+    def delete_columns(self):
+        while self.topLevelItemCount() > 0:
+            self.takeTopLevelItem(0)
+
+
+class comboBox_list_source_excel(QtWidgets.QComboBox):
+    def __init__(self, parent=None, check_widget=None):
+        super().__init__(parent)
+        self.check_widget = check_widget
+
+
+class ev_filt(QtCore.QObject):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        print(self.parent().check_widget)
+
+
+    def eventFilter(self, a0, a1) -> bool:
+        if a1.type() == QtCore.QEvent.MouseButtonPress:
+            if self.parent().check_widget.topLevelItemCount() > 0:
+                result = QtWidgets.QMessageBox.question(None,
+                                                        "Change list ?",
+                                                        "Change list ? Linked columns will remove",
+                                                        QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                        QtWidgets.QMessageBox.No
+                                                        )
+
+                if result == QtWidgets.QMessageBox.No:
+                    return True
+                elif result == QtWidgets.QMessageBox.Yes:
+                    return False
+            else:
+                return False
+        else:
+            return QtCore.QObject.eventFilter(self, a0, a1)
+
+
+
+
+
+
