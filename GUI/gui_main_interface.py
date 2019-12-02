@@ -395,9 +395,58 @@ class MainWindow(QtWidgets.QMainWindow):
             et.SubElement(column_to_add, 'colName').text = column['colName'].combo_box_name.currentText()
             et.SubElement(column_to_add, 'colNameDb').text = column['colNameDb'].currentText()
             et.SubElement(column_to_add, 'colType').text = list_of_types_dict_to_comboBox[f'{column["colType"].currentText()}']
+            et.SubElement(column_to_add, 'isPK').text = f"{column['isPK'].isChecked()}".lower()
 
-            # for replace in column['replace_box']:
-                # print(replace.checkBox_widget_for_replace_check.isChecked())
+            cropEnd = et.SubElement(column_to_add, 'cropEnd')
+            if column['cropEnd_box'].checkBox_widget_for_cropEnd_check.isChecked():
+                cropEnd.text = f"{column['cropEnd_box'].spin_box_cropEnd.value()}"
+            cropEnd.attrib['mode'] = \
+                f"{column['cropEnd_box'].checkBox_widget_for_cropEnd_check.isChecked()}".lower()
+
+            addValueEnd = et.SubElement(column_to_add, 'addValueEnd')
+            if column['addValueEnd_box'].checkBox_widget_for_addValueEnd_check.isChecked():
+                addValueEnd.text = f"{column['addValueEnd_box'].line_edit_addValueEnd.text()}"
+            addValueEnd.attrib['mode'] = \
+                f"{column['addValueEnd_box'].checkBox_widget_for_addValueEnd_check.isChecked()}".lower()
+
+            takeFromBegin = et.SubElement(column_to_add, 'takeFromBegin')
+            if column['takeFromBegin_box'].checkBox_widget_for_takeFromBegin_check.isChecked():
+                takeFromBegin.text = f"{column['takeFromBegin_box'].spin_box_takeFromBegin.value()}"
+            takeFromBegin.attrib['mode'] = \
+                f"{column['takeFromBegin_box'].checkBox_widget_for_takeFromBegin_check.isChecked()}".lower()
+
+            cropBegin = et.SubElement(column_to_add, 'cropBegin')
+            if column['cropBegin_box'].checkBox_widget_for_cropBegin_check.isChecked():
+                cropBegin.text = f"{column['cropBegin_box'].spin_box_cropBegin.value()}"
+            cropBegin.attrib['mode'] = \
+                f"{column['cropBegin_box'].checkBox_widget_for_cropBegin_check.isChecked()}".lower()
+
+            addValueBegin = et.SubElement(column_to_add, 'addValueBegin')
+            if column['addValueBegin_box'].checkBox_widget_for_addValueBegin_check.isChecked():
+                addValueBegin.text = f"{column['addValueBegin_box'].line_edit_addValueBegin.text()}"
+            addValueBegin.attrib['mode'] = \
+                f"{column['addValueBegin_box'].checkBox_widget_for_addValueBegin_check.isChecked()}".lower()
+
+            addValueBoth = et.SubElement(column_to_add, 'addValueBoth')
+            if column['addValueBoth_box'].checkBox_widget_for_addValueBoth_check.isChecked():
+                addValueBoth.text = \
+                    f"{column['addValueBoth_box'].line_edit_addBegin_Both_filter.text()},{column['addValueBoth_box'].line_edit_addEnd_Both_filter.text()}"
+            addValueBoth.attrib['mode'] = \
+                f"{column['addValueBoth_box'].checkBox_widget_for_addValueBoth_check.isChecked()}".lower()
+
+            replace_box = et.SubElement(column_to_add, 'replace')
+
+            for replace in column['replace_box']:
+                if replace.checkBox_widget_for_replace_check.isChecked():
+                    replace_box.attrib['mode'] = 'true'
+
+                    replaceVal = et.SubElement(replace_box, 'replaceVal')
+
+                    et.SubElement(replaceVal, 'value').text = f"""{replace.line_edit_addBegin_Both.text()}"""
+                    et.SubElement(replaceVal, 'toValue').text = f"""{replace.line_edit_addEnd_Both.text()}"""
+                else:
+                    replace_box.attrib['mode'] = 'false'
+
 
 
         print(et.dump(root))
