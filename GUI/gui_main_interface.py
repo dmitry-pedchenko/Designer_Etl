@@ -15,6 +15,7 @@ from dict_column_editor_viewer import create_dict_column
 import Core.DAO.DB_connector as db_con
 from Validate import Validate_res
 from DAO import XML_DAO as xpc
+import xml.etree.ElementTree as et
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -23,7 +24,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_of_source_cols_links = []
         self.list_of_receiver_cols_links = []
         self.config_dict = {}
-        self.list_of_db_pref = {}
         self.pref = {}
         self.list_of_dict_pref = []
 
@@ -89,7 +89,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_of_source_cols_links = []
         self.list_of_receiver_cols_links = []
         self.config_dict = {}
-        self.list_of_db_pref = {}
         self.pref = {}
         self.list_of_dict_pref = []
 
@@ -198,6 +197,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.treeWidget_of_Source.takeTopLevelItem(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
         else:
             dial_win = QtWidgets.QDialog(self)
+            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
             lay = QtWidgets.QVBoxLayout()
             lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
             dial_win.setLayout(lay)
@@ -205,11 +205,14 @@ class MainWindow(QtWidgets.QMainWindow):
             return
 
     def deleteReplace(self):
-        cur_column = list(filter(lambda x: x['colName'].combo_box_name.currentText() == self.treeWidget_of_Source.currentItem().parent().combo_box_name.currentText(), self.list_of_source_cols_links))[0]
+        cur_column = list(filter(lambda x: x['colName'].combo_box_name.currentText() ==
+                                           self.treeWidget_of_Source.currentItem().parent().combo_box_name.currentText(),
+                                 self.list_of_source_cols_links))[0]
         if len(cur_column['replace_box']) > 1:
             cur_column['replace_box'].remove(self.treeWidget_of_Source.currentItem())
         else:
             dial_win = QtWidgets.QDialog(self)
+            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
             lay = QtWidgets.QVBoxLayout()
             lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
             dial_win.setLayout(lay)
@@ -226,16 +229,24 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.pref_gui:
             self.pref_gui.show()
         else:
-            self.pref_gui = gui_prefernces_controller.Pref_Window(main_gui_widget=self,
-                                                                  list_of_db_pref=self.list_of_db_pref,
-                                                                  config_dict=self.config_dict,
-                                                                  pref=self.pref,
-                                                                  dbService=self.dbService,
-                                                                  logger_inst=self.loggerInst,
-                                                                  tables_in_db=self.tables_in_receiver,
-                                                                  schemas_in_db=self.schemas_in_db,
-                                                                  parent=self.pref_gui
-                                                                  )
+            try:
+                self.pref_gui = gui_prefernces_controller.Pref_Window(main_gui_widget=self,
+                                                                      config_dict=self.config_dict,
+                                                                      pref=self.pref,
+                                                                      dbService=self.dbService,
+                                                                      logger_inst=self.loggerInst,
+                                                                      tables_in_db=self.tables_in_receiver,
+                                                                      schemas_in_db=self.schemas_in_db,
+                                                                      parent=self.pref_gui
+                                                                      )
+            except Exception as e:
+                dial_win = QtWidgets.QDialog(self)
+                dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
+                lay = QtWidgets.QVBoxLayout()
+                lay.addWidget(QtWidgets.QLabel("Open config !!!"))
+                dial_win.setLayout(lay)
+                dial_win.exec_()
+                return
             self.pref_gui.show()
 
     def show_open_config(self):
@@ -256,6 +267,7 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 self.close_project_data()
                 dial_win = QtWidgets.QDialog(self)
+                dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
                 lay = QtWidgets.QVBoxLayout()
                 lay.addWidget(QtWidgets.QLabel(e.__str__()))
                 dial_win.setLayout(lay)
@@ -277,6 +289,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 except Exception as e:
                     self.close_project_data()
                     dial_win = QtWidgets.QDialog(self)
+                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
                     lay = QtWidgets.QVBoxLayout()
                     lay.addWidget(QtWidgets.QLabel(e.__str__()))
                     dial_win.setLayout(lay)
@@ -337,9 +350,57 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.list_of_source_cols_links))[0]['replace_box'].append(replace)
 
     def save_configuration(self):
-        print(self.list_of_source_cols_links,
-              self.list_of_receiver_cols_links
-              )
+        # print(
+        #     self.list_of_source_cols_links,
+        #       self.list_of_receiver_cols_links,
+        #       self.pref,
+        #       self.list_of_dict_pref
+        #       )
+
+        list_of_types_dict_to_comboBox = {
+            'String': 'str',
+            'Float': 'float',
+            'Integer': 'int',
+            'Date': 'date',
+            '---': '---'
+        }
+
+        root = et.Element('main')
+        importXml = et.SubElement(root, 'importXml')
+        importXml_columns = et.SubElement(importXml, 'columns')
+        linkedColumns = et.SubElement(importXml, 'linkedColumns')
+        withDict = et.SubElement(importXml, 'withDict')
+        exportTable = et.SubElement(root, 'exportTable')
+        exportTable_columns = et.SubElement(exportTable, 'columns')
+
+
+        et.SubElement(root, 'dbtype').text =  f'{self.pref["dbtype"]}'
+        et.SubElement(root, 'dbHost').text =  f'{self.pref["dbHost"]}'
+        et.SubElement(root, 'dbUser').text =  f'{self.pref["dbUser"]}'
+        et.SubElement(root, 'dbPass').text =  f'{self.pref["dbPass"]}'
+        et.SubElement(root, 'dbBase').text =  f'{self.pref["dbBase"]}'
+        et.SubElement(root, 'dbPort').text =  f'{self.pref["dbPort"]}'
+        et.SubElement(root, 'loadMode').text =  f'{self.pref["Load Mode"]}'.lower()
+        et.SubElement(root, 'dict').text =  f'{self.pref["checkBox_Dictionary"]}'.lower()
+        et.SubElement(root, 'checkMode').text =  f'{self.pref["checkBox_checkMode"]}'.lower()
+        et.SubElement(importXml, 'path').text = f'{self.pref["excelFileName"]}'
+        et.SubElement(importXml, 'sheetNumber').text = f'{self.pref["comboBox_list_source_excel"]}'
+
+        linkedColumns.attrib['mode'] = f'{self.pref["checkBox_checkMode"]}'.lower()
+        withDict.attrib['mode'] = f'{self.pref["checkBox_checkMode"]}'.lower()
+
+        for column in self.list_of_source_cols_links:
+            column_to_add = et.SubElement(importXml_columns, 'column')
+
+            et.SubElement(column_to_add, 'colName').text = column['colName'].combo_box_name.currentText()
+            et.SubElement(column_to_add, 'colNameDb').text = column['colNameDb'].currentText()
+            et.SubElement(column_to_add, 'colType').text = list_of_types_dict_to_comboBox[f'{column["colType"].currentText()}']
+
+            # for replace in column['replace_box']:
+                # print(replace.checkBox_widget_for_replace_check.isChecked())
+
+
+        print(et.dump(root))
 
 
 if __name__ == '__main__':

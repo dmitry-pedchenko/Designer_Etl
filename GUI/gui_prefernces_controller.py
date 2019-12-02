@@ -12,7 +12,6 @@ import pandas as pd
 class Pref_Window(QtWidgets.QWidget):
     def __init__(self,
                  main_gui_widget,
-                 list_of_db_pref: dict,
                  config_dict: dict,
                  pref: dict,
                  logger_inst,
@@ -32,7 +31,6 @@ class Pref_Window(QtWidgets.QWidget):
         self.logger_inst = logger_inst
         self.main_gui = main_gui_widget
         self.config_dict = config_dict
-        self.list_of_db_pref = list_of_db_pref
         self.ui = form_preferences.Ui_Form()
         self.ui.setupUi(self)
 
@@ -140,6 +138,7 @@ class Pref_Window(QtWidgets.QWidget):
             target_column = [i for i in self.df_compare.parse(self.comboBox_set_list_checked.currentIndex()).columns.values]
         else:
             dial_win = QtWidgets.QDialog(self)
+            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
             lay = QtWidgets.QVBoxLayout()
             lay.addWidget(QtWidgets.QLabel("Choose a file !!!"))
             dial_win.setLayout(lay)
@@ -255,7 +254,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['dbSchema'] = self.ui.comboBox_dbSchema.currentText()
         self.pref['Load Mode'] = self.ui.comboBox_chose_loadMode.currentText()
         self.pref['excelFileName'] = self.ui.excelFileName.text()
-        self.pref['comboBox_list_source_excel'] = self.comboBox_list_source_excel.currentText()
+        self.pref['comboBox_list_source_excel'] = self.comboBox_list_source_excel.currentIndex()
         self.pref['target_table_name'] = self.ui.target_table_name.currentText()
         self.pref['checkBox_checkMode'] = self.ui.checkBox_checkMode.isChecked()
         self.pref['compare_file'] = self.ui.compare_file.text()
@@ -407,7 +406,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['dbSchema'] = self.ui.comboBox_dbSchema.currentText()
         self.pref['Load Mode'] = self.ui.comboBox_chose_loadMode.currentText()
         self.pref['excelFileName'] = self.ui.excelFileName.text()
-        self.pref['comboBox_list_source_excel'] = self.comboBox_list_source_excel.currentText()
+        self.pref['comboBox_list_source_excel'] = self.comboBox_list_source_excel.currentIndex()
         self.pref['target_table_name'] = self.ui.target_table_name.currentText()
         self.pref['checkBox_checkMode'] = self.ui.checkBox_checkMode.isChecked()
         self.pref['compare_file'] = self.ui.compare_file.text()

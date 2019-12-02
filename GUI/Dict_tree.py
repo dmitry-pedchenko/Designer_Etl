@@ -97,6 +97,7 @@ class DictTree(QtWidgets.QTreeWidget):
 
         if len(cur_table) == 1:
             dial_win = QtWidgets.QDialog(self)
+            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
             lay = QtWidgets.QVBoxLayout()
             lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
             dial_win.setLayout(lay)
@@ -248,6 +249,7 @@ class DictTree(QtWidgets.QTreeWidget):
             )[0]
         else:
             dial_win = QtWidgets.QDialog(self)
+            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
             lay = QtWidgets.QVBoxLayout()
             lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
             dial_win.setLayout(lay)

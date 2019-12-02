@@ -34,7 +34,7 @@ class Source_tree(QtWidgets.QTreeWidget):
                 self.context_menu_duplicate_replace.exec(event.globalPos())
                 return
         except:
-            self.context_menu_duplicate_row.exec(event.globalPos())
+            pass
 
 
 
