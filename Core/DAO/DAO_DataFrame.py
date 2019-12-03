@@ -10,7 +10,10 @@ class ExcelSelect:
         lambdaStr = lambda x: str(x)
         lambdaInt = lambda x: int(x)
         lambdaFloat = lambda x: float(x)
-        lambdaDate = lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y")
+        try:
+            lambdaDate = lambda x: datetime.datetime.strptime(str(x), "%d.%m.%Y")
+        except Exception as e:
+            log.raiseError(45, e)
 
         for col in arrOfColTypesInExcel.keys():
             if arrOfColTypesInExcel.get(col) == 'str':
@@ -29,8 +32,10 @@ class ExcelSelect:
 
         if not self.df.sheet_names:
             log.raiseError(42)
-
-        sheet = self.df.parse(listNumber, converters=arrConverters)
+        try:
+            sheet = self.df.parse(listNumber, converters=arrConverters)
+        except Exception as e:
+            log.raiseError(45, e)
         self.sheet_name = self.df.sheet_names[listNumber]
         self.newDf = sheet.fillna("null")
 

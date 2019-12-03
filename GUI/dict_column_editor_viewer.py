@@ -93,8 +93,6 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
                 parent.addTopLevelItem(replace_box)
                 temp_dict['replace_box'].append(replace_box)
 
-
-
             temp_dict['colNameRow'] = colNameRow
             temp_dict['colNameDbRow'] = colNameDbRow
             temp_dict['colTypeRow'] = colTypeRow

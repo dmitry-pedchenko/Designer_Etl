@@ -517,10 +517,9 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
             if self.column_property['filter_dict_edit']['addValueBegin_mode'] == 'false':
                 self.checkBox_widget_f_addValueBegin_check.setCheckState(QtCore.Qt.Unchecked)
                 self.line_edit_f_addValueBegin.setDisabled(True)
-
             if self.column_property['filter_dict_edit']['addValueBoth_mode'] == 'true':
-                self.line_edit_addBegin_Both_filter.setText(self.column_property['addValueBoth'].split(',')[0])
-                self.line_edit_addEnd_Both_filter.setText(self.column_property['addValueBoth'].split(',')[1])
+                self.line_edit_addBegin_Both_filter.setText(self.column_property['filter_dict_edit']['addValueBoth'].split(',')[0])
+                self.line_edit_addEnd_Both_filter.setText(self.column_property['filter_dict_edit']['addValueBoth'].split(',')[1])
                 self.checkBox_widget_f_addValueBoth_check.setCheckState(QtCore.Qt.Checked)
             if self.column_property['filter_dict_edit']['addValueBoth_mode'] == 'false':
                 self.checkBox_widget_f_addValueBoth_check.setCheckState(QtCore.Qt.Unchecked)
@@ -543,16 +542,25 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                 self.line_edit_addEnd_filter = QtWidgets.QDateEdit()
                 self.line_edit_addEnd_filter.setDisplayFormat("yyyy.MM.dd")
                 self.line_edit_addEnd_filter.setCalendarPopup(True)
-                self.line_edit_addEnd_filter.setDate(
+                try:
+                    self.line_edit_addEnd_filter.setDate(
                     datetime.datetime.strptime(self.column_property['filterArr'][0]['filterValue'], "%Y.%m.%d"))
+                except Exception as e:
+                    dial_win = QtWidgets.QDialog()
+                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
+                    lay = QtWidgets.QVBoxLayout()
+                    lay.addWidget(QtWidgets.QLabel(f"Wrong date format in config file. <{e}> !!!"))
+                    dial_win.setLayout(lay)
+                    dial_win.exec_()
+                    return
 
             if self.column_property['colType'] != 'str':
                 self.combo_box_filter_condition = QtWidgets.QComboBox()
-                self.list_of_types_equals_for_filter = ['!=', '=', '>', '<', '<=', '>=']
+                self.list_of_types_equals_for_filter = ['!=', '=', '>', '<', '<=', '>=', '---']
                 self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
             if self.column_property['colType'] == 'str':
                 self.combo_box_filter_condition = QtWidgets.QComboBox()
-                self.list_of_types_equals_for_filter = ['!=', '=']
+                self.list_of_types_equals_for_filter = ['!=', '=', '---']
                 self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
 
             self.widget_for_filter = QtWidgets.QWidget()
@@ -566,9 +574,22 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
             self.widget_for_filter.setLayout(hbox_layout_filter)
 
             self.parent.setItemWidget(self.filter_box_sub_filter_state, 1, self.widget_for_filter)
+            if self.column_property['filterArr'][0]['filterMode']:
+                try:
+                    self.combo_box_filter_condition.setCurrentIndex(
+                    self.list_of_types_equals_for_filter.index(self.column_property['filterArr'][0]['filterMode']))
+                except Exception as e:
+                    dial_win = QtWidgets.QDialog()
+                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
+                    lay = QtWidgets.QVBoxLayout()
+                    lay.addWidget(QtWidgets.QLabel(f"Wrong filter mode. <{e}> !!!"))
+                    dial_win.setLayout(lay)
+                    dial_win.exec_()
+                    self.combo_box_filter_condition.setCurrentText('---')
+                    return
+            else:
+                self.combo_box_filter_condition.setCurrentText('---')
 
-            self.combo_box_filter_condition.setCurrentIndex(
-                self.list_of_types_equals_for_filter.index(self.column_property['filterArr'][0]['filterMode']))
 
         else:
             self.checkBox_widget_for_filter_check.setCheckState(QtCore.Qt.Unchecked)
@@ -591,16 +612,17 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
 
             if self.column_property['colType'] != 'str':
                 self.combo_box_filter_condition = QtWidgets.QComboBox()
-                self.list_of_types_equals_for_filter = ['!=', '=', '>', '<', '<=', '>=']
+                self.list_of_types_equals_for_filter = ['!=', '=', '>', '<', '<=', '>=', '---']
                 self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
             if self.column_property['colType'] == 'str':
                 self.combo_box_filter_condition = QtWidgets.QComboBox()
-                self.list_of_types_equals_for_filter = ['!=', '=']
+                self.list_of_types_equals_for_filter = ['!=', '=', '---']
                 self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
             if self.column_property['colType'] == '---':
                 self.combo_box_filter_condition = QtWidgets.QComboBox()
-                list_of_types_equals_for_filter = ['---']
-                self.combo_box_filter_condition.addItems(list_of_types_equals_for_filter)
+                self.list_of_types_equals_for_filter = ['---']
+                self.combo_box_filter_condition.addItems(self.list_of_types_equals_for_filter)
+
 
             self.widget_for_filter = QtWidgets.QWidget()
             hbox_layout_filter = QtWidgets.QHBoxLayout()

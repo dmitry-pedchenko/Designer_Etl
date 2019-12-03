@@ -171,9 +171,12 @@ class Log_info(Exception):
             message_temp = f"""{dict_of_err_types.get(5)}: Can't find file <{message[0]}>"""
         if errNum == 44:
             message_temp = f"""{dict_of_err_types.get(4)}: Message - <{message[0]}>"""
+        if errNum == 45:
+            message_temp = f"""{dict_of_err_types.get(5)}: Wrong cell value in Excel file - <{message[0]}>"""
 
         self.err_str = t.substitute(num=errNum, message=message_temp)
         self.logger.error(t.substitute(num=errNum, message=message_temp))
+
         if os.path.basename(sys.argv[0]) != 'gui_main_interface.py':
             raise SystemExit(1)
         else:

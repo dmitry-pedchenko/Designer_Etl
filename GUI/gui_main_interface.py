@@ -297,7 +297,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     return
 
                 connector = con.get_instance(self.loggerInst)
-                self.dbService = xpc.XmlParser(path, self.loggerInst)
+                try:
+                    self.dbService = xpc.XmlParser(path, self.loggerInst)
+                except Exception as e:
+                    self.close_project_data()
+                    dial_win = QtWidgets.QDialog(self)
+                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
+                    lay = QtWidgets.QVBoxLayout()
+                    lay.addWidget(QtWidgets.QLabel(f"Can't parse Excel file\n{e} !!!"))
+                    dial_win.setLayout(lay)
+                    dial_win.exec_()
+                    return
+
                 self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
                 self.columns_in_db = self.validator.queryForColumns()
                 self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
@@ -324,9 +335,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
             self.show_pref()
 
-        if self.pref_gui.ui.checkBox_Dictionary.isChecked():
-            self.ui.actionDictionary.setChecked(True)
-            self.ui.actionDictionary.triggered.emit(1)
+            if self.pref_gui.ui.checkBox_Dictionary.isChecked():
+                self.ui.actionDictionary.setChecked(True)
+                self.ui.actionDictionary.triggered.emit(1)
 
     def addColumnField(self):
         source_column_editor_viewer.create_input_column(
@@ -373,28 +384,26 @@ class MainWindow(QtWidgets.QMainWindow):
         exportTable = et.SubElement(root, 'exportTable')
         exportTable_columns = et.SubElement(exportTable, 'columns')
 
-
-        et.SubElement(root, 'dbtype').text =  f'{self.pref["dbtype"]}'
-        et.SubElement(root, 'dbHost').text =  f'{self.pref["dbHost"]}'
-        et.SubElement(root, 'dbUser').text =  f'{self.pref["dbUser"]}'
-        et.SubElement(root, 'dbPass').text =  f'{self.pref["dbPass"]}'
-        et.SubElement(root, 'dbBase').text =  f'{self.pref["dbBase"]}'
-        et.SubElement(root, 'dbPort').text =  f'{self.pref["dbPort"]}'
-        et.SubElement(root, 'loadMode').text =  f'{self.pref["Load Mode"]}'.lower()
-        et.SubElement(root, 'dict').text =  f'{self.pref["checkBox_Dictionary"]}'.lower()
-        et.SubElement(root, 'checkMode').text =  f'{self.pref["checkBox_checkMode"]}'.lower()
+        et.SubElement(root, 'dbtype').text = f'{self.pref["dbtype"]}'
+        et.SubElement(root, 'dbHost').text = f'{self.pref["dbHost"]}'
+        et.SubElement(root, 'dbUser').text = f'{self.pref["dbUser"]}'
+        et.SubElement(root, 'dbPass').text = f'{self.pref["dbPass"]}'
+        et.SubElement(root, 'dbBase').text = f'{self.pref["dbBase"]}'
+        et.SubElement(root, 'dbPort').text = f'{self.pref["dbPort"]}'
+        et.SubElement(root, 'loadMode').text = f'{self.pref["Load Mode"]}'.lower()
+        et.SubElement(root, 'dict').text = f'{self.pref["checkBox_Dictionary"]}'.lower()
+        et.SubElement(root, 'checkMode').text = f'{self.pref["checkBox_checkMode"]}'.lower()
         et.SubElement(importXml, 'path').text = f'{self.pref["excelFileName"]}'
         et.SubElement(importXml, 'sheetNumber').text = f'{self.pref["comboBox_list_source_excel"]}'
 
         linkedColumns.attrib['mode'] = f'{self.pref["checkBox_checkMode"]}'.lower()
-        withDict.attrib['mode'] = f'{self.pref["checkBox_checkMode"]}'.lower()
 
         for column in self.list_of_source_cols_links:
             column_to_add = et.SubElement(importXml_columns, 'column')
 
             et.SubElement(column_to_add, 'colName').text = column['colName'].combo_box_name.currentText()
             et.SubElement(column_to_add, 'colNameDb').text = column['colNameDb'].currentText()
-            et.SubElement(column_to_add, 'colType').text = list_of_types_dict_to_comboBox[f'{column["colType"].currentText()}']
+            col_type = et.SubElement(column_to_add, 'colType').text = list_of_types_dict_to_comboBox[f'{column["colType"].currentText()}']
             et.SubElement(column_to_add, 'isPK').text = f"{column['isPK'].isChecked()}".lower()
 
             cropEnd = et.SubElement(column_to_add, 'cropEnd')
@@ -447,7 +456,126 @@ class MainWindow(QtWidgets.QMainWindow):
                 else:
                     replace_box.attrib['mode'] = 'false'
 
+            filter_box = et.SubElement(column_to_add, 'filter')
+            if column['filter_box'].checkBox_widget_for_filter_check.isChecked():
+                filter_box.attrib['mode'] = 'true'
 
+                f_cropEnd = et.SubElement(filter_box, 'f_cropEnd')
+                if column['filter_box'].checkBox_widget_f_cropEnd_check.isChecked():
+                    f_cropEnd.text = f'{column["filter_box"].spin_box_f_cropEnd.value()}'
+                f_cropEnd.attrib['mode'] = \
+                    f'{column["filter_box"].checkBox_widget_f_cropEnd_check.isChecked()}'.lower()
+
+                f_addValueEnd = et.SubElement(filter_box, 'f_addValueEnd')
+                if column['filter_box'].checkBox_widget_f_addValueEnd_check.isChecked():
+                    f_addValueEnd.text = f'{column["filter_box"].line_edit_f_addValueEnd.text()}'
+                f_addValueEnd.attrib['mode'] = \
+                    f'{column["filter_box"].checkBox_widget_f_addValueEnd_check.isChecked()}'.lower()
+
+                f_takeFromBegin = et.SubElement(filter_box, 'f_takeFromBegin')
+                if column['filter_box'].checkBox_widget_f_takeFromBegin_check.isChecked():
+                    f_takeFromBegin.text = f'{column["filter_box"].spin_box_f_takeFromBegin.value()}'
+                f_takeFromBegin.attrib['mode'] = \
+                    f'{column["filter_box"].checkBox_widget_f_takeFromBegin_check.isChecked()}'.lower()
+
+                f_cropBegin = et.SubElement(filter_box, 'f_cropBegin')
+                if column['filter_box'].checkBox_widget_f_cropBegin_check.isChecked():
+                    f_cropBegin.text = f'{column["filter_box"].spin_box_f_cropBegin.value()}'
+                f_cropBegin.attrib['mode'] = \
+                    f'{column["filter_box"].checkBox_widget_f_cropBegin_check.isChecked()}'.lower()
+
+                f_addValueBegin = et.SubElement(filter_box, 'f_addValueBegin')
+                if column['filter_box'].checkBox_widget_f_addValueBegin_check.isChecked():
+                    f_addValueBegin.text = f'{column["filter_box"].line_edit_f_addValueBegin.text()}'
+                f_addValueBegin.attrib['mode'] = \
+                    f'{column["filter_box"].checkBox_widget_f_addValueBegin_check.isChecked()}'.lower()
+
+                f_addValueBoth = et.SubElement(filter_box, 'f_addValueBoth')
+                if column['filter_box'].checkBox_widget_f_addValueBoth_check.isChecked():
+                    f_addValueBoth.text = f'{column["filter_box"].line_edit_addBegin_Both_filter.text()},{column["filter_box"].line_edit_addEnd_Both_filter.text()}'
+                f_addValueBoth.attrib['mode'] = \
+                    f'{column["filter_box"].checkBox_widget_f_addValueBoth_check.isChecked()}'.lower()
+
+                filterVal = et.SubElement(filter_box, 'filterVal')
+                filterMode = et.SubElement(filterVal, 'filterMode')
+                filterValue = et.SubElement(filterVal, 'filterValue')
+                if column['filter_box'].combo_box_filter_condition.currentText() == '---':
+                    dial_win = QtWidgets.QDialog(self)
+                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
+                    lay = QtWidgets.QVBoxLayout()
+                    lay.addWidget(QtWidgets.QLabel(f"Filter mode must be not '---' !!!"))
+                    dial_win.setLayout(lay)
+                    dial_win.exec_()
+                    return
+
+                filterMode.text = f"{column['filter_box'].combo_box_filter_condition.currentText()}"
+
+                if col_type == 'str':
+                    filterValue.text = column['filter_box'].line_edit_addEnd_filter.text()
+                elif col_type == 'int' or col_type == 'float':
+                    filterValue.text = column['filter_box'].line_edit_addEnd_filter.value()
+                elif col_type == 'date':
+                    filterValue.text = column['filter_box'].line_edit_addEnd_filter.date().toPyDate().strftime("%Y.%m.%d")
+                else:
+                    self.loggerInst.raiseError(0, 'Unknown filter type')
+
+            else:
+                filter_box.attrib['mode'] = 'false'
+
+            post_filter = et.SubElement(column_to_add, 'post-filter')
+
+            if column['post_filter_box'].checkBox_widget_for_post_filter_check.isChecked():
+                post_filter.attrib['mode'] = 'true'
+
+                filterMode = et.SubElement(post_filter, 'filterMode')
+                filterValue = et.SubElement(post_filter, 'filterValue')
+
+                filterMode.text = f"{column['post_filter_box'].combo_box_post_filter_condition.currentText()}"
+
+                if col_type == 'str':
+                    filterValue.text = column['post_filter_box'].line_edit_post_filter.text()
+                elif col_type == 'int' or col_type == 'float':
+                    filterValue.text = column['post_filter_box'].line_edit_post_filter.value()
+                elif col_type == 'date':
+                    filterValue.text = column['post_filter_box'].line_edit_post_filter.date().toPyDate().strftime("%Y.%m.%d")
+                else:
+                    self.loggerInst.raiseError(0, 'Unknown filter type')
+            else:
+                post_filter.attrib['mode'] = 'false'
+
+        if self.pref_gui.ui.checkBox_checkMode.isChecked():
+            pathToLinkFile = et.SubElement(linkedColumns, 'pathToLinkFile')
+            pathToLinkFile.text = f"{self.pref_gui.ui.compare_file.text()}"
+            linkedFileSheetNumber = et.SubElement(linkedColumns, 'linkedFileSheetNumber')
+            linkedFileSheetNumber.text = f"{self.pref_gui.comboBox_set_list_checked.currentIndex()}"
+            both = et.SubElement(linkedColumns, 'both')
+            both.text = f"{self.pref_gui.ui.checkBox_both.isChecked()}".lower()
+
+            for col in self.pref['col_to_check']:
+                column = et.SubElement(linkedColumns, 'column')
+                linkedColName = et.SubElement(column, 'linkedColName')
+                colNameInSource = et.SubElement(column, 'colNameInSource')
+
+                colNameInSource.text = f"{col.combo_box_source_links.currentText()}"
+                linkedColName.text = f"{col.combo_box_target_links.currentText()}"
+
+        if self.pref_gui.ui.checkBox_Dictionary.isChecked():
+            # withDict
+            tables = et.SubElement(withDict, 'tables')
+            withDict.attrib['mode'] = 'true'
+
+            for table_count in self.list_of_dict_pref:
+                table = et.SubElement(tables, 'table')
+                dictTableName = et.SubElement(table, 'dictTableName')
+                indxDbColumn = et.SubElement(table, 'indxDbColumn')
+                indxColumnDic = et.SubElement(table, 'indxColumnDic')
+
+                columns = et.SubElement(table, 'columns')
+
+                for col_count in table_count['columns']:
+                    column = et.SubElement(columns, 'column')
+        else:
+            withDict.attrib['mode'] = 'false'
 
         print(et.dump(root))
 
