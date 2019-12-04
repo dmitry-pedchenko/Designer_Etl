@@ -1,5 +1,5 @@
 from Parser import XML_parser
-from DAO import DAO_DataFrame
+from Core.DAO import DAO_DataFrame
 import os
 
 class XmlParser:

@@ -89,6 +89,7 @@ def create_receiver_column(tree_table: QtWidgets.QTreeWidget, column_property: d
 class ColumnnameReceiverRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget = None):
         super().__init__(parent, ["colName", column_property['colName']])
+        self.name = column_property['colName']
         self.col_name = column_property['colName']
         self.column_property = column_property
 

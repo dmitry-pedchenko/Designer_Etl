@@ -53,7 +53,7 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
             addValueEndRow = AddValueEndRow(row, parent, colNameRow)
             takeFromBeginRow = TakeFromBeginRow(row, parent, colNameRow)
             cropBeginRow = CropBeginRow(row, parent, colNameRow)
-            addValueBeginRow = CropBeginRow(row, parent, colNameRow)
+            addValueBeginRow = AddValueBeginRow(row, parent, colNameRow)
             addValueBothRow = AddValueBothRow(row, parent, colNameRow)
 
             if row['replace_mode'] == 'true':
@@ -120,7 +120,7 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
         addValueEndRow = AddValueEndRow(cur_dic_table_pref, parent, colNameRow)
         takeFromBeginRow = TakeFromBeginRow(cur_dic_table_pref, parent, colNameRow)
         cropBeginRow = CropBeginRow(cur_dic_table_pref, parent, colNameRow)
-        addValueBeginRow = CropBeginRow(cur_dic_table_pref, parent, colNameRow)
+        addValueBeginRow = AddValueBeginRow(cur_dic_table_pref, parent, colNameRow)
         addValueBothRow = AddValueBothRow(cur_dic_table_pref, parent, colNameRow)
 
 
@@ -178,11 +178,11 @@ class IndxDbColumn(QtWidgets.QTreeWidgetItem):
     def __init__(self, cur_dic_table_pref, parent, tree_widget, config, columns_in_receiver):
         super().__init__(parent, ['indxDbColumn', ])
         list_indxDbColumn = [i[0] for i in columns_in_receiver]
-        combo_box_indxDbColumn = QtWidgets.QComboBox()
-        combo_box_indxDbColumn.addItems(list_indxDbColumn)
+        self.combo_box_indxDbColumn = QtWidgets.QComboBox()
+        self.combo_box_indxDbColumn.addItems(list_indxDbColumn)
         if cur_dic_table_pref['indxDbColumn']:
-            combo_box_indxDbColumn.setCurrentIndex(list_indxDbColumn.index(cur_dic_table_pref['indxDbColumn']))
-        tree_widget.setItemWidget(self, 1, combo_box_indxDbColumn)
+            self.combo_box_indxDbColumn.setCurrentIndex(list_indxDbColumn.index(cur_dic_table_pref['indxDbColumn']))
+        tree_widget.setItemWidget(self, 1, self.combo_box_indxDbColumn)
 
 
 class IndxColumnDic(QtWidgets.QTreeWidgetItem):

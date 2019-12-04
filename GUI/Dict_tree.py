@@ -3,6 +3,7 @@ import sys
 from dict_column_editor_viewer import create_dict_column
 import gui_main_interface
 import dict_column_editor_viewer
+from alarm_window import show_alarm_window
 
 class DictTree(QtWidgets.QTreeWidget):
     def __init__(self, list_of_dict_pref, config, validator, tables_in_receiver, columns_names_source, window_pref, parent=None):
@@ -96,12 +97,7 @@ class DictTree(QtWidgets.QTreeWidget):
         )[0]['columns']
 
         if len(cur_table) == 1:
-            dial_win = QtWidgets.QDialog(self)
-            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-            lay = QtWidgets.QVBoxLayout()
-            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
-            dial_win.setLayout(lay)
-            dial_win.exec_()
+            show_alarm_window(self,"You can't delete last element !!!")
             return
 
         cur_line = list(
@@ -248,12 +244,7 @@ class DictTree(QtWidgets.QTreeWidget):
                        self.list_of_dict_pref)
             )[0]
         else:
-            dial_win = QtWidgets.QDialog(self)
-            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-            lay = QtWidgets.QVBoxLayout()
-            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
-            dial_win.setLayout(lay)
-            dial_win.exec_()
+            show_alarm_window(self,"You can't delete last element !!!")
             return
         self.list_of_dict_pref.remove(cur_column)
         self.takeTopLevelItem(self.indexFromItem(self.currentItem()).row())

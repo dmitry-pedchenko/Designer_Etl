@@ -5,9 +5,9 @@ from gui_qt import main_window
 from gui_qt import form_preferences
 import os
 from PyQt5 import QtGui
-from DAO import XML_DAO as xpc
+from Core.DAO import XML_DAO as xpc
 import pandas as pd
-
+from alarm_window import show_alarm_window
 
 class Pref_Window(QtWidgets.QWidget):
     def __init__(self,
@@ -69,10 +69,10 @@ class Pref_Window(QtWidgets.QWidget):
             # except Exception as e:
             #     raise Exception
                 # self.parent.close_project_data()
-        if self.ui.checkBox_checkMode.isChecked():
-            self.ui.target_table_name.setDisabled(True)
-        else:
-            self.ui.target_table_name.setDisabled(False)
+        # if self.ui.checkBox_checkMode.isChecked():
+        #     self.ui.target_table_name.setDisabled(True)
+        # else:
+        #     self.ui.target_table_name.setDisabled(False)
 
         self.ui.button_save_pref.clicked.connect(self.save_db_pref)
 
@@ -137,12 +137,13 @@ class Pref_Window(QtWidgets.QWidget):
         if self.df_compare:
             target_column = [i for i in self.df_compare.parse(self.comboBox_set_list_checked.currentIndex()).columns.values]
         else:
-            dial_win = QtWidgets.QDialog(self)
-            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-            lay = QtWidgets.QVBoxLayout()
-            lay.addWidget(QtWidgets.QLabel("Choose a file !!!"))
-            dial_win.setLayout(lay)
-            dial_win.exec_()
+            show_alarm_window(self, "Choose a file !!!")
+            # dial_win = QtWidgets.QDialog(self)
+            # dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
+            # lay = QtWidgets.QVBoxLayout()
+            # lay.addWidget(QtWidgets.QLabel("Choose a file !!!"))
+            # dial_win.setLayout(lay)
+            # dial_win.exec_()
             return
 
         source_column = [i for i in self.df.parse(self.comboBox_list_source_excel.currentIndex()).columns.values]
@@ -208,11 +209,18 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.lineEdit_dbhost.setText(self.config_dict['dbHost'])
         self.ui.excelFileName.setText(self.config_dict['importXml_path_value'])
         self.ui.comboBox_chose_loadMode.setCurrentText(self.config_dict['loadMode'])
-        if self.config_dict['checkMode_value'] == 'false':
-            self.ui.target_table_name.addItems(sorted(self.tables_in_db))
-            self.ui.target_table_name.setCurrentIndex(sorted(self.tables_in_db).index(self.config_dict['exportTableName_value_text']))
+        # if self.config_dict['checkMode_value'] == 'false':
+        self.ui.target_table_name.addItems(sorted(self.tables_in_db))
+        self.ui.target_table_name.setCurrentIndex(sorted(self.tables_in_db).index(self.config_dict['exportTableName_value_text']))
 
         if self.config_dict['checkMode_value'] == 'true':
+
+            self.ui.comboBox_dbSchema.addItems(self.schemas_in_db)
+            self.ui.comboBox_dbSchema.setCurrentIndex(self.schemas_in_db.index(self.config_dict['db_schema']))
+
+            self.ui.checkBox_Dictionary.setCheckState(QtCore.Qt.Unchecked)
+            self.ui.checkBox_Dictionary.setDisabled(True)
+
             self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Checked)
             self.create_links_columns()
 

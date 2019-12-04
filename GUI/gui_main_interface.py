@@ -14,11 +14,16 @@ import Dict_tree
 from dict_column_editor_viewer import create_dict_column
 import Core.DAO.DB_connector as db_con
 from Validate import Validate_res
-from DAO import XML_DAO as xpc
+from Core.DAO import XML_DAO as xpc
 import xml.etree.ElementTree as et
+from GUI.DAO.create_xml import create_config
+from alarm_window import show_alarm_window
+from error_window import show_error_window
+from connection_db import CreateConnection
 
 
 class MainWindow(QtWidgets.QMainWindow):
+
     def __init__(self):
         super().__init__()
         self.list_of_source_cols_links = []
@@ -58,6 +63,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tables_in_receiver = None
         self.schemas_in_db = None
 
+        self.ui.actionSave.setDisabled(True)
+        self.ui.actionSave_as.setDisabled(True)
+
+        # self.ui.actionLoader.setDisabled(True)
+        self.ui.actionConfig_Editor.setDisabled(True)
+        self.ui.actionDictionary.setDisabled(True)
+        self.ui.actionEditor.setDisabled(True)
+        self.connection_tread = CreateConnection()
         self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
         self.ui.gridLayout_2.addWidget(self.tabWidget, 0, 0, 1, 1)
@@ -65,13 +78,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionPreferences.triggered.connect(self.show_pref)
         self.ui.actionOpen.triggered.connect(self.show_open_config)
         self.ui.actionSave.triggered.connect(self.save_configuration)
+        self.ui.actionSave_as.triggered.connect(self.save_as_configuration)
         self.ui.actionConfiguration_Wizard.triggered.connect(self.show_wizrd)
         self.ui.actionConfig_Editor.triggered.connect(self.show_config_editor)
         self.ui.actionLoader.triggered.connect(self.show_loader)
         self.ui.actionDictionary.triggered.connect(self.show_dictionary)
         self.ui.actionClose_Project.triggered.connect(self.close_project_data)
+        self.connection_tread.task_done.connect(self.created_connection, QtCore.Qt.QueuedConnection)
 
     def close_project_data(self):
+
+        self.setWindowTitle(f"Easy Loader")
 
         if self.ui.actionConfig_Editor.isChecked():
             self.ui.actionConfig_Editor.setChecked(False)
@@ -101,6 +118,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab_widget_config_editor = None
         self.tab_widget_loader = None
         self.tab_widget_dictionary = None
+
+
 
 
     def create_config_editor(self):
@@ -196,12 +215,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.list_of_source_cols_links.remove(element)
             self.treeWidget_of_Source.takeTopLevelItem(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
         else:
-            dial_win = QtWidgets.QDialog(self)
-            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-            lay = QtWidgets.QVBoxLayout()
-            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
-            dial_win.setLayout(lay)
-            dial_win.exec_()
+            show_alarm_window(self,"You can't delete last element !!!")
             return
 
     def deleteReplace(self):
@@ -211,12 +225,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(cur_column['replace_box']) > 1:
             cur_column['replace_box'].remove(self.treeWidget_of_Source.currentItem())
         else:
-            dial_win = QtWidgets.QDialog(self)
-            dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-            lay = QtWidgets.QVBoxLayout()
-            lay.addWidget(QtWidgets.QLabel("You can't delete last element !!!"))
-            dial_win.setLayout(lay)
-            dial_win.exec_()
+            show_alarm_window(self, "You can't delete last element !!!")
             return
 
         self.treeWidget_of_Source.currentItem().parent().takeChild(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
@@ -240,104 +249,137 @@ class MainWindow(QtWidgets.QMainWindow):
                                                                       parent=self.pref_gui
                                                                       )
             except Exception as e:
-                dial_win = QtWidgets.QDialog(self)
-                dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                lay = QtWidgets.QVBoxLayout()
-                lay.addWidget(QtWidgets.QLabel("Open config !!!"))
-                dial_win.setLayout(lay)
-                dial_win.exec_()
+                show_alarm_window(self, "Open config !!!")
                 return
             self.pref_gui.show()
 
-    def show_open_config(self):
-        path_name_config = QtWidgets.QFileDialog.getOpenFileName(
-            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml'
-        )
-        path = os.path.basename(path_name_config[0])
+    def created_connection(self, conn):
+        print(conn)
+        self.connector = conn
 
-        if path:
+    def show_open_config(self):
+        self.path_name_config = QtWidgets.QFileDialog.getOpenFileName(
+            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+        self.path = os.path.basename(self.path_name_config[0])
+
+
+
+
+        if self.path:
             self.close_project_data()
+            self.setWindowTitle(f"Easy Loader [{self.path}]")
             self.ui.actionConfig_Editor.setChecked(True)
             self.ui.actionConfig_Editor.triggered.emit(1)
-            self.loggerInst = Logger.Log_info.getInstance(path, path)
-            self.loggerInst.set_config(path)
+            self.loggerInst = Logger.Log_info.getInstance(self.path, self.path)
+            self.loggerInst.set_config(self.path)
 
             try:
-                self.config_dict = xml_parse(path, self.loggerInst)
+                self.config_dict = xml_parse(self.path, self.loggerInst)
             except Exception as e:
+                show_error_window(self, e.__str__())
                 self.close_project_data()
-                dial_win = QtWidgets.QDialog(self)
-                dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                lay = QtWidgets.QVBoxLayout()
-                lay.addWidget(QtWidgets.QLabel(e.__str__()))
-                dial_win.setLayout(lay)
-                dial_win.exec_()
                 return
 
-            if self.config_dict['checkMode_value'] == 'false':
+            # if self.config_dict['checkMode_value'] == 'false':
 
-                con = db_con.Connection.get_instance(self.loggerInst)
-                try:
-                    con.connectToTheDB(host=self.config_dict['dbHost'],
-                                       user=self.config_dict['dbUser'],
-                                       password=self.config_dict['dbPass'],
-                                       dbname=self.config_dict['dbBase'],
-                                       port=int(self.config_dict['dbPort']),
-                                       dbtype=self.config_dict['dbtype']
-                                       )
-                    con.test_conn()
-                except Exception as e:
-                    self.close_project_data()
-                    dial_win = QtWidgets.QDialog(self)
-                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                    lay = QtWidgets.QVBoxLayout()
-                    lay.addWidget(QtWidgets.QLabel(e.__str__()))
-                    dial_win.setLayout(lay)
-                    dial_win.exec_()
-                    return
+            # con = db_con.Connection.get_instance(self.loggerInst)
+            #             # try:
+            #             #     con.connectToTheDB(host=self.config_dict['dbHost'],
+            #             #                        user=self.config_dict['dbUser'],
+            #             #                        password=self.config_dict['dbPass'],
+            #             #                        dbname=self.config_dict['dbBase'],
+            #             #                        port=int(self.config_dict['dbPort']),
+            #             #                        dbtype=self.config_dict['dbtype']
+            #             #                        )
+            #             #     con.test_conn()
+            #             # except Exception as e:
+            #             #     show_error_window(self, e.__str__())
+            #             #     self.close_project_data()
+            #             #     return
+            #             #
+            #             # connector = con.get_instance(self.loggerInst)
 
-                connector = con.get_instance(self.loggerInst)
-                try:
-                    self.dbService = xpc.XmlParser(path, self.loggerInst)
-                except Exception as e:
-                    self.close_project_data()
-                    dial_win = QtWidgets.QDialog(self)
-                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                    lay = QtWidgets.QVBoxLayout()
-                    lay.addWidget(QtWidgets.QLabel(f"Can't parse Excel file\n{e} !!!"))
-                    dial_win.setLayout(lay)
-                    dial_win.exec_()
-                    return
+            self.connection_tread.start()
+            # CreateConnection.wait(self.connection_tread)
 
-                self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
-                self.columns_in_db = self.validator.queryForColumns()
-                self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
-                self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
-                self.tables_in_receiver = [i[0] for i in self.validator.queryForTableInDbList()]
-                self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
+            while self.connection_tread.isRunning():
+                self.ui.statusbar.showMessage('Connecting...')
+            self.ui.statusbar.showMessage('Connected')
 
-                for col in self.config_dict['excelColumns']:
-                    source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
-                                                                    self.colnames_of_receiver,
-                                                                    col,
-                                                                    list_of_cols=self.list_of_source_cols_links,
-                                                                    source_columnes=self.columns_in_source
-                                                                    )
-                for col in self.config_dict['dbColumns']:
-                    target_column_editor_viewer.create_receiver_column(
-                        self.treeWidget_of_Receiver,
-                        col,
-                        list_of_cols=self.list_of_receiver_cols_links
-                    )
-            else:
-                self.dbService = xpc.XmlParser(path, self.loggerInst)
-                self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
+            try:
+                self.dbService = xpc.XmlParser(self.path, self.loggerInst)
+            except Exception as e:
+                show_error_window(self, f"Can't parse Excel file\n{e} !!!")
+                self.close_project_data()
+                return
+
+            self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=self.connector)
+            self.columns_in_db = self.validator.queryForColumns()
+            self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
+            self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
+            self.tables_in_receiver = [i[0] for i in self.validator.queryForTableInDbList()]
+            self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
+
+            for col in self.config_dict['excelColumns']:
+                source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
+                                                                self.colnames_of_receiver,
+                                                                col,
+                                                                list_of_cols=self.list_of_source_cols_links,
+                                                                source_columnes=self.columns_in_source
+                                                                )
+            for col in self.config_dict['dbColumns']:
+                target_column_editor_viewer.create_receiver_column(
+                    self.treeWidget_of_Receiver,
+                    col,
+                    list_of_cols=self.list_of_receiver_cols_links
+                )
+            # else:
+            #     self.dbService = xpc.XmlParser(self.path, self.loggerInst)
+            #     self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
+            #
+            #     con = db_con.Connection.get_instance(self.loggerInst)
+            #     try:
+            #         con.connectToTheDB(host=self.config_dict['dbHost'],
+            #                            user=self.config_dict['dbUser'],
+            #                            password=self.config_dict['dbPass'],
+            #                            dbname=self.config_dict['dbBase'],
+            #                            port=int(self.config_dict['dbPort']),
+            #                            dbtype=self.config_dict['dbtype']
+            #                            )
+            #         con.test_conn()
+            #     except Exception as e:
+            #         show_error_window(self, e.__str__())
+            #         self.close_project_data()
+            #         return
+            #
+            #     connector = con.get_instance(self.loggerInst)
+            #     try:
+            #         self.dbService = xpc.XmlParser(self.path, self.loggerInst)
+            #     except Exception as e:
+            #         show_error_window(self, f"Can't parse Excel file\n{e} !!!")
+            #         self.close_project_data()
+            #         return
+            #
+            #     self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
+            #     self.columns_in_db = self.validator.queryForColumns()
+            #     self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
+            #
+            #     for col in self.config_dict['excelColumns']:
+            #         source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
+            #                                                         self.colnames_of_receiver,
+            #                                                         col,
+            #                                                         list_of_cols=self.list_of_source_cols_links,
+            #                                                         source_columnes=self.columns_in_source
+            #                                                         )
 
             self.show_pref()
 
             if self.pref_gui.ui.checkBox_Dictionary.isChecked():
                 self.ui.actionDictionary.setChecked(True)
                 self.ui.actionDictionary.triggered.emit(1)
+
+            self.ui.actionSave.setDisabled(False)
+            self.ui.actionSave_as.setDisabled(False)
 
     def addColumnField(self):
         source_column_editor_viewer.create_input_column(
@@ -361,223 +403,13 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.list_of_source_cols_links))[0]['replace_box'].append(replace)
 
     def save_configuration(self):
-        # print(
-        #     self.list_of_source_cols_links,
-        #       self.list_of_receiver_cols_links,
-        #       self.pref,
-        #       self.list_of_dict_pref
-        #       )
+        create_config(self.path_name_config[0], self)
 
-        list_of_types_dict_to_comboBox = {
-            'String': 'str',
-            'Float': 'float',
-            'Integer': 'int',
-            'Date': 'date',
-            '---': '---'
-        }
+    def save_as_configuration(self):
+        path_to_save = QtWidgets.QFileDialog.getSaveFileName(
+            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+        create_config(f"{path_to_save[0]}", self)
 
-        root = et.Element('main')
-        importXml = et.SubElement(root, 'importXml')
-        importXml_columns = et.SubElement(importXml, 'columns')
-        linkedColumns = et.SubElement(importXml, 'linkedColumns')
-        withDict = et.SubElement(importXml, 'withDict')
-        exportTable = et.SubElement(root, 'exportTable')
-        exportTable_columns = et.SubElement(exportTable, 'columns')
-
-        et.SubElement(root, 'dbtype').text = f'{self.pref["dbtype"]}'
-        et.SubElement(root, 'dbHost').text = f'{self.pref["dbHost"]}'
-        et.SubElement(root, 'dbUser').text = f'{self.pref["dbUser"]}'
-        et.SubElement(root, 'dbPass').text = f'{self.pref["dbPass"]}'
-        et.SubElement(root, 'dbBase').text = f'{self.pref["dbBase"]}'
-        et.SubElement(root, 'dbPort').text = f'{self.pref["dbPort"]}'
-        et.SubElement(root, 'loadMode').text = f'{self.pref["Load Mode"]}'.lower()
-        et.SubElement(root, 'dict').text = f'{self.pref["checkBox_Dictionary"]}'.lower()
-        et.SubElement(root, 'checkMode').text = f'{self.pref["checkBox_checkMode"]}'.lower()
-        et.SubElement(importXml, 'path').text = f'{self.pref["excelFileName"]}'
-        et.SubElement(importXml, 'sheetNumber').text = f'{self.pref["comboBox_list_source_excel"]}'
-
-        linkedColumns.attrib['mode'] = f'{self.pref["checkBox_checkMode"]}'.lower()
-
-        for column in self.list_of_source_cols_links:
-            column_to_add = et.SubElement(importXml_columns, 'column')
-
-            et.SubElement(column_to_add, 'colName').text = column['colName'].combo_box_name.currentText()
-            et.SubElement(column_to_add, 'colNameDb').text = column['colNameDb'].currentText()
-            col_type = et.SubElement(column_to_add, 'colType').text = list_of_types_dict_to_comboBox[f'{column["colType"].currentText()}']
-            et.SubElement(column_to_add, 'isPK').text = f"{column['isPK'].isChecked()}".lower()
-
-            cropEnd = et.SubElement(column_to_add, 'cropEnd')
-            if column['cropEnd_box'].checkBox_widget_for_cropEnd_check.isChecked():
-                cropEnd.text = f"{column['cropEnd_box'].spin_box_cropEnd.value()}"
-            cropEnd.attrib['mode'] = \
-                f"{column['cropEnd_box'].checkBox_widget_for_cropEnd_check.isChecked()}".lower()
-
-            addValueEnd = et.SubElement(column_to_add, 'addValueEnd')
-            if column['addValueEnd_box'].checkBox_widget_for_addValueEnd_check.isChecked():
-                addValueEnd.text = f"{column['addValueEnd_box'].line_edit_addValueEnd.text()}"
-            addValueEnd.attrib['mode'] = \
-                f"{column['addValueEnd_box'].checkBox_widget_for_addValueEnd_check.isChecked()}".lower()
-
-            takeFromBegin = et.SubElement(column_to_add, 'takeFromBegin')
-            if column['takeFromBegin_box'].checkBox_widget_for_takeFromBegin_check.isChecked():
-                takeFromBegin.text = f"{column['takeFromBegin_box'].spin_box_takeFromBegin.value()}"
-            takeFromBegin.attrib['mode'] = \
-                f"{column['takeFromBegin_box'].checkBox_widget_for_takeFromBegin_check.isChecked()}".lower()
-
-            cropBegin = et.SubElement(column_to_add, 'cropBegin')
-            if column['cropBegin_box'].checkBox_widget_for_cropBegin_check.isChecked():
-                cropBegin.text = f"{column['cropBegin_box'].spin_box_cropBegin.value()}"
-            cropBegin.attrib['mode'] = \
-                f"{column['cropBegin_box'].checkBox_widget_for_cropBegin_check.isChecked()}".lower()
-
-            addValueBegin = et.SubElement(column_to_add, 'addValueBegin')
-            if column['addValueBegin_box'].checkBox_widget_for_addValueBegin_check.isChecked():
-                addValueBegin.text = f"{column['addValueBegin_box'].line_edit_addValueBegin.text()}"
-            addValueBegin.attrib['mode'] = \
-                f"{column['addValueBegin_box'].checkBox_widget_for_addValueBegin_check.isChecked()}".lower()
-
-            addValueBoth = et.SubElement(column_to_add, 'addValueBoth')
-            if column['addValueBoth_box'].checkBox_widget_for_addValueBoth_check.isChecked():
-                addValueBoth.text = \
-                    f"{column['addValueBoth_box'].line_edit_addBegin_Both_filter.text()},{column['addValueBoth_box'].line_edit_addEnd_Both_filter.text()}"
-            addValueBoth.attrib['mode'] = \
-                f"{column['addValueBoth_box'].checkBox_widget_for_addValueBoth_check.isChecked()}".lower()
-
-            replace_box = et.SubElement(column_to_add, 'replace')
-
-            for replace in column['replace_box']:
-                if replace.checkBox_widget_for_replace_check.isChecked():
-                    replace_box.attrib['mode'] = 'true'
-
-                    replaceVal = et.SubElement(replace_box, 'replaceVal')
-
-                    et.SubElement(replaceVal, 'value').text = f"""{replace.line_edit_addBegin_Both.text()}"""
-                    et.SubElement(replaceVal, 'toValue').text = f"""{replace.line_edit_addEnd_Both.text()}"""
-                else:
-                    replace_box.attrib['mode'] = 'false'
-
-            filter_box = et.SubElement(column_to_add, 'filter')
-            if column['filter_box'].checkBox_widget_for_filter_check.isChecked():
-                filter_box.attrib['mode'] = 'true'
-
-                f_cropEnd = et.SubElement(filter_box, 'f_cropEnd')
-                if column['filter_box'].checkBox_widget_f_cropEnd_check.isChecked():
-                    f_cropEnd.text = f'{column["filter_box"].spin_box_f_cropEnd.value()}'
-                f_cropEnd.attrib['mode'] = \
-                    f'{column["filter_box"].checkBox_widget_f_cropEnd_check.isChecked()}'.lower()
-
-                f_addValueEnd = et.SubElement(filter_box, 'f_addValueEnd')
-                if column['filter_box'].checkBox_widget_f_addValueEnd_check.isChecked():
-                    f_addValueEnd.text = f'{column["filter_box"].line_edit_f_addValueEnd.text()}'
-                f_addValueEnd.attrib['mode'] = \
-                    f'{column["filter_box"].checkBox_widget_f_addValueEnd_check.isChecked()}'.lower()
-
-                f_takeFromBegin = et.SubElement(filter_box, 'f_takeFromBegin')
-                if column['filter_box'].checkBox_widget_f_takeFromBegin_check.isChecked():
-                    f_takeFromBegin.text = f'{column["filter_box"].spin_box_f_takeFromBegin.value()}'
-                f_takeFromBegin.attrib['mode'] = \
-                    f'{column["filter_box"].checkBox_widget_f_takeFromBegin_check.isChecked()}'.lower()
-
-                f_cropBegin = et.SubElement(filter_box, 'f_cropBegin')
-                if column['filter_box'].checkBox_widget_f_cropBegin_check.isChecked():
-                    f_cropBegin.text = f'{column["filter_box"].spin_box_f_cropBegin.value()}'
-                f_cropBegin.attrib['mode'] = \
-                    f'{column["filter_box"].checkBox_widget_f_cropBegin_check.isChecked()}'.lower()
-
-                f_addValueBegin = et.SubElement(filter_box, 'f_addValueBegin')
-                if column['filter_box'].checkBox_widget_f_addValueBegin_check.isChecked():
-                    f_addValueBegin.text = f'{column["filter_box"].line_edit_f_addValueBegin.text()}'
-                f_addValueBegin.attrib['mode'] = \
-                    f'{column["filter_box"].checkBox_widget_f_addValueBegin_check.isChecked()}'.lower()
-
-                f_addValueBoth = et.SubElement(filter_box, 'f_addValueBoth')
-                if column['filter_box'].checkBox_widget_f_addValueBoth_check.isChecked():
-                    f_addValueBoth.text = f'{column["filter_box"].line_edit_addBegin_Both_filter.text()},{column["filter_box"].line_edit_addEnd_Both_filter.text()}'
-                f_addValueBoth.attrib['mode'] = \
-                    f'{column["filter_box"].checkBox_widget_f_addValueBoth_check.isChecked()}'.lower()
-
-                filterVal = et.SubElement(filter_box, 'filterVal')
-                filterMode = et.SubElement(filterVal, 'filterMode')
-                filterValue = et.SubElement(filterVal, 'filterValue')
-                if column['filter_box'].combo_box_filter_condition.currentText() == '---':
-                    dial_win = QtWidgets.QDialog(self)
-                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                    lay = QtWidgets.QVBoxLayout()
-                    lay.addWidget(QtWidgets.QLabel(f"Filter mode must be not '---' !!!"))
-                    dial_win.setLayout(lay)
-                    dial_win.exec_()
-                    return
-
-                filterMode.text = f"{column['filter_box'].combo_box_filter_condition.currentText()}"
-
-                if col_type == 'str':
-                    filterValue.text = column['filter_box'].line_edit_addEnd_filter.text()
-                elif col_type == 'int' or col_type == 'float':
-                    filterValue.text = column['filter_box'].line_edit_addEnd_filter.value()
-                elif col_type == 'date':
-                    filterValue.text = column['filter_box'].line_edit_addEnd_filter.date().toPyDate().strftime("%Y.%m.%d")
-                else:
-                    self.loggerInst.raiseError(0, 'Unknown filter type')
-
-            else:
-                filter_box.attrib['mode'] = 'false'
-
-            post_filter = et.SubElement(column_to_add, 'post-filter')
-
-            if column['post_filter_box'].checkBox_widget_for_post_filter_check.isChecked():
-                post_filter.attrib['mode'] = 'true'
-
-                filterMode = et.SubElement(post_filter, 'filterMode')
-                filterValue = et.SubElement(post_filter, 'filterValue')
-
-                filterMode.text = f"{column['post_filter_box'].combo_box_post_filter_condition.currentText()}"
-
-                if col_type == 'str':
-                    filterValue.text = column['post_filter_box'].line_edit_post_filter.text()
-                elif col_type == 'int' or col_type == 'float':
-                    filterValue.text = column['post_filter_box'].line_edit_post_filter.value()
-                elif col_type == 'date':
-                    filterValue.text = column['post_filter_box'].line_edit_post_filter.date().toPyDate().strftime("%Y.%m.%d")
-                else:
-                    self.loggerInst.raiseError(0, 'Unknown filter type')
-            else:
-                post_filter.attrib['mode'] = 'false'
-
-        if self.pref_gui.ui.checkBox_checkMode.isChecked():
-            pathToLinkFile = et.SubElement(linkedColumns, 'pathToLinkFile')
-            pathToLinkFile.text = f"{self.pref_gui.ui.compare_file.text()}"
-            linkedFileSheetNumber = et.SubElement(linkedColumns, 'linkedFileSheetNumber')
-            linkedFileSheetNumber.text = f"{self.pref_gui.comboBox_set_list_checked.currentIndex()}"
-            both = et.SubElement(linkedColumns, 'both')
-            both.text = f"{self.pref_gui.ui.checkBox_both.isChecked()}".lower()
-
-            for col in self.pref['col_to_check']:
-                column = et.SubElement(linkedColumns, 'column')
-                linkedColName = et.SubElement(column, 'linkedColName')
-                colNameInSource = et.SubElement(column, 'colNameInSource')
-
-                colNameInSource.text = f"{col.combo_box_source_links.currentText()}"
-                linkedColName.text = f"{col.combo_box_target_links.currentText()}"
-
-        if self.pref_gui.ui.checkBox_Dictionary.isChecked():
-            # withDict
-            tables = et.SubElement(withDict, 'tables')
-            withDict.attrib['mode'] = 'true'
-
-            for table_count in self.list_of_dict_pref:
-                table = et.SubElement(tables, 'table')
-                dictTableName = et.SubElement(table, 'dictTableName')
-                indxDbColumn = et.SubElement(table, 'indxDbColumn')
-                indxColumnDic = et.SubElement(table, 'indxColumnDic')
-
-                columns = et.SubElement(table, 'columns')
-
-                for col_count in table_count['columns']:
-                    column = et.SubElement(columns, 'column')
-        else:
-            withDict.attrib['mode'] = 'false'
-
-        print(et.dump(root))
 
 
 if __name__ == '__main__':

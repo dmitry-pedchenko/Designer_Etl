@@ -26,6 +26,10 @@ class Source_tree(QtWidgets.QTreeWidget):
 
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         try:
+            if self.currentItem() is None:
+                self.context_menu_duplicate_row.exec(event.globalPos())
+                return
+
             if self.currentItem().text(0) == 'colName':
                 self.context_menu_duplicate_row.exec(event.globalPos())
                 return
