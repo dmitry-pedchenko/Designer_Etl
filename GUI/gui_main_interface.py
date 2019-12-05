@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 
 from PyQt5.QtCore import pyqtSlot
@@ -78,11 +78,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionDictionary.setDisabled(True)
         self.ui.actionEditor.setDisabled(True)
         self.connection_tread = CreateConnection(self)
+
         self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
         self.ui.gridLayout_2.addWidget(self.tabWidget, 0, 0, 1, 1)
 
         self.ui.actionPreferences.triggered.connect(self.show_pref)
+        self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionOpen.triggered.connect(self.show_open_config)
         self.ui.actionSave.triggered.connect(self.save_configuration)
         self.ui.actionSave_as.triggered.connect(self.save_as_configuration)
@@ -94,6 +96,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.connection_tread.task_done.connect(self.created_connection, QtCore.Qt.QueuedConnection)
         self.connection_tread.task_done_error.connect(self.conn_err, QtCore.Qt.QueuedConnection)
         self.connection_tread.started.connect(self.show_conn_status, QtCore.Qt.QueuedConnection)
+
 
 
     def close_project_data(self):
@@ -133,14 +136,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSave.setDisabled(True)
         self.ui.actionSave_as.setDisabled(True)
 
-
     def show_conn_status(self):
         self.ui.statusbar.showMessage('Connecting...')
+        self.setCursor(QtCore.Qt.WaitCursor)
         self.ui.menuHello.setDisabled(True)
         self.ui.menuSystem.setDisabled(True)
-
-
-
 
     def create_config_editor(self):
         if self.tab_widget_config_editor:
@@ -252,6 +252,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def show_wizrd(self):
         self.wizard = wizard_configuration.WizardConfig()
+        self.wizard.setWindowModality(QtCore.Qt.ApplicationModal)
         self.wizard.show()
 
     def show_pref(self):
@@ -284,6 +285,7 @@ class MainWindow(QtWidgets.QMainWindow):
     @pyqtSlot(object)
     def created_connection(self, conn):
         self.ui.statusbar.showMessage(f"Connected to {self.config_dict['dbHost']}: {self.config_dict['dbBase']}")
+        self.setCursor(QtCore.Qt.ArrowCursor)
 
         self.ui.menuHello.setDisabled(False)
         self.ui.menuSystem.setDisabled(False)
@@ -384,10 +386,20 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.list_of_source_cols_links))[0]['replace_box'].append(replace)
 
     def save_configuration(self):
-        self.create_xml_save = CreateXML(self.path_name_config[0], self)
-        self.create_xml_save.start()
-        self.create_xml_save.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
-        self.create_xml_save.finished.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {self.path_name_config[0]}'))
+
+        result = QtWidgets.QMessageBox.question(self,
+                                                f"Save file ?",
+                                                f"Save file as {self.path_name_config[0]} ?",
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                QtWidgets.QMessageBox.No
+                                                )
+
+        if result == QtWidgets.QMessageBox.Yes:
+            self.create_xml_save = CreateXML(self.path_name_config[0], self)
+            self.create_xml_save.start()
+            self.create_xml_save.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
+            self.create_xml_save.message.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {self.path_name_config[0]}'))
+            self.create_xml_save.error_message.connect(self.error_at_create_xml)
 
     def save_as_configuration(self):
         path_to_save = QtWidgets.QFileDialog.getSaveFileName(
@@ -395,8 +407,27 @@ class MainWindow(QtWidgets.QMainWindow):
         self.create_xml_save_as = CreateXML(f"{path_to_save[0]}", self)
         self.create_xml_save_as.start()
         self.create_xml_save_as.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
-        self.create_xml_save_as.finished.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {path_to_save[0]}'))
+        self.create_xml_save_as.message.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {path_to_save[0]}'))
+        self.create_xml_save_as.error_message.connect(self.error_at_create_xml)
 
+    def closeEvent(self, e):
+        answer = QtWidgets.QMessageBox.question(self,
+                                                "Question",
+                                                "Exit?",
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                QtWidgets.QMessageBox.Yes
+                                                )
+
+        if answer == QtWidgets.QMessageBox.Yes:
+            e.accept()
+            QtWidgets.QWidget.closeEvent(self, e)
+        else:
+            e.ignore()
+
+    @pyqtSlot(object)
+    def error_at_create_xml(self, message):
+        show_alarm_window(self, message)
+        self.ui.statusbar.showMessage(f'Creating XML failed !')
 
 
 if __name__ == '__main__':

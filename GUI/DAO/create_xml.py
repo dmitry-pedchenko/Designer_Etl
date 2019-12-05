@@ -6,6 +6,8 @@ import time
 
 
 class CreateXML(QtCore.QThread):
+    error_message = QtCore.pyqtSignal(object)
+    message = QtCore.pyqtSignal()
 
     def __init__(self, path_config, obj) -> None:
         super().__init__()
@@ -147,13 +149,10 @@ class CreateXML(QtCore.QThread):
                 filterVal = et.SubElement(filter_box, 'filterVal')
                 filterMode = et.SubElement(filterVal, 'filterMode')
                 filterValue = et.SubElement(filterVal, 'filterValue')
+
+
                 if column['filter_box'].combo_box_filter_condition.currentText() == '---':
-                    dial_win = QtWidgets.QDialog(self.obj)
-                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                    lay = QtWidgets.QVBoxLayout()
-                    lay.addWidget(QtWidgets.QLabel(f"Filter mode must be not '---' !!!"))
-                    dial_win.setLayout(lay)
-                    dial_win.exec_()
+                    self.error_message.emit(f"Filter mode must be not '---' !!!")
                     return
 
                 filterMode.text = f"{column['filter_box'].combo_box_filter_condition.currentText()}"
@@ -323,3 +322,4 @@ class CreateXML(QtCore.QThread):
                 ifNull.attrib['mode'] = 'false'
 
         tree.write(f"{self.path_config}")
+        self.message.emit()

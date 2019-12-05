@@ -1,5 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 import datetime
+from alarm_window import show_alarm_window
 
 
 def create_input_column(tree_table: QtWidgets.QTreeWidget,
@@ -546,12 +547,7 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                     self.line_edit_addEnd_filter.setDate(
                     datetime.datetime.strptime(self.column_property['filterArr'][0]['filterValue'], "%Y.%m.%d"))
                 except Exception as e:
-                    dial_win = QtWidgets.QDialog()
-                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                    lay = QtWidgets.QVBoxLayout()
-                    lay.addWidget(QtWidgets.QLabel(f"Wrong date format in config file. <{e}> !!!"))
-                    dial_win.setLayout(lay)
-                    dial_win.exec_()
+                    show_alarm_window(self, f"Wrong date format in config file. <{e}> !!!")
                     return
 
             if self.column_property['colType'] != 'str':
@@ -579,12 +575,7 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
                     self.combo_box_filter_condition.setCurrentIndex(
                     self.list_of_types_equals_for_filter.index(self.column_property['filterArr'][0]['filterMode']))
                 except Exception as e:
-                    dial_win = QtWidgets.QDialog()
-                    dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-                    lay = QtWidgets.QVBoxLayout()
-                    lay.addWidget(QtWidgets.QLabel(f"Wrong filter mode. <{e}> !!!"))
-                    dial_win.setLayout(lay)
-                    dial_win.exec_()
+                    show_alarm_window(self, f"Wrong filter mode. <{e}> !!!")
                     self.combo_box_filter_condition.setCurrentText('---')
                     return
             else:
