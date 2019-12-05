@@ -1,5 +1,8 @@
 from PyQt5 import QtWidgets, QtCore
 import sys
+
+from PyQt5.QtCore import pyqtSlot
+
 from gui_qt import main_window
 import gui_prefernces_controller
 import source_column_editor_viewer
@@ -16,10 +19,13 @@ import Core.DAO.DB_connector as db_con
 from Validate import Validate_res
 from Core.DAO import XML_DAO as xpc
 import xml.etree.ElementTree as et
-from GUI.DAO.create_xml import create_config
+from GUI.DAO.create_xml import CreateXML
 from alarm_window import show_alarm_window
 from error_window import show_error_window
 from connection_db import CreateConnection
+import time
+from queue import Queue
+import queue
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -62,6 +68,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.dbService = None
         self.tables_in_receiver = None
         self.schemas_in_db = None
+        self.connector = None
 
         self.ui.actionSave.setDisabled(True)
         self.ui.actionSave_as.setDisabled(True)
@@ -70,7 +77,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionConfig_Editor.setDisabled(True)
         self.ui.actionDictionary.setDisabled(True)
         self.ui.actionEditor.setDisabled(True)
-        self.connection_tread = CreateConnection()
+        self.connection_tread = CreateConnection(self)
         self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
         self.tabWidget.setObjectName("tabWidget")
         self.ui.gridLayout_2.addWidget(self.tabWidget, 0, 0, 1, 1)
@@ -85,6 +92,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionDictionary.triggered.connect(self.show_dictionary)
         self.ui.actionClose_Project.triggered.connect(self.close_project_data)
         self.connection_tread.task_done.connect(self.created_connection, QtCore.Qt.QueuedConnection)
+        self.connection_tread.task_done_error.connect(self.conn_err, QtCore.Qt.QueuedConnection)
+        self.connection_tread.started.connect(self.show_conn_status, QtCore.Qt.QueuedConnection)
+
 
     def close_project_data(self):
 
@@ -109,7 +119,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.pref = {}
         self.list_of_dict_pref = []
 
-
+        # del self.pref_gui
         self.pref_gui = None
         self.dbService = None
         self.tables_in_receiver = None
@@ -118,6 +128,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab_widget_config_editor = None
         self.tab_widget_loader = None
         self.tab_widget_dictionary = None
+        self.connector = None
+
+        self.ui.actionSave.setDisabled(True)
+        self.ui.actionSave_as.setDisabled(True)
+
+
+    def show_conn_status(self):
+        self.ui.statusbar.showMessage('Connecting...')
+        self.ui.menuHello.setDisabled(True)
+        self.ui.menuSystem.setDisabled(True)
 
 
 
@@ -238,32 +258,54 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.pref_gui:
             self.pref_gui.show()
         else:
-            try:
-                self.pref_gui = gui_prefernces_controller.Pref_Window(main_gui_widget=self,
-                                                                      config_dict=self.config_dict,
-                                                                      pref=self.pref,
-                                                                      dbService=self.dbService,
-                                                                      logger_inst=self.loggerInst,
-                                                                      tables_in_db=self.tables_in_receiver,
-                                                                      schemas_in_db=self.schemas_in_db,
-                                                                      parent=self.pref_gui
-                                                                      )
-            except Exception as e:
+            if self.connector is None:
                 show_alarm_window(self, "Open config !!!")
+                self.close_project_data()
                 return
-            self.pref_gui.show()
+            else:
+                try:
+                    self.pref_gui = gui_prefernces_controller.Pref_Window(main_gui_widget=self,
+                                                                          config_dict=self.config_dict,
+                                                                          pref=self.pref,
+                                                                          dbService=self.dbService,
+                                                                          logger_inst=self.loggerInst,
+                                                                          tables_in_db=self.tables_in_receiver,
+                                                                          schemas_in_db=self.schemas_in_db,
+                                                                          parent=self.pref_gui
+                                                                          )
+                    self.pref_gui.show()
+                except Exception:
+                    show_alarm_window(self, "Open config !!!")
+                    self.close_project_data()
+                    return
 
+
+
+    @pyqtSlot(object)
     def created_connection(self, conn):
-        print(conn)
+        self.ui.statusbar.showMessage(f"Connected to {self.config_dict['dbHost']}: {self.config_dict['dbBase']}")
+
+        self.ui.menuHello.setDisabled(False)
+        self.ui.menuSystem.setDisabled(False)
+
         self.connector = conn
+        self.show_windows()
+
+    @pyqtSlot(object)
+    def conn_err(self, err: object):
+
+        self.ui.menuHello.setDisabled(False)
+        self.ui.menuSystem.setDisabled(False)
+
+        show_error_window(self, err)
+        self.close_project_data()
+
+
 
     def show_open_config(self):
         self.path_name_config = QtWidgets.QFileDialog.getOpenFileName(
             directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
         self.path = os.path.basename(self.path_name_config[0])
-
-
-
 
         if self.path:
             self.close_project_data()
@@ -280,106 +322,45 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.close_project_data()
                 return
 
-            # if self.config_dict['checkMode_value'] == 'false':
-
-            # con = db_con.Connection.get_instance(self.loggerInst)
-            #             # try:
-            #             #     con.connectToTheDB(host=self.config_dict['dbHost'],
-            #             #                        user=self.config_dict['dbUser'],
-            #             #                        password=self.config_dict['dbPass'],
-            #             #                        dbname=self.config_dict['dbBase'],
-            #             #                        port=int(self.config_dict['dbPort']),
-            #             #                        dbtype=self.config_dict['dbtype']
-            #             #                        )
-            #             #     con.test_conn()
-            #             # except Exception as e:
-            #             #     show_error_window(self, e.__str__())
-            #             #     self.close_project_data()
-            #             #     return
-            #             #
-            #             # connector = con.get_instance(self.loggerInst)
-
             self.connection_tread.start()
-            # CreateConnection.wait(self.connection_tread)
 
-            while self.connection_tread.isRunning():
-                self.ui.statusbar.showMessage('Connecting...')
-            self.ui.statusbar.showMessage('Connected')
+    def show_windows(self):
+        try:
+            self.dbService = xpc.XmlParser(self.path, self.loggerInst)
+        except Exception as e:
+            show_error_window(self, f"Can't parse Excel file\n{e} !!!")
+            self.close_project_data()
+            return
 
-            try:
-                self.dbService = xpc.XmlParser(self.path, self.loggerInst)
-            except Exception as e:
-                show_error_window(self, f"Can't parse Excel file\n{e} !!!")
-                self.close_project_data()
-                return
+        self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=self.connector)
+        self.columns_in_db = self.validator.queryForColumns()
+        self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
+        self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
+        self.tables_in_receiver = [i[0] for i in self.validator.queryForTableInDbList()]
+        self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
 
-            self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=self.connector)
-            self.columns_in_db = self.validator.queryForColumns()
-            self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
-            self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
-            self.tables_in_receiver = [i[0] for i in self.validator.queryForTableInDbList()]
-            self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
+        for col in self.config_dict['excelColumns']:
+            source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
+                                                            self.colnames_of_receiver,
+                                                            col,
+                                                            list_of_cols=self.list_of_source_cols_links,
+                                                            source_columnes=self.columns_in_source
+                                                            )
+        for col in self.config_dict['dbColumns']:
+            target_column_editor_viewer.create_receiver_column(
+                self.treeWidget_of_Receiver,
+                col,
+                list_of_cols=self.list_of_receiver_cols_links
+            )
 
-            for col in self.config_dict['excelColumns']:
-                source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
-                                                                self.colnames_of_receiver,
-                                                                col,
-                                                                list_of_cols=self.list_of_source_cols_links,
-                                                                source_columnes=self.columns_in_source
-                                                                )
-            for col in self.config_dict['dbColumns']:
-                target_column_editor_viewer.create_receiver_column(
-                    self.treeWidget_of_Receiver,
-                    col,
-                    list_of_cols=self.list_of_receiver_cols_links
-                )
-            # else:
-            #     self.dbService = xpc.XmlParser(self.path, self.loggerInst)
-            #     self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
-            #
-            #     con = db_con.Connection.get_instance(self.loggerInst)
-            #     try:
-            #         con.connectToTheDB(host=self.config_dict['dbHost'],
-            #                            user=self.config_dict['dbUser'],
-            #                            password=self.config_dict['dbPass'],
-            #                            dbname=self.config_dict['dbBase'],
-            #                            port=int(self.config_dict['dbPort']),
-            #                            dbtype=self.config_dict['dbtype']
-            #                            )
-            #         con.test_conn()
-            #     except Exception as e:
-            #         show_error_window(self, e.__str__())
-            #         self.close_project_data()
-            #         return
-            #
-            #     connector = con.get_instance(self.loggerInst)
-            #     try:
-            #         self.dbService = xpc.XmlParser(self.path, self.loggerInst)
-            #     except Exception as e:
-            #         show_error_window(self, f"Can't parse Excel file\n{e} !!!")
-            #         self.close_project_data()
-            #         return
-            #
-            #     self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=connector)
-            #     self.columns_in_db = self.validator.queryForColumns()
-            #     self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
-            #
-            #     for col in self.config_dict['excelColumns']:
-            #         source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
-            #                                                         self.colnames_of_receiver,
-            #                                                         col,
-            #                                                         list_of_cols=self.list_of_source_cols_links,
-            #                                                         source_columnes=self.columns_in_source
-            #                                                         )
+        self.show_pref()
 
-            self.show_pref()
+        if self.pref_gui.ui.checkBox_Dictionary.isChecked():
+            self.ui.actionDictionary.setChecked(True)
+            self.ui.actionDictionary.triggered.emit(1)
 
-            if self.pref_gui.ui.checkBox_Dictionary.isChecked():
-                self.ui.actionDictionary.setChecked(True)
-                self.ui.actionDictionary.triggered.emit(1)
-
-            self.ui.actionSave.setDisabled(False)
-            self.ui.actionSave_as.setDisabled(False)
+        self.ui.actionSave.setDisabled(False)
+        self.ui.actionSave_as.setDisabled(False)
 
     def addColumnField(self):
         source_column_editor_viewer.create_input_column(
@@ -403,12 +384,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.list_of_source_cols_links))[0]['replace_box'].append(replace)
 
     def save_configuration(self):
-        create_config(self.path_name_config[0], self)
+        self.create_xml_save = CreateXML(self.path_name_config[0], self)
+        self.create_xml_save.start()
+        self.create_xml_save.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
+        self.create_xml_save.finished.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {self.path_name_config[0]}'))
 
     def save_as_configuration(self):
         path_to_save = QtWidgets.QFileDialog.getSaveFileName(
             directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
-        create_config(f"{path_to_save[0]}", self)
+        self.create_xml_save_as = CreateXML(f"{path_to_save[0]}", self)
+        self.create_xml_save_as.start()
+        self.create_xml_save_as.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
+        self.create_xml_save_as.finished.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {path_to_save[0]}'))
 
 
 
