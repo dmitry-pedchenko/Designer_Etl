@@ -83,7 +83,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Routing Map</string>
+    <string>DB conn editor</string>
    </property>
   </action>
   <action name="actionLoader">

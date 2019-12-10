@@ -84,7 +84,11 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
        <item>
-        <widget class="QLineEdit" name="lineEdit_dbhost"/>
+        <widget class="QLineEdit" name="lineEdit_dbhost">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_18">
@@ -105,7 +109,11 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_8">
        <item>
-        <widget class="QLineEdit" name="lineEdit_dbuser"/>
+        <widget class="QLineEdit" name="lineEdit_dbuser">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_19">
@@ -126,7 +134,11 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_9">
        <item>
-        <widget class="QLineEdit" name="lineEdit_dbpass"/>
+        <widget class="QLineEdit" name="lineEdit_dbpass">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_20">
@@ -147,7 +159,11 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_10">
        <item>
-        <widget class="QLineEdit" name="lineEdit_dbbase"/>
+        <widget class="QLineEdit" name="lineEdit_dbbase">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_21">
@@ -189,7 +205,11 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_11">
        <item>
-        <widget class="QLineEdit" name="lineEdit_dbport"/>
+        <widget class="QLineEdit" name="lineEdit_dbport">
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_23">

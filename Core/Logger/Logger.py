@@ -11,7 +11,7 @@ class Log_info(Exception):
     debug_stat_dict = {}  # список дебага в формате сообщение : количество сообщений
 
     @classmethod
-    def getInstance(cls, pathToConfigXML, configs_list):
+    def getInstance(cls, pathToConfigXML=None, configs_list=None):
         if not cls.__instance:
             cls.__instance = Log_info(pathToConfigXML, configs_list)
         return cls.__instance

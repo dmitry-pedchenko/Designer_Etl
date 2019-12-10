@@ -25,9 +25,6 @@ class Ui_Form(object):
         self.horizontalLayout_3 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_3)
         self.horizontalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.open_excel_file = QtWidgets.QToolButton(self.horizontalLayoutWidget_3)
-        self.open_excel_file.setObjectName("open_excel_file")
-        self.horizontalLayout_3.addWidget(self.open_excel_file)
         self.excelFileName = QtWidgets.QLineEdit(self.horizontalLayoutWidget_3)
         self.excelFileName.setReadOnly(True)
         self.excelFileName.setObjectName("excelFileName")
@@ -207,7 +204,6 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.open_excel_file.setText(_translate("Form", "..."))
         self.open_excel_compare_file.setText(_translate("Form", "..."))
         self.checkBox_checkMode.setText(_translate("Form", "Check mode"))
         self.checkBox_both.setText(_translate("Form", "Both"))

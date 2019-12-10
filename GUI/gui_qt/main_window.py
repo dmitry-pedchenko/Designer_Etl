@@ -89,7 +89,7 @@ class Ui_MainWindow(object):
         self.menuView.setTitle(_translate("MainWindow", "View"))
         self.actionSave.setText(_translate("MainWindow", "Save"))
         self.actionConfiguration_Wizard.setText(_translate("MainWindow", "Configuration Wizard"))
-        self.actionEditor.setText(_translate("MainWindow", "Routing Map"))
+        self.actionEditor.setText(_translate("MainWindow", "DB conn editor"))
         self.actionLoader.setText(_translate("MainWindow", "Loader"))
         self.actionExit.setText(_translate("MainWindow", "Exit"))
         self.actionPreferences.setText(_translate("MainWindow", "Preferences"))

@@ -7,7 +7,7 @@ class Connection:
     connection_arr = []
 
     @classmethod
-    def get_instance(cls, log):
+    def get_instance(cls, log=None):
         if not cls.__instance:
             cls.__instance = Connection(log)
         return cls.__instance

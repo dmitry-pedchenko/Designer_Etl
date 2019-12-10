@@ -26,9 +26,6 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_16">
       <item>
-       <widget class="QComboBox" name="comboBox_dbSchema"/>
-      </item>
-      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_22">
         <item>
          <widget class="QLabel" name="label">
@@ -46,9 +43,6 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_14">
-      <item>
-       <widget class="QComboBox" name="target_table_name"/>
-      </item>
       <item>
        <widget class="QLabel" name="label_receiver">
         <property name="text">

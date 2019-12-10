@@ -3,6 +3,7 @@ import xml.etree.ElementTree as et
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QObject
 import time
+import xml.dom.minidom as xml_parse
 
 
 class CreateXML(QtCore.QThread):
@@ -323,3 +324,4 @@ class CreateXML(QtCore.QThread):
 
         tree.write(f"{self.path_config}")
         self.message.emit()
+

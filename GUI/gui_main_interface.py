@@ -29,7 +29,6 @@ import queue
 
 
 class MainWindow(QtWidgets.QMainWindow):
-
     def __init__(self):
         super().__init__()
         self.list_of_source_cols_links = []
@@ -76,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.ui.actionLoader.setDisabled(True)
         self.ui.actionConfig_Editor.setDisabled(True)
         self.ui.actionDictionary.setDisabled(True)
-        self.ui.actionEditor.setDisabled(True)
+        # self.ui.actionEditor.setDisabled(True)
         self.connection_tread = CreateConnection(self)
 
         self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
@@ -251,7 +250,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget_of_Source.currentItem().parent().takeChild(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
 
     def show_wizrd(self):
-        self.wizard = wizard_configuration.WizardConfig()
+        self.wizard = wizard_configuration.WizardConfig(self)
         self.wizard.setWindowModality(QtCore.Qt.ApplicationModal)
         self.wizard.show()
 
@@ -305,11 +304,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def show_open_config(self):
-        self.path_name_config = QtWidgets.QFileDialog.getOpenFileName(
+        path_name_config = QtWidgets.QFileDialog.getOpenFileName(
             directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
-        self.path = os.path.basename(self.path_name_config[0])
+        path = os.path.basename(path_name_config[0])
 
-        if self.path:
+        if path:
+            self.path_name_config = path_name_config
+            self.path = path
             self.close_project_data()
             self.setWindowTitle(f"Easy Loader [{self.path}]")
             self.ui.actionConfig_Editor.setChecked(True)
@@ -350,8 +351,8 @@ class MainWindow(QtWidgets.QMainWindow):
                                                             )
         for col in self.config_dict['dbColumns']:
             target_column_editor_viewer.create_receiver_column(
-                self.treeWidget_of_Receiver,
-                col,
+                tree_table=self.treeWidget_of_Receiver,
+                column_property=col,
                 list_of_cols=self.list_of_receiver_cols_links
             )
 
@@ -404,11 +405,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def save_as_configuration(self):
         path_to_save = QtWidgets.QFileDialog.getSaveFileName(
             directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
-        self.create_xml_save_as = CreateXML(f"{path_to_save[0]}", self)
-        self.create_xml_save_as.start()
-        self.create_xml_save_as.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
-        self.create_xml_save_as.message.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {path_to_save[0]}'))
-        self.create_xml_save_as.error_message.connect(self.error_at_create_xml)
+        if path_to_save[0] != '':
+            self.create_xml_save_as = CreateXML(f"{path_to_save[0]}", self)
+            self.create_xml_save_as.start()
+            self.create_xml_save_as.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
+            self.create_xml_save_as.message.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {path_to_save[0]}'))
+            self.create_xml_save_as.error_message.connect(self.error_at_create_xml)
 
     def closeEvent(self, e):
         answer = QtWidgets.QMessageBox.question(self,
@@ -428,6 +430,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def error_at_create_xml(self, message):
         show_alarm_window(self, message)
         self.ui.statusbar.showMessage(f'Creating XML failed !')
+
+
 
 
 if __name__ == '__main__':

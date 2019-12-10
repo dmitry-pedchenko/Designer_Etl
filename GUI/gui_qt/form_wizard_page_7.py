@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(400, 300)
+        Form.resize(663, 508)
 
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)

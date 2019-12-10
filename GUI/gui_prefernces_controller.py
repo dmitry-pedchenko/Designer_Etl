@@ -64,15 +64,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref = pref
         self.pref['col_to_check'] = []
         if config_dict:
-            # try:
             self.initialize()
-            # except Exception as e:
-            #     raise Exception
-                # self.parent.close_project_data()
-        # if self.ui.checkBox_checkMode.isChecked():
-        #     self.ui.target_table_name.setDisabled(True)
-        # else:
-        #     self.ui.target_table_name.setDisabled(False)
 
         self.ui.button_save_pref.clicked.connect(self.save_db_pref)
 
@@ -138,12 +130,6 @@ class Pref_Window(QtWidgets.QWidget):
             target_column = [i for i in self.df_compare.parse(self.comboBox_set_list_checked.currentIndex()).columns.values]
         else:
             show_alarm_window(self, "Choose a file !!!")
-            # dial_win = QtWidgets.QDialog(self)
-            # dial_win.setWindowModality(QtCore.Qt.ApplicationModal)
-            # lay = QtWidgets.QVBoxLayout()
-            # lay.addWidget(QtWidgets.QLabel("Choose a file !!!"))
-            # dial_win.setLayout(lay)
-            # dial_win.exec_()
             return
 
         source_column = [i for i in self.df.parse(self.comboBox_list_source_excel.currentIndex()).columns.values]
@@ -270,6 +256,16 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['checkBox_Dictionary'] = self.ui.checkBox_Dictionary.isChecked()
         self.pref['checkBox_both'] = self.ui.checkBox_both.isChecked()
 
+        # self.ui.lineEdit_dbtype.setReadOnly(True)
+        # self.ui.lineEdit_dbhost.setReadOnly(True)
+        # self.ui.lineEdit_dbuser.setReadOnly(True)
+        # self.ui.lineEdit_dbpass.setReadOnly(True)
+        # self.ui.lineEdit_dbbase.setReadOnly(True)
+        # self.ui.lineEdit_dbport.setReadOnly(True)
+        # self.ui.comboBox_dbSchema.setReadOnly(True)
+        # self.ui.target_table_name.setReadOnly(True)
+
+
 
 
     def add_asterisc_checkBox_Dictionary(self):
@@ -320,7 +316,6 @@ class Pref_Window(QtWidgets.QWidget):
     def add_asterisc_checkBox_checkMode(self):
         if self.ui.checkBox_checkMode.isChecked():
             self.ui.label_check_mode.setDisabled(True)
-            self.ui.target_table_name.setDisabled(True)
             self.ui.label_check_mode.setDisabled(False)
             self.ui.open_excel_compare_file.setDisabled(False)
             self.ui.compare_file.setDisabled(False)
@@ -332,7 +327,6 @@ class Pref_Window(QtWidgets.QWidget):
 
         else:
             self.ui.label_check_mode.setDisabled(False)
-            self.ui.target_table_name.setDisabled(False)
             self.ui.label_check_mode.setDisabled(True)
             self.ui.open_excel_compare_file.setDisabled(True)
             self.ui.compare_file.setDisabled(True)
