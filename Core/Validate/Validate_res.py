@@ -13,6 +13,9 @@ class Validate:
         if self.dbService.dictionary['checkMode_value'] == 'true':
             self.df_link = dbService.dataFrame_link
 
+    def __str__(self):
+        return "validate_instance"
+
     def exec(self, query):
         try:
             self.cur.execute(query)
@@ -33,6 +36,7 @@ class Validate:
     @staticmethod
     def queryForColumns_edit(dbtype: str, target_table: str, db_base: str, connector, executor, cur, loggerInst):
         query = ''
+        # print(connector)
         if dbtype == 'mssql':
             query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{target_table}'); """
         if dbtype == 'mysql':
@@ -86,6 +90,16 @@ class Validate:
             query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{dict_table_name}';"""
         self.connector.test_conn(3)
         return self.exec(query)
+
+    @staticmethod
+    def queryForColumnsInDict_edit(dict_table_name, dbtype, dbBase, connector, exec, cur, loggerInst):
+        query = ''
+        if dbtype == 'mssql':
+            query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{dict_table_name}'); """
+        if dbtype == 'mysql':
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{dbBase}' AND TABLE_NAME = '{dict_table_name}';"""
+        connector.test_conn(3)
+        return exec(query, cur, loggerInst, connector)
 
     def queryForTableInDbList(self):
         query = ''

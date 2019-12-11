@@ -321,7 +321,7 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 self.config_dict = xml_parse(self.path, self.loggerInst)
             except Exception as e:
-                show_error_window(self, e.__str__())
+                show_error_window(self, e)
                 self.close_project_data()
                 return
 

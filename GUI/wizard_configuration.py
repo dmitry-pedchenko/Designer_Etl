@@ -46,14 +46,15 @@ class WizardConfig(QtWidgets.QWizard):
 class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.loggerInst = Logger.Log_info.getInstance()
+        self.loggerInst = Logger.Log_info.getInstance(pathToConfigXML='GUI', configs_list=['GUI'])
 
         self.pref = {'col_to_check': []}
         self.setupUi(self)
+        self.change_flag = False
 
         self.open_excel_file = QtWidgets.QToolButton(self.horizontalLayoutWidget_3)
         self.open_excel_file.setObjectName("open_excel_file")
-        self.horizontalLayout_3.addWidget(self.open_excel_file)
+        self.horizontalLayout_3.insertWidget(0, self.open_excel_file)
         self.open_excel_file.setText("...")
 
         self.registerField('dictionary_state', self.checkBox_Dictionary)
@@ -119,6 +120,12 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         self.excelFileName.textChanged.connect(self.add_asterisc_label_receiver)
         self.compare_file.textChanged.connect(self.add_asterisc_checkMode)
 
+        self.lineEdit_dbhost.textEdited.connect(self.set_flag)
+        self.lineEdit_dbpass.textEdited.connect(self.set_flag)
+        self.lineEdit_dbport.textEdited.connect(self.set_flag)
+        self.lineEdit_dbuser.textEdited.connect(self.set_flag)
+        self.lineEdit_dbbase.textEdited.connect(self.set_flag)
+
     #
         self.lineEdit_dbhost.setText('localhost')
         self.lineEdit_dbpass.setText('P@$$w0rd')
@@ -126,6 +133,8 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         self.lineEdit_dbuser.setText('root')
         self.lineEdit_dbbase.setText('designer_etl')
     #
+    def set_flag(self):
+        self.change_flag = True
 
     def add_asterisc_checkMode(self):
 
@@ -179,7 +188,9 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         path = os.path.basename(path_name[0])
         if path:
 
-            if self.treeWidget_linked_columns.topLevelItemCount() > 0 or self.wizard().page(2).treeWidget_of_Source.topLevelItemCount() > 0:
+            if self.treeWidget_linked_columns.topLevelItemCount() > 0 or \
+                    self.wizard().page(2).treeWidget_of_Source.topLevelItemCount() > 0 or \
+                    (hasattr(self.wizard().page(4), "tree_dict") and self.wizard().page(4).tree_dict.topLevelItemCount() > 0):
                 result = QtWidgets.QMessageBox.question(self,
                                                         "Change file ?",
                                                         "Change file ? Linked columns and Source Columns will remove",
@@ -266,32 +277,66 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
             self.checkBox_both.setDisabled(True)
 
     def validatePage(self) -> bool:
-
         if not self.excelFileName.text():
             show_alarm_window(self, "Choose a source file !!!")
             return False
         else:
-            con = db_con.Connection.get_instance(self.loggerInst)
-            try:
-                con.connectToTheDB(host=self.lineEdit_dbhost.text(),
-                                   user=self.lineEdit_dbuser.text(),
-                                   password=self.lineEdit_dbpass.text(),
-                                   dbname=self.lineEdit_dbbase.text(),
-                                   port=int(self.lineEdit_dbport.text()),
-                                   dbtype=self.lineEdit_dbtype.currentText()
-                                   )
-                con.test_conn()
+            if self.change_flag is True or hasattr(self, "con") is False:
+                if hasattr(self, "con"):
+                    self.con.closeConnect()
+                    del self.con
+                self.wizard().page(1).comboBox_dbSchema.clear()
+                self.wizard().page(1).target_table_name.clear()
+                con = db_con.Connection.get_instance(self.loggerInst)
+                try:
+                    con.connectToTheDB(host=self.lineEdit_dbhost.text(),
+                                       user=self.lineEdit_dbuser.text(),
+                                       password=self.lineEdit_dbpass.text(),
+                                       dbname=self.lineEdit_dbbase.text(),
+                                       port=int(self.lineEdit_dbport.text()),
+                                       dbtype=self.lineEdit_dbtype.currentText()
+                                       )
+                    con.test_conn(0)
 
-            except Exception:
-                show_alarm_window(self, "Can't connect to the DB !!!")
-                return False
+                except Exception:
+                    if hasattr(self, "con"):
+                        self.con.closeConnect()
+                    show_alarm_window(self, "Can't connect to the DB !!!")
+                    return False
+                else:
+                    self.change_flag = False
+                    self.con = con
+                    self.initializePage2()
+                    return True
             else:
-                self.con = con
+                try:
+                    self.con.test_conn(0)
+                except Exception:
+                    if hasattr(self, "con"):
+                        self.con.closeConnect()
+                    show_alarm_window(self, "Can't connect to the DB !!!")
+                    return False
                 return True
 
     def close_project_data(self):
-
         self.pref = {}
+
+    def initializePage2(self) -> None:
+        self.wizard().page(1).comboBox_dbSchema.addItems(sorted([i[0] for i in Validate_res.Validate.queryForSchemasInDb_edit(
+            dbtype=self.lineEdit_dbtype.currentText(),
+            connector=self.con,
+            executor=Validate_res.Validate.executor,
+            cur=self.con.cursor,
+            loggerInst=self.loggerInst
+        )]))
+
+        self.wizard().page(1).target_table_name.addItems(sorted([i[0] for i in Validate_res.Validate.queryForTableInDbList_edit(
+            connector=self.con,
+            dbtype=self.lineEdit_dbtype.currentText(),
+            executor=Validate_res.Validate.executor,
+            cur=self.con.cursor,
+            loggerInst=self.loggerInst
+        )]))
 
 
 
@@ -301,7 +346,6 @@ class Page2(QtWidgets.QWizardPage, form_wizard_page_2.Ui_Form):
         self.setupUi(self)
         self.adjustSize()
 
-
         self.comboBox_dbSchema = comboBox_list_for_Page3(self.verticalLayoutWidget)
         self.comboBox_dbSchema.setObjectName("comboBox_dbSchema")
         self.horizontalLayout_16.addWidget(self.comboBox_dbSchema)
@@ -309,26 +353,6 @@ class Page2(QtWidgets.QWizardPage, form_wizard_page_2.Ui_Form):
         self.target_table_name = comboBox_list_for_Page3(self.verticalLayoutWidget)
         self.target_table_name.setObjectName("target_table_name")
         self.horizontalLayout_14.addWidget(self.target_table_name)
-
-
-    def initializePage(self) -> None:
-
-        self.comboBox_dbSchema.addItems(sorted([i[0] for i in Validate_res.Validate.queryForSchemasInDb_edit(
-            dbtype=self.wizard().page(0).lineEdit_dbtype.currentText(),
-            connector=self.wizard().page(0).con,
-            executor=Validate_res.Validate.executor,
-            cur=self.wizard().page(0).con.cursor,
-            loggerInst=self.wizard().page(0).loggerInst
-        )]))
-
-        self.target_table_name.addItems(sorted([i[0] for i in Validate_res.Validate.queryForTableInDbList_edit(
-            connector=self.wizard().page(0).con,
-            dbtype=self.wizard().page(0).lineEdit_dbtype.currentText(),
-            executor=Validate_res.Validate.executor,
-            cur=self.wizard().page(0).con.cursor,
-            loggerInst=self.wizard().page(0).loggerInst
-        )]))
-
 
 
 
@@ -438,6 +462,7 @@ class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
         self.wizard().page(1).target_table_name.installEventFilter(self.filter_target)
 
 
+
     def clear(self):
         while self.treeWidget_of_Source.topLevelItemCount() > 0:
             self.treeWidget_of_Source.takeTopLevelItem(0)
@@ -512,7 +537,11 @@ class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
         self.setupUi(self)
         self.list_of_dict_pref = []
         self.config_dict = {}
-        self.validator = Validate_res
+        self.validator = Validate_res.Validate
+
+    def clear(self):
+        while self.tree_dict.topLevelItemCount() > 0:
+            self.tree_dict.takeTopLevelItem(0)
 
     def initializePage(self) -> None:
         self.tables_in_receiver = [i[0] for i in Validate_res.Validate.queryForTableInDbList_edit(
@@ -522,20 +551,35 @@ class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
             cur=self.wizard().page(0).con.cursor,
             loggerInst=self.wizard().page(0).loggerInst
         )]
-
         self.columns_in_source = self.wizard().page(2).columns_in_source
 
-        self.tree_dict = Dict_tree.DictTree(
-            list_of_dict_pref=self.list_of_dict_pref,
-            config=self.config_dict,
-            validator=self.validator,
-            tables_in_receiver=self.tables_in_receiver,
-            columns_names_source=self.columns_in_source,
-        )
+        if not hasattr(self, "tree_dict"):
+            self.tree_dict = Dict_tree.DictTree(
+                list_of_dict_pref=self.list_of_dict_pref,
+                config=self.config_dict,
+                validator=self.validator,
+                tables_in_receiver=self.tables_in_receiver,
+                columns_names_source=self.columns_in_source,
+                dbtype=self.wizard().page(0).lineEdit_dbtype.currentText(),
+                target_table=self.wizard().page(1).target_table_name.currentText(),
+                db_base=self.wizard().page(1).comboBox_dbSchema.currentText(),
+                connector=self.wizard().page(0).con,
+                executor=Validate_res.Validate.executor,
+                cur=self.wizard().page(0).con.cursor,
+                loggerInst=self.wizard().page(0).loggerInst
+            )
 
         self.horizontalLayout.addWidget(self.tree_dict)
 
+    def cleanupPage(self) -> None:
+        self.wizard().page(1).comboBox_dbSchema.dict_widget = self.tree_dict
+        self.wizard().page(1).target_table_name.dict_widget = self.tree_dict
+        self.wizard().page(0).comboBox_list_source_excel.dict_widget = self.tree_dict
 
+        self.wizard().page(1).comboBox_dbSchema.currentIndexChanged.connect(self.clear)
+        self.wizard().page(1).target_table_name.currentIndexChanged.connect(self.clear)
+        self.wizard().page(0).excelFileName.textChanged.connect(self.clear)
+        self.wizard().page(0).comboBox_list_source_excel.currentIndexChanged.connect(self.clear)
 
 
 
@@ -609,10 +653,11 @@ class ev_filt(QtCore.QObject):
     def eventFilter(self, a0, a1) -> bool:
         if a1.type() == QtCore.QEvent.MouseButtonPress:
             if self.parent().check_widget.topLevelItemCount() > 0 or \
-                    (hasattr(self.parent(), "widget_to_delete_sources") and self.parent().widget_to_delete_sources.topLevelItemCount() > 0):
+                    (hasattr(self.parent(), "widget_to_delete_sources") and self.parent().widget_to_delete_sources.topLevelItemCount() > 0) or \
+                (hasattr(self.parent(), "dict_widget") and self.parent().dict_widget.topLevelItemCount() > 0):
                 result = QtWidgets.QMessageBox.question(None,
                                                         "Change list ?",
-                                                        "Change list ? Linked and Source Columns will remove",
+                                                        "Change list ? Linked, Source, Dictionary Columns will remove",
                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                                         QtWidgets.QMessageBox.No
                                                         )
@@ -635,10 +680,11 @@ class ev_filt_of_Page3(QtCore.QObject):
     def eventFilter(self, a0: 'QObject', a1: 'QEvent') -> bool:
         if a1.type() == QtCore.QEvent.MouseButtonPress:
             if (hasattr(self.parent(), "check_widget") and self.parent().check_widget.topLevelItemCount() > 0) or\
-                    (hasattr(self.parent(), "widget_to_delete_target_tables") and self.parent().widget_to_delete_target_tables.topLevelItemCount() > 0):
+                    (hasattr(self.parent(), "widget_to_delete_target_tables") and self.parent().widget_to_delete_target_tables.topLevelItemCount() > 0) or \
+                    (hasattr(self.parent(), "dict_widget") and self.parent().dict_widget.topLevelItemCount() > 0):
                 result = QtWidgets.QMessageBox.question(None,
                                                         "Change ?",
-                                                        "Change ? Source and Target columns will remove",
+                                                        "Change ? Source, Target, Dictionary columns will remove",
                                                         QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
                                                         QtWidgets.QMessageBox.No
                                                         )

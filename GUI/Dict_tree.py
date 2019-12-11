@@ -6,8 +6,34 @@ import dict_column_editor_viewer
 from alarm_window import show_alarm_window
 
 class DictTree(QtWidgets.QTreeWidget):
-    def __init__(self, list_of_dict_pref, config, validator, tables_in_receiver, columns_names_source, window_pref=None, parent=None):
+    def __init__(
+            self,
+            list_of_dict_pref,
+            config,
+            validator,
+            tables_in_receiver,
+            columns_names_source,
+            window_pref=None,
+            parent=None,
+            dbtype=None,
+            target_table=None,
+            db_base=None,
+            connector=None,
+            executor=None,
+            cur=None,
+            loggerInst=None
+    ):
         super().__init__(parent)
+
+        self.parent = parent
+        self.dbtype = dbtype
+        self.target_table = target_table
+        self.db_base = db_base
+        self.connector = connector
+        self.executor = executor
+        self.cur = cur
+        self.loggerInst = loggerInst
+
         self.window_pref = window_pref
         self.columns_names_source = columns_names_source
         self.tables_in_receiver = tables_in_receiver
@@ -128,11 +154,26 @@ class DictTree(QtWidgets.QTreeWidget):
         )
         self.addTopLevelItem(new_colName)
 
-        colNameDbRow = dict_column_editor_viewer.ColumnNameDbRow(
-            column_property=self.dict_pref,
-            parent=new_colName,
-            tree_widget=self,
-            columns_in_receiver=self.validator.queryForColumns())
+        if not isinstance(self.validator, type):
+            colNameDbRow = dict_column_editor_viewer.ColumnNameDbRow(
+                column_property=self.dict_pref,
+                parent=new_colName,
+                tree_widget=self,
+                columns_in_receiver=self.validator.queryForColumns())
+        else:
+            colNameDbRow = dict_column_editor_viewer.ColumnNameDbRow(
+                column_property=self.dict_pref,
+                parent=new_colName,
+                tree_widget=self,
+                columns_in_receiver=self.validator.queryForColumns_edit(
+                    dbtype=self.dbtype,
+                    target_table=self.target_table,
+                    db_base=self.db_base,
+                    connector=self.connector,
+                    executor=self.executor,
+                    cur=self.cur,
+                    loggerInst=self.loggerInst
+                ))
 
         colTypeRow = dict_column_editor_viewer.ColTypeRow(
             cur_dic_table_pref=self.dict_pref,
@@ -223,19 +264,42 @@ class DictTree(QtWidgets.QTreeWidget):
             filter(lambda x: x['colNameRow'].combo_box.currentText() == self.currentItem().parent().combo_box.currentText(),
                     cur_column)
         )[0]['replace_box']
+
+        if len(element_in_list) == 1:
+            show_alarm_window(self, "You can't delete last element !!!")
+            return
+
         element_in_list.remove(self.currentItem())
         self.currentItem().parent().takeChild(
             self.indexFromItem(self.currentItem()).row())
 
     def add_table_dict(self):
-        create_dict_column(pref=self.list_of_dict_pref,
-                           parent=self,
-                           cur_dic_table_pref=self.dict_pref,
-                           config=self.config,
-                           validator=self.validator,
-                           tables_in_receiver=self.tables_in_receiver,
-                           columns_names_source=self.columns_names_source
-                           )
+        if not isinstance(self.validator, type):
+            create_dict_column(pref=self.list_of_dict_pref,
+                               parent=self,
+                               cur_dic_table_pref=self.dict_pref,
+                               config=self.config,
+                               validator=self.validator,
+                               tables_in_receiver=self.tables_in_receiver,
+                               columns_names_source=self.columns_names_source
+                               )
+        else:
+            create_dict_column(pref=self.list_of_dict_pref,
+                               parent=self,
+                               cur_dic_table_pref=self.dict_pref,
+                               config=self.config,
+                               validator=self.validator,
+                               tables_in_receiver=self.tables_in_receiver,
+                               columns_names_source=self.columns_names_source,
+                               dbtype=self.dbtype,
+                               target_table=self.target_table,
+                               db_base=self.db_base,
+                               connector=self.connector,
+                               executor=self.executor,
+                               cur=self.cur,
+                               loggerInst=self.loggerInst,
+                               )
+
 
     def delete_table_dict(self):
         if len(self.list_of_dict_pref) > 1:

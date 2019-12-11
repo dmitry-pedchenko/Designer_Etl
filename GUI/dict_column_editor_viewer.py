@@ -1,11 +1,40 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
+import Validate
 import sys
 
 
-def create_dict_column(pref, parent, config, validator, tables_in_receiver, columns_names_source, cur_dic_table_pref):
+def create_dict_column(
+        pref,
+        parent,
+        config,
+        validator,
+        tables_in_receiver,
+        columns_names_source,
+        cur_dic_table_pref,
+        dbtype=None,
+        target_table=None,
+        db_base=None,
+        connector=None,
+        executor=None,
+        cur=None,
+        loggerInst=None,
+        ):
     dict_pref = {}
     dict_pref['columns'] = []
-    columns_in_receiver = validator.queryForColumns()
+
+    if not isinstance(validator, type):
+        columns_in_receiver = validator.queryForColumns()
+    else:
+        columns_in_receiver = validator.queryForColumns_edit(
+            dbtype=dbtype,
+            target_table=target_table,
+            db_base=db_base,
+            connector=connector,
+            executor=executor,
+            cur=cur,
+            loggerInst=loggerInst
+        )
+
     if cur_dic_table_pref['dictTableName']:
         columns_in_db_dict = validator.queryForColumnsInDict(cur_dic_table_pref['dictTableName'])
     else:
@@ -31,7 +60,15 @@ def create_dict_column(pref, parent, config, validator, tables_in_receiver, colu
         config=config,
         col_names_in_db_dict=columns_in_db_dict,
         table_name=main_row.combo_box_dictTableName,
-        validator=validator
+        validator=validator,
+
+        dbtype=dbtype,
+        dbBase=db_base,
+        connector=connector,
+        executor=executor,
+        target_table=target_table,
+        cur=cur,
+        loggerInst=loggerInst
 
     )
 
@@ -186,8 +223,31 @@ class IndxDbColumn(QtWidgets.QTreeWidgetItem):
 
 
 class IndxColumnDic(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_dic_table_pref, parent, tree_widget, config, col_names_in_db_dict, table_name,validator):
+    def __init__(
+            self,
+            cur_dic_table_pref,
+            parent,
+            tree_widget,
+            config,
+            col_names_in_db_dict,
+            table_name,
+            validator,
+            dbtype=None,
+            dbBase=None,
+            connector=None,
+            executor=None,
+            target_table=None,
+            cur=None,
+            loggerInst=None
+            ):
         super().__init__(parent, ['indxColumnDic', ])
+        self.dbtype = dbtype
+        self.dbBase = dbBase
+        self.connector = connector
+        self.executor = executor
+        self.target_table = target_table
+        self.cur = cur
+        self.loggerInst = loggerInst
         #
         self.validator = validator
         self.table_name=table_name
@@ -208,7 +268,20 @@ class IndxColumnDic(QtWidgets.QTreeWidgetItem):
         self.table_name.currentTextChanged.connect(self.cur_table_change)
 
     def cur_table_change(self, name):
-        col_names_in_db_dict = self.validator.queryForColumnsInDict(f'{name}')
+        if not isinstance(self.validator, type):
+            col_names_in_db_dict = self.validator.queryForColumnsInDict(f'{name}')
+        else:
+            col_names_in_db_dict = self.validator.queryForColumnsInDict_edit(
+                dict_table_name=f"{name}",
+                dbtype=self.dbtype,
+                dbBase=self.dbBase,
+                connector=self.connector,
+                exec=self.executor,
+                # target_table=self.target_table,
+                cur=self.cur,
+                loggerInst=self.loggerInst
+            )
+
         list_indxColumnDic = [i[0] for i in col_names_in_db_dict]
 
         while self.combo_box_indxColumnDic.count()>0:

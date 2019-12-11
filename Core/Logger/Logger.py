@@ -5,7 +5,8 @@ from string import Template
 import sys
 
 
-class Log_info(Exception):
+
+class Log_info():
     __instance = None
     __config = None
     debug_stat_dict = {}  # список дебага в формате сообщение : количество сообщений
@@ -23,6 +24,7 @@ class Log_info(Exception):
             self.__config = pathToConfigXML
 
     def __init__(self, pathToConfigXML, configs_list):
+        # super().__init__(self)
         self.getLogger(configs_list)
         self.set_config(pathToConfigXML)
 
@@ -180,10 +182,7 @@ class Log_info(Exception):
         if os.path.basename(sys.argv[0]) != 'gui_main_interface.py':
             raise SystemExit(1)
         else:
-            raise self
-
-    def __str__(self) -> str:
-        return self.err_str
+            raise ThrowExc(t.substitute(num=errNum, message=message_temp))
 
     def raiseInfo(self, info_num, *message):
         message_temp = "default_info"
@@ -219,7 +218,7 @@ class Log_info(Exception):
         if info_num == 13:
             message_temp = f"""Log files created in: <{message[0]}>"""
         if info_num == 14:
-            message_temp = f"""Reconnect in: <{message[0]}> minute"""
+            message_temp = f"""Reconnect in: <{message[0]}> seconds"""
         if info_num == 15:
             message_temp = f"""Connection to DB lost... Message - \n<{message[0]}>"""
         if info_num == 16:
@@ -247,5 +246,11 @@ class Log_info(Exception):
 
     def clear_debug(self):
         self.debug_stat_dict = {}
+
+class ThrowExc(Exception):
+    pass
+
+
+
 
 

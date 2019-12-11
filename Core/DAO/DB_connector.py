@@ -31,6 +31,7 @@ class Connection:
                                                         database=dbname)
                     self.cursor = self.conn.cursor()
                     self.connection_arr.append({'dbtype': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
+                    print(self.connection_arr)
                 except:
                     self.log.raiseError(18, host, dbname, user, port)
         else:
@@ -62,6 +63,7 @@ class Connection:
                 self.conn.close()
                 for con in self.connection_arr:
                     con['conn'].close()
+                self.connection_arr = []
                 self.log.raiseInfo(3)
             except:
                 self.log.raiseError(19)
@@ -81,8 +83,8 @@ class Connection:
                 self.exec(query)
                 has_try = True
             except Exception as e:
+                counter_attempt += 1
                 if counter_attempt <= attempt:
-                    counter_attempt += 1
                     self.log.raiseInfo(15, e.args[0])
                     self.log.raiseInfo(16, counter_attempt)
                     self.log.raiseInfo(14, 120)
