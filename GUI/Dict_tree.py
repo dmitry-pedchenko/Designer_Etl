@@ -6,7 +6,7 @@ import dict_column_editor_viewer
 from alarm_window import show_alarm_window
 
 class DictTree(QtWidgets.QTreeWidget):
-    def __init__(self, list_of_dict_pref, config, validator, tables_in_receiver, columns_names_source, window_pref, parent=None):
+    def __init__(self, list_of_dict_pref, config, validator, tables_in_receiver, columns_names_source, window_pref=None, parent=None):
         super().__init__(parent)
         self.window_pref = window_pref
         self.columns_names_source = columns_names_source

@@ -23,6 +23,9 @@ from error_window import show_error_window
 import source_column_editor_viewer
 import target_column_editor_viewer
 import copy
+import Dict_tree
+
+
 
 class WizardConfig(QtWidgets.QWizard):
     def __init__(self, parent):
@@ -507,6 +510,32 @@ class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.list_of_dict_pref = []
+        self.config_dict = {}
+        self.validator = Validate_res
+
+    def initializePage(self) -> None:
+        self.tables_in_receiver = [i[0] for i in Validate_res.Validate.queryForTableInDbList_edit(
+            connector=self.wizard().page(0).con,
+            dbtype=self.wizard().page(0).lineEdit_dbtype.currentText(),
+            executor=Validate_res.Validate.executor,
+            cur=self.wizard().page(0).con.cursor,
+            loggerInst=self.wizard().page(0).loggerInst
+        )]
+
+        self.columns_in_source = self.wizard().page(2).columns_in_source
+
+        self.tree_dict = Dict_tree.DictTree(
+            list_of_dict_pref=self.list_of_dict_pref,
+            config=self.config_dict,
+            validator=self.validator,
+            tables_in_receiver=self.tables_in_receiver,
+            columns_names_source=self.columns_in_source,
+        )
+
+        self.horizontalLayout.addWidget(self.tree_dict)
+
+
 
 
 
