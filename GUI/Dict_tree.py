@@ -200,7 +200,7 @@ class DictTree(QtWidgets.QTreeWidget):
             parent=self,
             parent_widget=new_colName)
 
-        addValueBeginRow = dict_column_editor_viewer.CropBeginRow(
+        addValueBeginRow = dict_column_editor_viewer.AddValueBeginRow(
             column_property=self.dict_pref,
             parent=self,
             parent_widget=new_colName)

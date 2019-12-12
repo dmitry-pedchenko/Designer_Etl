@@ -24,6 +24,8 @@ import source_column_editor_viewer
 import target_column_editor_viewer
 import copy
 import Dict_tree
+from GUI.DAO.create_xml import CreateXML
+import xml.etree.ElementTree as et
 
 
 
@@ -58,17 +60,17 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         self.open_excel_file.setText("...")
 
         self.registerField('dictionary_state', self.checkBox_Dictionary)
-        self.registerField('lineEdit_dbtype', self.lineEdit_dbtype)
-        self.registerField('lineEdit_dbhost', self.lineEdit_dbhost)
-        self.registerField('lineEdit_dbuser', self.lineEdit_dbuser)
-        self.registerField('lineEdit_dbpass', self.lineEdit_dbpass)
-        self.registerField('lineEdit_dbbase', self.lineEdit_dbbase)
-        self.registerField('lineEdit_dbport', self.lineEdit_dbport)
-        self.registerField('comboBox_chose_loadMode', self.comboBox_chose_loadMode)
-        self.registerField('excelFileName', self.excelFileName)
-        self.registerField('checkBox_checkMode', self.checkBox_checkMode)
-        self.registerField('checkBox_both', self.checkBox_both)
-        self.registerField('compare_file', self.compare_file)
+        # self.registerField('lineEdit_dbtype', self.lineEdit_dbtype)
+        # self.registerField('lineEdit_dbhost', self.lineEdit_dbhost)
+        # self.registerField('lineEdit_dbuser', self.lineEdit_dbuser)
+        # self.registerField('lineEdit_dbpass', self.lineEdit_dbpass)
+        # self.registerField('lineEdit_dbbase', self.lineEdit_dbbase)
+        # self.registerField('lineEdit_dbport', self.lineEdit_dbport)
+        # self.registerField('comboBox_chose_loadMode', self.comboBox_chose_loadMode)
+        # self.registerField('excelFileName', self.excelFileName)
+        # self.registerField('checkBox_checkMode', self.checkBox_checkMode)
+        # self.registerField('checkBox_both', self.checkBox_both)
+        # self.registerField('compare_file', self.compare_file)
 
         self.df_compare = None
 
@@ -298,6 +300,22 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
                                        )
                     con.test_conn(0)
 
+                    self.pref['dbtype'] = self.lineEdit_dbtype.currentText()
+                    self.pref['dbHost'] = self.lineEdit_dbhost.text()
+                    self.pref['dbUser'] = self.lineEdit_dbuser.text()
+                    self.pref['dbPass'] = self.lineEdit_dbpass.text()
+                    self.pref['dbBase'] = self.lineEdit_dbbase.text()
+                    self.pref['dbPort'] = self.lineEdit_dbport.text()
+
+                    self.pref['Load Mode'] = self.comboBox_chose_loadMode.currentText()
+                    self.pref['excelFileName'] = self.excelFileName.text()
+                    self.pref['comboBox_list_source_excel'] = self.comboBox_list_source_excel.currentIndex()
+                    self.pref['checkBox_checkMode'] = self.checkBox_checkMode.isChecked()
+                    self.pref['compare_file'] = self.compare_file.text()
+                    self.pref['comboBox_set_list_checked'] = self.comboBox_set_list_checked.currentText()
+                    self.pref['checkBox_Dictionary'] = self.checkBox_Dictionary.isChecked()
+                    self.pref['checkBox_both'] = self.checkBox_both.isChecked()
+
                 except Exception:
                     if hasattr(self, "con"):
                         self.con.closeConnect()
@@ -322,6 +340,7 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         self.pref = {}
 
     def initializePage2(self) -> None:
+
         self.wizard().page(1).comboBox_dbSchema.addItems(sorted([i[0] for i in Validate_res.Validate.queryForSchemasInDb_edit(
             dbtype=self.lineEdit_dbtype.currentText(),
             connector=self.con,
@@ -353,6 +372,16 @@ class Page2(QtWidgets.QWizardPage, form_wizard_page_2.Ui_Form):
         self.target_table_name = comboBox_list_for_Page3(self.verticalLayoutWidget)
         self.target_table_name.setObjectName("target_table_name")
         self.horizontalLayout_14.addWidget(self.target_table_name)
+
+    def validatePage(self) -> bool:
+        try:
+            self.wizard().page(0).pref['dbSchema'] = self.comboBox_dbSchema.currentText()
+            self.wizard().page(0).pref['target_table_name'] = self.target_table_name.currentText()
+        except Exception as e:
+            show_alarm_window(self, "Can't save params")
+            return False
+        else:
+            return True
 
 
 
@@ -520,6 +549,7 @@ class Page4(QtWidgets.QWizardPage, form_wizard_page_4.Ui_Form):
     def clear(self):
         while self.treeWidget_of_Receiver.topLevelItemCount() > 0:
             self.treeWidget_of_Receiver.takeTopLevelItem(0)
+        self.list_of_receiver_cols_links = []
 
     # def cleanupPage(self) -> None:
 
@@ -542,6 +572,7 @@ class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
     def clear(self):
         while self.tree_dict.topLevelItemCount() > 0:
             self.tree_dict.takeTopLevelItem(0)
+        self.list_of_dict_pref = []
 
     def initializePage(self) -> None:
         self.tables_in_receiver = [i[0] for i in Validate_res.Validate.queryForTableInDbList_edit(
@@ -589,6 +620,39 @@ class Page6(QtWidgets.QWizardPage, form_wizard_page_6.Ui_Form):
         super().__init__(parent)
         self.setupUi(self)
         self.parent = parent
+
+    def initializePage(self) -> None:
+        self.obj = ObjectToCreateXML(
+            pref=self.wizard().page(0).pref
+            ,list_of_source_cols_links=self.wizard().page(2).list_of_source_cols_links
+            ,loggerInst=self.wizard().page(0).loggerInst
+            ,list_of_dict_pref=self.wizard().page(4).list_of_dict_pref
+            ,list_of_receiver_cols_links=self.wizard().page(3).list_of_receiver_cols_links
+            ,pref_gui=self.wizard().page(0)
+        )
+
+
+        self.create_xml_save = CreateXML(self.obj)
+        self.create_xml_save.started.connect(lambda: self.wizard().parent().ui.statusbar.showMessage('Creating XML...'))
+        self.create_xml_save.message.connect(self.print_xml)
+        self.create_xml_save.error_message.connect(self.wizard().parent().error_at_create_xml)
+        self.create_xml_save.start()
+
+    def print_xml(self, tree, root):
+        self.tree = tree
+        self.root = root
+        self.textEdit.clear()
+        self.wizard().parent().ui.statusbar.showMessage(f'XML Created.')
+        self.textEdit.append(xml_format.parseString(et.tostring(root)).toprettyxml(indent="    "))
+        del self.obj
+
+    def validatePage(self) -> bool:
+        path_to_save = QtWidgets.QFileDialog.getSaveFileName(
+            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+        if path_to_save[0] != '':
+            self.wizard().parent().write_as_xml(self.tree, self.root, path=path_to_save[0])
+            return True
+        return False
 
 
 
@@ -716,7 +780,33 @@ class LinkedColumns(QtWidgets.QTreeWidgetItem):
         tree_widget.setItemWidget(self, 0, self.combo_box_source_links)
         tree_widget.setItemWidget(self, 1, self.combo_box_target_links)
 
+class ObjectToCreateXML:
+    def __init__(self,
+                 pref,
+                 list_of_source_cols_links,
+                 loggerInst,
+                 list_of_dict_pref,
+                 list_of_receiver_cols_links,
+                 pref_gui
+                 ):
+        self.pref = pref
+        self.list_of_source_cols_links = list_of_source_cols_links
+        self.loggerInst = loggerInst
+        self.list_of_dict_pref = list_of_dict_pref
+        self.list_of_receiver_cols_links = list_of_receiver_cols_links
+        self.pref_gui = pref_gui
 
+    def __str__(self):
+        return f"""
+                    pref                        {self.pref }
+                    list_of_source_cols_links   {self.list_of_source_cols_links}
+                    loggerInst                  {self.loggerInst}
+                    list_of_dict_pref           {self.list_of_dict_pref} 
+                    list_of_receiver_cols_links {self.list_of_receiver_cols_links}
+                    pref_gui                    {self.pref_gui}
+
+                    id                          {id(self)}
+                    """
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)

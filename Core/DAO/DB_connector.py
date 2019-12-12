@@ -31,7 +31,6 @@ class Connection:
                                                         database=dbname)
                     self.cursor = self.conn.cursor()
                     self.connection_arr.append({'dbtype': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
-                    print(self.connection_arr)
                 except:
                     self.log.raiseError(18, host, dbname, user, port)
         else:

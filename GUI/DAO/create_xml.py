@@ -8,12 +8,13 @@ import xml.dom.minidom as xml_parse
 
 class CreateXML(QtCore.QThread):
     error_message = QtCore.pyqtSignal(object)
-    message = QtCore.pyqtSignal()
+    message = QtCore.pyqtSignal(object, object)
 
-    def __init__(self, path_config, obj) -> None:
+    def __init__(self
+                 , obj
+                 ) -> None:
         super().__init__()
         self.obj = obj
-        self.path_config = path_config
 
     def run(self):
         list_of_types_dict_to_comboBox = {
@@ -192,23 +193,46 @@ class CreateXML(QtCore.QThread):
             else:
                 post_filter.attrib['mode'] = 'false'
 
-        if self.obj.pref_gui.ui.checkBox_checkMode.isChecked():
-            pathToLinkFile = et.SubElement(linkedColumns, 'pathToLinkFile')
-            pathToLinkFile.text = f"{self.obj.pref_gui.ui.compare_file.text()}"
-            linkedFileSheetNumber = et.SubElement(linkedColumns, 'linkedFileSheetNumber')
-            linkedFileSheetNumber.text = f"{self.obj.pref_gui.comboBox_set_list_checked.currentIndex() + 1}"
-            both = et.SubElement(linkedColumns, 'both')
-            both.text = f"{self.obj.pref_gui.ui.checkBox_both.isChecked()}".lower()
+        if hasattr(self.obj.pref_gui, "ui"):
+            if self.obj.pref_gui.ui.checkBox_checkMode.isChecked():
+                pathToLinkFile = et.SubElement(linkedColumns, 'pathToLinkFile')
+                pathToLinkFile.text = f"{self.obj.pref_gui.ui.compare_file.text()}"
+                linkedFileSheetNumber = et.SubElement(linkedColumns, 'linkedFileSheetNumber')
+                linkedFileSheetNumber.text = f"{self.obj.pref_gui.comboBox_set_list_checked.currentIndex() + 1}"
+                both = et.SubElement(linkedColumns, 'both')
+                both.text = f"{self.obj.pref_gui.ui.checkBox_both.isChecked()}".lower()
 
-            for col in self.obj.pref['col_to_check']:
-                column = et.SubElement(linkedColumns, 'column')
-                linkedColName = et.SubElement(column, 'linkedColName')
-                colNameInSource = et.SubElement(column, 'colNameInSource')
+                for col in self.obj.pref['col_to_check']:
+                    column = et.SubElement(linkedColumns, 'column')
+                    linkedColName = et.SubElement(column, 'linkedColName')
+                    colNameInSource = et.SubElement(column, 'colNameInSource')
 
-                colNameInSource.text = f"{col.combo_box_source_links.currentText()}"
-                linkedColName.text = f"{col.combo_box_target_links.currentText()}"
+                    colNameInSource.text = f"{col.combo_box_source_links.currentText()}"
+                    linkedColName.text = f"{col.combo_box_target_links.currentText()}"
+        else:
+            if self.obj.pref_gui.checkBox_checkMode.isChecked():
+                pathToLinkFile = et.SubElement(linkedColumns, 'pathToLinkFile')
+                pathToLinkFile.text = f"{self.obj.pref_gui.compare_file.text()}"
+                linkedFileSheetNumber = et.SubElement(linkedColumns, 'linkedFileSheetNumber')
+                linkedFileSheetNumber.text = f"{self.obj.pref_gui.comboBox_set_list_checked.currentIndex() + 1}"
+                both = et.SubElement(linkedColumns, 'both')
+                both.text = f"{self.obj.pref_gui.checkBox_both.isChecked()}".lower()
 
-        if self.obj.pref_gui.ui.checkBox_Dictionary.isChecked():
+                for col in self.obj.pref['col_to_check']:
+                    column = et.SubElement(linkedColumns, 'column')
+                    linkedColName = et.SubElement(column, 'linkedColName')
+                    colNameInSource = et.SubElement(column, 'colNameInSource')
+
+                    colNameInSource.text = f"{col.combo_box_source_links.currentText()}"
+                    linkedColName.text = f"{col.combo_box_target_links.currentText()}"
+
+
+        if hasattr(self.obj.pref_gui, "ui"):
+            checkBox_Dictionary = self.obj.pref_gui.ui.checkBox_Dictionary
+        else:
+            checkBox_Dictionary = self.obj.pref_gui.checkBox_Dictionary
+
+        if checkBox_Dictionary.isChecked():
             tables = et.SubElement(withDict, 'tables')
             withDict.attrib['mode'] = 'true'
 
@@ -322,6 +346,6 @@ class CreateXML(QtCore.QThread):
             else:
                 ifNull.attrib['mode'] = 'false'
 
-        tree.write(f"{self.path_config}")
-        self.message.emit()
+        # tree.write(f"{self.path_config}")
+        self.message.emit(tree, root)
 

@@ -230,7 +230,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def deleteColumn(self):
         if len(self.list_of_source_cols_links) > 1:
-            element = list(filter(lambda x: x['colName'].combo_box_name.currentText() == self.treeWidget_of_Source.currentItem().combo_box_name.currentText(), self.list_of_source_cols_links))[0]
+            element = list(filter(lambda x: x['colName'].combo_box_name.currentText() ==
+                                            self.treeWidget_of_Source.currentItem().combo_box_name.currentText(),
+                                  self.list_of_source_cols_links))[0]
             self.list_of_source_cols_links.remove(element)
             self.treeWidget_of_Source.takeTopLevelItem(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
         else:
@@ -396,21 +398,46 @@ class MainWindow(QtWidgets.QMainWindow):
                                                 )
 
         if result == QtWidgets.QMessageBox.Yes:
-            self.create_xml_save = CreateXML(self.path_name_config[0], self)
-            self.create_xml_save.start()
+            self.create_xml_save = CreateXML(self)
             self.create_xml_save.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
-            self.create_xml_save.message.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {self.path_name_config[0]}'))
+            self.create_xml_save.message.connect(self.write_xml)
             self.create_xml_save.error_message.connect(self.error_at_create_xml)
+            self.create_xml_save.start()
+
 
     def save_as_configuration(self):
-        path_to_save = QtWidgets.QFileDialog.getSaveFileName(
+        self.path_to_save = QtWidgets.QFileDialog.getSaveFileName(
             directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
-        if path_to_save[0] != '':
-            self.create_xml_save_as = CreateXML(f"{path_to_save[0]}", self)
-            self.create_xml_save_as.start()
+        if self.path_to_save[0] != '':
+            self.create_xml_save_as = CreateXML(self)
             self.create_xml_save_as.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
-            self.create_xml_save_as.message.connect(lambda: self.ui.statusbar.showMessage(f'Created XML. {path_to_save[0]}'))
+            self.create_xml_save_as.message.connect(self.write_as_xml)
             self.create_xml_save_as.error_message.connect(self.error_at_create_xml)
+            self.create_xml_save_as.start()
+
+
+    def write_xml(self, tree, root):
+        try:
+            tree.write(f"{self.path_name_config[0]}")
+        except Exception as e:
+            show_alarm_window(self, "Error at creating config !!!")
+        else:
+            self.ui.statusbar.showMessage(f'Created XML. {self.path_name_config[0]}')
+
+    def write_as_xml(self, tree, root, path=None):
+        try:
+            if path:
+                tree.write(f"{path}")
+            else:
+                tree.write(f"{self.path_to_save[0]}")
+        except Exception as e:
+            show_alarm_window(self, "Error at creating config !!!")
+        else:
+            if path:
+                self.ui.statusbar.showMessage(f'Created XML. {path}')
+            else:
+                self.ui.statusbar.showMessage(f'Created XML. {self.path_to_save[0]}')
+
 
     def closeEvent(self, e):
         answer = QtWidgets.QMessageBox.question(self,
