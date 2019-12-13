@@ -23,6 +23,7 @@ from GUI.DAO.create_xml import CreateXML
 from alarm_window import show_alarm_window
 from error_window import show_error_window
 from connection_db import CreateConnection
+import db_connect_editor
 import time
 from queue import Queue
 import queue
@@ -62,6 +63,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.tab_widget_config_editor = None
         self.tab_widget_loader = None
+        self.tab_widget_editor = None
         self.tab_widget_dictionary = None
         self.pref_gui = None
         self.dbService = None
@@ -90,6 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionConfiguration_Wizard.triggered.connect(self.show_wizrd)
         self.ui.actionConfig_Editor.triggered.connect(self.show_config_editor)
         self.ui.actionLoader.triggered.connect(self.show_loader)
+        self.ui.actionEditor.triggered.connect(self.show_editor)
         self.ui.actionDictionary.triggered.connect(self.show_dictionary)
         self.ui.actionClose_Project.triggered.connect(self.close_project_data)
         self.connection_tread.task_done.connect(self.created_connection, QtCore.Qt.QueuedConnection)
@@ -129,6 +132,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.tab_widget_config_editor = None
         self.tab_widget_loader = None
+        self.tab_widget_editor = None
         self.tab_widget_dictionary = None
         self.connector = None
 
@@ -201,6 +205,175 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.tabWidget.addTab(self.tab_widget_loader, 'Loader')
 
+    def create_editor(self):
+        if self.tab_widget_editor:
+            pass
+        else:
+            self.tab_widget_editor = QtWidgets.QWidget()
+            self.tab_widget_editor.ui = db_connect_editor.Ui_Form()
+            self.tab_widget_editor.ui.setupUi(self.tab_widget_editor)
+
+
+
+
+            self.tab_widget_editor.ui.pushButton_Open.clicked.connect(self.select_config_file)
+            self.tab_widget_editor.ui.pushButton_Save.clicked.connect(self.save_edit_config)
+
+        self.tabWidget.addTab(self.tab_widget_editor, 'DB connect editor')
+
+    def save_edit_config(self):
+        result = QtWidgets.QMessageBox.question(self,
+                                                f"Save file ?",
+                                                f"Save file as {self.tab_widget_editor.path_name_config} ?",
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                QtWidgets.QMessageBox.No
+                                                )
+
+        if result == QtWidgets.QMessageBox.Yes:
+            self.tab_widget_editor.root.find('dbtype').text = f"{self.tab_widget_editor.ui.lineEdit_dbtype.currentText()}"
+            self.tab_widget_editor.root.find('loadMode').text = f"{self.tab_widget_editor.ui.comboBox_chose_loadMode.currentText()}"
+            self.tab_widget_editor.root.find('dbSchema').text = f"{self.tab_widget_editor.ui.dbSchema.text()}"
+            self.tab_widget_editor.root.find('dbHost').text = f"{self.tab_widget_editor.ui.lineEdit_dbhost.text()}"
+            self.tab_widget_editor.root.find('dbUser').text = f"{self.tab_widget_editor.ui.lineEdit_dbuser.text()}"
+            self.tab_widget_editor.root.find('dbPass').text = f"{self.tab_widget_editor.ui.lineEdit_dbpass.text()}"
+            self.tab_widget_editor.root.find('dbBase').text = f"{self.tab_widget_editor.ui.lineEdit_dbbase.text()}"
+            self.tab_widget_editor.root.find('dbPort').text = f"{self.tab_widget_editor.ui.lineEdit_dbport.text()}"
+            self.tab_widget_editor.root.find('exportTable/path').text = f"{self.tab_widget_editor.ui.lineEdit_target_name.text()}"
+
+            self.write_edit_xml()
+
+    def save_as_edit_config(self):
+        pass
+
+    def write_edit_xml(self):
+        try:
+            self.tab_widget_editor.tree.write(f"{self.tab_widget_editor.path_name_config}")
+        except Exception as e:
+            show_alarm_window(self, "Error at creating config !!!")
+        else:
+            self.ui.statusbar.showMessage(f'Created XML: {self.tab_widget_editor.path_name_config}')
+
+
+    def select_config_file(self):
+
+        path_name_config = QtWidgets.QFileDialog.getOpenFileName(
+            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+        path = os.path.basename(path_name_config[0])
+
+
+
+        if path != '':
+            self.loggerInst = Logger.Log_info.getInstance(path, path)
+
+            self.tab_widget_editor.path = path
+            self.tab_widget_editor.path_name_config = path_name_config[0]
+
+            self.tab_widget_editor.ui.lineEdit_dbtype.addItems(['mssql', 'mysql'])
+            self.tab_widget_editor.ui.comboBox_chose_loadMode.addItems(['insert', 'update'])
+
+            try:
+                root = et.parse(path_name_config[0]).getroot()
+            except Exception as e:
+                try:
+                    self.loggerInst.raiseError(1, e)
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.root = root
+                self.tab_widget_editor.tree = et.ElementTree(root)
+
+            try:
+                dbtype = root.find("dbtype").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "dbtype")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.lineEdit_dbtype.setCurrentText(f"{dbtype}")
+
+            try:
+                loadMode = root.find("loadMode").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "loadMode")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.comboBox_chose_loadMode.setCurrentText(f"{loadMode}")
+
+            try:
+                db_schema = root.find("dbSchema").text
+            except:
+                try:
+                    self.loggerInst.raiseError(4, "dbSchema")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.dbSchema.setText(f"{db_schema}")
+
+            try:
+                exportTableName_value_text = root.find("exportTable/path").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "exportTable/path")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.lineEdit_target_name.setText(f"{exportTableName_value_text}")
+
+            try:
+                dbHost = root.find("dbHost").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "dbHost")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.lineEdit_dbhost.setText(f"{dbHost}")
+
+            try:
+                dbUser = root.find("dbUser").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "dbUser")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.lineEdit_dbuser.setText(f"{dbUser}")
+
+            try:
+                dbPass = root.find("dbPass").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "dbPass")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.lineEdit_dbpass.setText(f"{dbPass}")
+
+            try:
+                dbBase = root.find("dbBase").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "dbBase")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.lineEdit_dbbase.setText(f"{dbBase}")
+
+            try:
+                dbPort = root.find("dbPort").text
+            except:
+                try:
+                    self.loggerInst.raiseError(3, "dbPort")
+                except Exception as e:
+                    show_alarm_window(self, e)
+            else:
+                self.tab_widget_editor.ui.lineEdit_dbport.setText(f"{dbPort}")
+
+            self.ui.statusbar.showMessage(f'Open config: {self.tab_widget_editor.path_name_config}')
+
     def show_config_editor(self):
         if self.ui.actionConfig_Editor.isChecked():
             if self.tab_widget_config_editor:
@@ -227,6 +400,15 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.create_loader()
         else:
             self.tabWidget.removeTab(self.tabWidget.indexOf(self.tab_widget_loader))
+
+    def show_editor(self):
+        if self.ui.actionEditor.isChecked():
+            if self.tab_widget_editor:
+                self.tabWidget.addTab(self.tab_widget_editor, 'DB connect editor')
+            else:
+                self.create_editor()
+        else:
+            self.tabWidget.removeTab(self.tabWidget.indexOf(self.tab_widget_editor))
 
     def deleteColumn(self):
         if len(self.list_of_source_cols_links) > 1:
@@ -422,7 +604,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e:
             show_alarm_window(self, "Error at creating config !!!")
         else:
-            self.ui.statusbar.showMessage(f'Created XML. {self.path_name_config[0]}')
+            self.ui.statusbar.showMessage(f'Created XML: {self.path_name_config[0]}')
 
     def write_as_xml(self, tree, root, path=None):
         try:
@@ -434,9 +616,9 @@ class MainWindow(QtWidgets.QMainWindow):
             show_alarm_window(self, "Error at creating config !!!")
         else:
             if path:
-                self.ui.statusbar.showMessage(f'Created XML. {path}')
+                self.ui.statusbar.showMessage(f'Created XML: {path}')
             else:
-                self.ui.statusbar.showMessage(f'Created XML. {self.path_to_save[0]}')
+                self.ui.statusbar.showMessage(f'Created XML: {self.path_to_save[0]}')
 
 
     def closeEvent(self, e):

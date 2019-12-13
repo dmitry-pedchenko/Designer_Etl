@@ -2,6 +2,7 @@ from Parser import XML_parser
 from Core.DAO import DAO_DataFrame
 import os
 
+
 class XmlParser:
 
     def __init__(self, pathToConfig, log, opts=None):

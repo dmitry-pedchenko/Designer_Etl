@@ -60,17 +60,6 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         self.open_excel_file.setText("...")
 
         self.registerField('dictionary_state', self.checkBox_Dictionary)
-        # self.registerField('lineEdit_dbtype', self.lineEdit_dbtype)
-        # self.registerField('lineEdit_dbhost', self.lineEdit_dbhost)
-        # self.registerField('lineEdit_dbuser', self.lineEdit_dbuser)
-        # self.registerField('lineEdit_dbpass', self.lineEdit_dbpass)
-        # self.registerField('lineEdit_dbbase', self.lineEdit_dbbase)
-        # self.registerField('lineEdit_dbport', self.lineEdit_dbport)
-        # self.registerField('comboBox_chose_loadMode', self.comboBox_chose_loadMode)
-        # self.registerField('excelFileName', self.excelFileName)
-        # self.registerField('checkBox_checkMode', self.checkBox_checkMode)
-        # self.registerField('checkBox_both', self.checkBox_both)
-        # self.registerField('compare_file', self.compare_file)
 
         self.df_compare = None
 
