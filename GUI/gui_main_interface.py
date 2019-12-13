@@ -16,6 +16,7 @@ from GUI.Windows.alarm_window import show_alarm_window
 from GUI.Windows.error_window import show_error_window
 from GUI.DAO.connection_db import CreateConnection
 from GUI.Windows import easy_loader, gui_prefernces_controller, wizard_configuration
+from GUI.System.LanguageAdaptor import Adapter
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -26,6 +27,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.config_dict = {}
         self.pref = {}
         self.list_of_dict_pref = []
+
+        self.adapter = Adapter()
 
         self.ui = main_window.Ui_MainWindow()
         self.ui.setupUi(self)
@@ -485,7 +488,8 @@ class MainWindow(QtWidgets.QMainWindow):
                                                                           logger_inst=self.loggerInst,
                                                                           tables_in_db=self.tables_in_receiver,
                                                                           schemas_in_db=self.schemas_in_db,
-                                                                          parent=self.pref_gui
+                                                                          parent=self.pref_gui,
+                                                                          adapter=self.adapter
                                                                           )
                     self.pref_gui.show()
                 except Exception:

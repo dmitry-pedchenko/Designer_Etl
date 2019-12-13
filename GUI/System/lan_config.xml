@@ -1,0 +1,43 @@
+<languages>
+    <rus>
+        <pref_window>
+            <dbtype>Тип базы</dbtype>
+            <dbHost>Хост</dbHost>
+            <dbUser>Пользователь</dbUser>
+            <dbPass>Пароль</dbPass>
+            <dbBase>База</dbBase>
+            <dbScheme>Схема</dbScheme>
+            <dbPort>Порт</dbPort>
+            <Load_Mode>Тип загрузки</Load_Mode>
+            <Source_excel_file_name>Имя источника</Source_excel_file_name>
+            <Target_table_name>Имя целевой таблицы</Target_table_name>
+            <Check_mode>Сверка файлов</Check_mode>
+            <Check_table_name>Имя файла сверки</Check_table_name>
+            <Both>Оба</Both>
+            <Dictionary>Со словарём</Dictionary>
+            <LinkedColumns>Столбцы источника</LinkedColumns>
+            <TargetColumns>Столбцы в сверочном файле</TargetColumns>
+        </pref_window>
+    </rus>
+    <system>
+        <pref_window>
+            <dbtype>dbtype</dbtype>
+            <dbHost>dbHost</dbHost>
+            <dbUser>dbUser</dbUser>
+            <dbPass>dbPass</dbPass>
+            <dbBase>dbBase</dbBase>
+            <dbScheme>dbScheme</dbScheme>
+            <dbPort>dbPort</dbPort>
+            <Load_Mode>Load_Mode</Load_Mode>
+            <Source_excel_file_name>Source_excel_file_name</Source_excel_file_name>
+            <Target_table_name>Target_table_name</Target_table_name>
+            <Check_mode>Check_mode</Check_mode>
+            <Check_table_name>Check_table_name</Check_table_name>
+            <Both>Both</Both>
+            <Dictionary>Dictionary</Dictionary>
+            <LinkedColumns>LinkedColumns</LinkedColumns>
+            <TargetColumns>TargetColumns</TargetColumns>
+        </pref_window>
+    </system>
+
+</languages>

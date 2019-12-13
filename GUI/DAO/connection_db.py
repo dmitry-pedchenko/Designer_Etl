@@ -1,9 +1,5 @@
-import typing
-from error_window import show_error_window
-from PyQt5.QtCore import QObject
-import time
 import Core.DAO.DB_connector as db_con
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtCore
 
 
 class CreateConnection(QtCore.QThread):

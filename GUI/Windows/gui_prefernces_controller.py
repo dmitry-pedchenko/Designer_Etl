@@ -15,7 +15,8 @@ class Pref_Window(QtWidgets.QWidget):
                  tables_in_db,
                  schemas_in_db,
                  dbService=None,
-                 parent=None):
+                 parent=None,
+                 adapter=None):
         super().__init__()
         self.parent = parent
         self.setWindowModality(QtCore.Qt.ApplicationModal)
@@ -30,6 +31,9 @@ class Pref_Window(QtWidgets.QWidget):
         self.config_dict = config_dict
         self.ui = form_preferences.Ui_Form()
         self.ui.setupUi(self)
+        # translate
+        self.ui.label_dbtype.setText(adapter.take_translate('pref_window', 'dbtype'))
+        # translate
 
         self.treeWidget_linked_columns = TreeWidgetLinkedColumns(widget_sighal=self.ui.excelFileName)
         self.ui.tree_widget_box.addWidget(self.treeWidget_linked_columns)
