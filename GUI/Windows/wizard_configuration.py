@@ -1,29 +1,21 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
 import sys
-import form_wizard_page_1
-import form_wizard_page_2
-import form_wizard_page_3
-import form_wizard_page_4
-import form_wizard_page_5
-import form_wizard_page_6
-import form_wizard_page_7
-import form_wizard_page_8
-import Source_tree
-import Receiver_tree
+import GUI.gui_qt.form_wizard_page_1 as form_wizard_page_1
+import GUI.gui_qt.form_wizard_page_2 as form_wizard_page_2
+import GUI.gui_qt.form_wizard_page_3 as form_wizard_page_3
+import GUI.gui_qt.form_wizard_page_4 as form_wizard_page_4
+import GUI.gui_qt.form_wizard_page_5 as form_wizard_page_5
+import GUI.gui_qt.form_wizard_page_6 as form_wizard_page_6
+from GUI.Trees import Receiver_tree, Dict_tree, Source_tree
 import xml.dom.minidom as xml_format
 import os
 import pandas as pd
 import Core.DAO.DB_connector as db_con
-from Logger import Logger
-from alarm_window import show_alarm_window
-from Validate import Validate_res
-from Core.DAO import XML_DAO as xpc
-from alarm_window import show_alarm_window
-from error_window import show_error_window
-import source_column_editor_viewer
-import target_column_editor_viewer
+from Core.Logger import Logger
+from Core.Validate import Validate_res
+from GUI.Windows.alarm_window import show_alarm_window
+from GUI.Creators import source_column_editor_viewer, target_column_editor_viewer
 import copy
-import Dict_tree
 from GUI.DAO.create_xml import CreateXML
 import xml.etree.ElementTree as et
 
@@ -43,6 +35,20 @@ class WizardConfig(QtWidgets.QWizard):
         # self.setPage(RoadMapConfiguration.DictTables, Page8(self))
 
         self.resize(900, 550)
+
+    def closeEvent(self, e):
+        answer = QtWidgets.QMessageBox.question(self,
+                                                "Question",
+                                                "Exit from creator ?",
+                                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No,
+                                                QtWidgets.QMessageBox.Yes
+                                                )
+
+        if answer == QtWidgets.QMessageBox.Yes:
+            e.accept()
+            QtWidgets.QWidget.closeEvent(self, e)
+        else:
+            e.ignore()
 
 
 class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):

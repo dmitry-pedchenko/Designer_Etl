@@ -16,7 +16,7 @@
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>300</x>
      <y>20</y>
      <width>281</width>
      <height>401</height>
@@ -259,7 +259,7 @@
   <widget class="QPushButton" name="pushButton_Open">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>640</x>
      <y>20</y>
      <width>112</width>
      <height>32</height>
@@ -272,7 +272,7 @@
   <widget class="QPushButton" name="pushButton_Save">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>640</x>
      <y>60</y>
      <width>112</width>
      <height>32</height>
@@ -285,7 +285,7 @@
   <widget class="QPushButton" name="pushButton_SaveAs">
    <property name="geometry">
     <rect>
-     <x>680</x>
+     <x>640</x>
      <y>100</y>
      <width>112</width>
      <height>32</height>

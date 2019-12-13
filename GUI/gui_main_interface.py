@@ -1,32 +1,21 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtCore
 import sys
-
 from PyQt5.QtCore import pyqtSlot
-
-from gui_qt import main_window
-import gui_prefernces_controller
-import source_column_editor_viewer
+from GUI.gui_qt import main_window
+from GUI.Creators import source_column_editor_viewer, target_column_editor_viewer
 import os
-from Parser.XML_parser import do_XML_parse as xml_parse
-from Logger import Logger
-import Source_tree
-import Receiver_tree
-import wizard_configuration
-import target_column_editor_viewer
-import Dict_tree
-from dict_column_editor_viewer import create_dict_column
-import Core.DAO.DB_connector as db_con
-from Validate import Validate_res
+from Core.Parser.XML_parser import do_XML_parse as xml_parse
+from Core.Logger import Logger
+from GUI.Trees import Receiver_tree, Dict_tree, Source_tree
+from GUI.Creators.dict_column_editor_viewer import create_dict_column
+from Core.Validate import Validate_res
 from Core.DAO import XML_DAO as xpc
 import xml.etree.ElementTree as et
 from GUI.DAO.create_xml import CreateXML
-from alarm_window import show_alarm_window
-from error_window import show_error_window
-from connection_db import CreateConnection
-import db_connect_editor
-import time
-from queue import Queue
-import queue
+from GUI.Windows.alarm_window import show_alarm_window
+from GUI.Windows.error_window import show_error_window
+from GUI.DAO.connection_db import CreateConnection
+from GUI.Windows import easy_loader, gui_prefernces_controller, wizard_configuration
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -200,8 +189,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.tab_widget_loader:
             pass
         else:
-            self.tab_widget_loader = QtWidgets.QWidget()
-        #     create widget here
+            self.tab_widget_loader = easy_loader.EasyLoader()
 
         self.tabWidget.addTab(self.tab_widget_loader, 'Loader')
 
@@ -213,11 +201,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_widget_editor.ui = db_connect_editor.Ui_Form()
             self.tab_widget_editor.ui.setupUi(self.tab_widget_editor)
 
-
-
-
             self.tab_widget_editor.ui.pushButton_Open.clicked.connect(self.select_config_file)
             self.tab_widget_editor.ui.pushButton_Save.clicked.connect(self.save_edit_config)
+            self.tab_widget_editor.ui.pushButton_SaveAs.clicked.connect(self.save_as_edit_config)
 
         self.tabWidget.addTab(self.tab_widget_editor, 'DB connect editor')
 
@@ -243,7 +229,32 @@ class MainWindow(QtWidgets.QMainWindow):
             self.write_edit_xml()
 
     def save_as_edit_config(self):
-        pass
+        path_to_save = QtWidgets.QFileDialog.getSaveFileName(
+            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+        if path_to_save[0] != '':
+            self.tab_widget_editor.path_to_save = path_to_save[0]
+            self.tab_widget_editor.root.find(
+                'dbtype').text = f"{self.tab_widget_editor.ui.lineEdit_dbtype.currentText()}"
+            self.tab_widget_editor.root.find(
+                'loadMode').text = f"{self.tab_widget_editor.ui.comboBox_chose_loadMode.currentText()}"
+            self.tab_widget_editor.root.find('dbSchema').text = f"{self.tab_widget_editor.ui.dbSchema.text()}"
+            self.tab_widget_editor.root.find('dbHost').text = f"{self.tab_widget_editor.ui.lineEdit_dbhost.text()}"
+            self.tab_widget_editor.root.find('dbUser').text = f"{self.tab_widget_editor.ui.lineEdit_dbuser.text()}"
+            self.tab_widget_editor.root.find('dbPass').text = f"{self.tab_widget_editor.ui.lineEdit_dbpass.text()}"
+            self.tab_widget_editor.root.find('dbBase').text = f"{self.tab_widget_editor.ui.lineEdit_dbbase.text()}"
+            self.tab_widget_editor.root.find('dbPort').text = f"{self.tab_widget_editor.ui.lineEdit_dbport.text()}"
+            self.tab_widget_editor.root.find(
+                'exportTable/path').text = f"{self.tab_widget_editor.ui.lineEdit_target_name.text()}"
+
+            self.write_as_edit_xml()
+
+    def write_as_edit_xml(self):
+        try:
+            self.tab_widget_editor.tree.write(f"{self.tab_widget_editor.path_to_save}")
+        except Exception as e:
+            show_alarm_window(self, "Error at creating config !!!")
+        else:
+            self.ui.statusbar.showMessage(f'Created XML: {self.tab_widget_editor.path_to_save}')
 
     def write_edit_xml(self):
         try:
@@ -268,6 +279,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_widget_editor.path = path
             self.tab_widget_editor.path_name_config = path_name_config[0]
 
+            self.tab_widget_editor.ui.lineEdit_dbhost.clear()
+            self.tab_widget_editor.ui.lineEdit_dbuser.clear()
+            self.tab_widget_editor.ui.lineEdit_dbpass.clear()
+            self.tab_widget_editor.ui.lineEdit_dbbase.clear()
+            self.tab_widget_editor.ui.dbSchema.clear()
+            self.tab_widget_editor.ui.lineEdit_dbport.clear()
+            self.tab_widget_editor.ui.lineEdit_target_name.clear()
+            self.tab_widget_editor.ui.lineEdit_dbtype.clear()
+            self.tab_widget_editor.ui.comboBox_chose_loadMode.clear()
+
             self.tab_widget_editor.ui.lineEdit_dbtype.addItems(['mssql', 'mysql'])
             self.tab_widget_editor.ui.comboBox_chose_loadMode.addItems(['insert', 'update'])
 
@@ -286,6 +307,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 dbtype = root.find("dbtype").text
             except:
                 try:
+                    dbtype = et.SubElement(root, 'dbtype')
                     self.loggerInst.raiseError(3, "dbtype")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -296,6 +318,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 loadMode = root.find("loadMode").text
             except:
                 try:
+                    loadMode = et.SubElement(root, 'loadMode')
                     self.loggerInst.raiseError(3, "loadMode")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -306,6 +329,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 db_schema = root.find("dbSchema").text
             except:
                 try:
+                    db_schema = et.SubElement(root, 'dbSchema')
                     self.loggerInst.raiseError(4, "dbSchema")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -316,6 +340,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 exportTableName_value_text = root.find("exportTable/path").text
             except:
                 try:
+                    exportTableName_value_text = et.SubElement(root, 'exportTable/path')
                     self.loggerInst.raiseError(3, "exportTable/path")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -326,6 +351,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 dbHost = root.find("dbHost").text
             except:
                 try:
+                    dbHost = et.SubElement(root, 'dbHost')
                     self.loggerInst.raiseError(3, "dbHost")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -336,6 +362,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 dbUser = root.find("dbUser").text
             except:
                 try:
+                    dbUser = et.SubElement(root, 'dbUser')
                     self.loggerInst.raiseError(3, "dbUser")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -346,6 +373,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 dbPass = root.find("dbPass").text
             except:
                 try:
+                    dbdbPassUser = et.SubElement(root, 'dbPass')
                     self.loggerInst.raiseError(3, "dbPass")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -356,6 +384,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 dbBase = root.find("dbBase").text
             except:
                 try:
+                    dbBase = et.SubElement(root, 'dbBase')
                     self.loggerInst.raiseError(3, "dbBase")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -366,6 +395,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 dbPort = root.find("dbPort").text
             except:
                 try:
+                    dbPort = et.SubElement(root, 'dbPort')
                     self.loggerInst.raiseError(3, "dbPort")
                 except Exception as e:
                     show_alarm_window(self, e)
@@ -588,9 +618,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def save_as_configuration(self):
-        self.path_to_save = QtWidgets.QFileDialog.getSaveFileName(
+        path_to_save = QtWidgets.QFileDialog.getSaveFileName(
             directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
-        if self.path_to_save[0] != '':
+        if path_to_save[0] != '':
+            self.path_to_save = path_to_save
             self.create_xml_save_as = CreateXML(self)
             self.create_xml_save_as.started.connect(lambda: self.ui.statusbar.showMessage('Creating XML...'))
             self.create_xml_save_as.message.connect(self.write_as_xml)

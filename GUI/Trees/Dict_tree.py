@@ -1,9 +1,7 @@
-from PyQt5 import QtWidgets, QtGui, QtCore
-import sys
-from dict_column_editor_viewer import create_dict_column
-import gui_main_interface
-import dict_column_editor_viewer
-from alarm_window import show_alarm_window
+from PyQt5 import QtWidgets, QtGui
+from GUI.Creators.dict_column_editor_viewer import create_dict_column
+from GUI.Creators import dict_column_editor_viewer
+from GUI.Windows.alarm_window import show_alarm_window
 
 class DictTree(QtWidgets.QTreeWidget):
     def __init__(

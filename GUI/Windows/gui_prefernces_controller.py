@@ -1,13 +1,10 @@
 from PyQt5 import QtWidgets, QtCore
-import sys
-from PyQt5.QtWidgets import QApplication
-from gui_qt import main_window
-from gui_qt import form_preferences
+from GUI.gui_qt import form_preferences
 import os
 from PyQt5 import QtGui
-from Core.DAO import XML_DAO as xpc
 import pandas as pd
-from alarm_window import show_alarm_window
+from GUI.Windows.alarm_window import show_alarm_window
+
 
 class Pref_Window(QtWidgets.QWidget):
     def __init__(self,

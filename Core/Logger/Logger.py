@@ -12,9 +12,9 @@ class Log_info():
     debug_stat_dict = {}  # список дебага в формате сообщение : количество сообщений
 
     @classmethod
-    def getInstance(cls, pathToConfigXML=None, configs_list=None):
+    def getInstance(cls, pathToConfigXML=None, configs_list=None, signal_debug=None, signal_log=None):
         if not cls.__instance:
-            cls.__instance = Log_info(pathToConfigXML, configs_list)
+            cls.__instance = Log_info(pathToConfigXML, configs_list, signal_debug, signal_log)
         return cls.__instance
 
     def set_config(self, pathToConfigXML):
@@ -23,10 +23,12 @@ class Log_info():
         elif self.__config != pathToConfigXML:
             self.__config = pathToConfigXML
 
-    def __init__(self, pathToConfigXML, configs_list):
+    def __init__(self, pathToConfigXML, configs_list, signal_debug=None, signal_log=None):
         # super().__init__(self)
         self.getLogger(configs_list)
         self.set_config(pathToConfigXML)
+        self.signal_debug = signal_debug
+        self.signal_log = signal_log
 
     def getLogger(self, configs_list):
         currentPath = os.getcwd()
@@ -92,7 +94,7 @@ class Log_info():
         if errNum == 3:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <{self.__config}>"""
         if errNum == 4:
-            message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <--{message[0]}> in XML"""
+            message_temp = f"""{dict_of_err_types.get(1)}: Can't find option <--{message[0]}> in parameters"""
         if errNum == 5:
             message_temp = f"""{dict_of_err_types.get(1)}: Can't find tag <{message[0]}> in <column> tag at block number <{message[1] + 1}> in <importXml/columns> block in <{self.__config}>"""
         if errNum == 6:
@@ -182,6 +184,8 @@ class Log_info():
         if os.path.basename(sys.argv[0]) != 'gui_main_interface.py':
             raise SystemExit(1)
         else:
+            if self.signal_debug:
+                self.signal_debug.emit(t.substitute(num=errNum, message=message_temp))
             raise ThrowExc(t.substitute(num=errNum, message=message_temp))
 
     def raiseInfo(self, info_num, *message):
@@ -225,6 +229,8 @@ class Log_info():
             message_temp = f"""Attempt - <{message[0]}>"""
 
         self.logger.info(t.substitute(message=message_temp))
+        if self.signal_log:
+            self.signal_log.emit(t.substitute(message=message_temp))
 
     def raiseDebug(self,debug_num, *message):
         message_temp = "default_debug"
@@ -243,6 +249,8 @@ class Log_info():
                 self.debug_stat_dict[f"{message[2]}"] = 1
 
         self.logger.debug(t.substitute(number=debug_num, message=message_temp))
+        if self.signal_debug:
+            self.signal_debug.emit(t.substitute(number=debug_num, message=message_temp))
 
     def clear_debug(self):
         self.debug_stat_dict = {}

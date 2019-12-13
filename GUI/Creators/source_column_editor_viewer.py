@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 import datetime
-from alarm_window import show_alarm_window
+from Windows.alarm_window import show_alarm_window
 
 
 def create_input_column(tree_table: QtWidgets.QTreeWidget,

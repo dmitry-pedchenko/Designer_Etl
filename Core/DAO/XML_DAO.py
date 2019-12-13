@@ -1,4 +1,4 @@
-from Parser import XML_parser
+from Core.Parser import XML_parser
 from Core.DAO import DAO_DataFrame
 import os
 

@@ -1,9 +1,5 @@
-import typing
 import xml.etree.ElementTree as et
-from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtCore import QObject
-import time
-import xml.dom.minidom as xml_parse
+from PyQt5 import QtCore
 
 
 class CreateXML(QtCore.QThread):

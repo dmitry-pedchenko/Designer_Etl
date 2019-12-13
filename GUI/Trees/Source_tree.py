@@ -1,6 +1,4 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
-import sys
-import source_column_editor_viewer
+from PyQt5 import QtWidgets, QtGui
 
 
 class Source_tree(QtWidgets.QTreeWidget):

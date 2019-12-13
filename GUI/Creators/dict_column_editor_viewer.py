@@ -1,6 +1,4 @@
-from PyQt5 import QtWidgets, QtCore, QtGui
-import Validate
-import sys
+from PyQt5 import QtWidgets, QtCore
 
 
 def create_dict_column(

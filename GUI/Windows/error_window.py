@@ -1,4 +1,5 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
+
 
 def show_error_window(parent, message, error=""):
     QtWidgets.QMessageBox.critical(parent,

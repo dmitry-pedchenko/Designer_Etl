@@ -10,3 +10,4 @@ pyuic5 wizard_page_6.ui -o form_wizard_page_6.py -x
 pyuic5 wizard_page_7.ui -o form_wizard_page_7.py -x
 pyuic5 wizard_page_8.ui -o form_wizard_page_8.py -x
 pyuic5 db_connect_editor.ui -o db_connect_editor.py -x
+pyuic5 loader.ui -o loader.py -x
