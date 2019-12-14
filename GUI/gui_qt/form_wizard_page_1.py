@@ -43,7 +43,7 @@ class Ui_Form(object):
         self.compare_file.setObjectName("compare_file")
         self.horizontalLayout_5.addWidget(self.compare_file)
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.frame_2)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 80, 111, 31))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(10, 80, 191, 31))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)

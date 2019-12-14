@@ -16,6 +16,7 @@ def create_dict_column(
         executor=None,
         cur=None,
         loggerInst=None,
+        adapter=None
         ):
     dict_pref = {}
     dict_pref['columns'] = []
@@ -43,13 +44,15 @@ def create_dict_column(
         parent=parent,
         config=config,
         tables_in_receiver=tables_in_receiver,
+        adapter=adapter
     )
     dict_pref_indxDbColumn = IndxDbColumn(
         cur_dic_table_pref=cur_dic_table_pref,
         parent=main_row,
         tree_widget=parent,
         config=config,
-        columns_in_receiver=columns_in_receiver
+        columns_in_receiver=columns_in_receiver,
+        adapter=adapter
     )
     dict_pref_indxColumnDic = IndxColumnDic(
         cur_dic_table_pref=cur_dic_table_pref,
@@ -59,14 +62,14 @@ def create_dict_column(
         col_names_in_db_dict=columns_in_db_dict,
         table_name=main_row.combo_box_dictTableName,
         validator=validator,
-
         dbtype=dbtype,
         dbBase=db_base,
         connector=connector,
         executor=executor,
         target_table=target_table,
         cur=cur,
-        loggerInst=loggerInst
+        loggerInst=loggerInst,
+        adapter=adapter
 
     )
 
@@ -80,16 +83,17 @@ def create_dict_column(
                 parent=main_row,
                 tree_widget=parent,
                 columns_names_source=columns_names_source,
-                after_widget=dict_pref_indxColumnDic
+                after_widget=dict_pref_indxColumnDic,
+                adapter=adapter
             )
-            colNameDbRow = ColumnNameDbRow(row, colNameRow, parent, columns_in_receiver=columns_in_receiver)
-            colTypeRow = ColTypeRow(row, colNameRow, tree_widget=parent)
-            cropEndRow = CropEndRow(row, parent, colNameRow)
-            addValueEndRow = AddValueEndRow(row, parent, colNameRow)
-            takeFromBeginRow = TakeFromBeginRow(row, parent, colNameRow)
-            cropBeginRow = CropBeginRow(row, parent, colNameRow)
-            addValueBeginRow = AddValueBeginRow(row, parent, colNameRow)
-            addValueBothRow = AddValueBothRow(row, parent, colNameRow)
+            colNameDbRow = ColumnNameDbRow(row, colNameRow, parent, columns_in_receiver=columns_in_receiver, adapter=adapter)
+            colTypeRow = ColTypeRow(row, colNameRow, tree_widget=parent, adapter=adapter)
+            cropEndRow = CropEndRow(row, parent, colNameRow, adapter)
+            addValueEndRow = AddValueEndRow(row, parent, colNameRow, adapter)
+            takeFromBeginRow = TakeFromBeginRow(row, parent, colNameRow, adapter)
+            cropBeginRow = CropBeginRow(row, parent, colNameRow, adapter)
+            addValueBeginRow = AddValueBeginRow(row, parent, colNameRow, adapter)
+            addValueBothRow = AddValueBothRow(row, parent, colNameRow, adapter)
 
             if row['replace_mode'] == 'true':
                 link_to_prior = None
@@ -101,7 +105,8 @@ def create_dict_column(
                             parent=parent,
                             parent_widget=colNameRow,
                             after_widget=link_to_prior,
-                            table_item=main_row
+                            table_item=main_row,
+                            adapter=adapter
                         )
                     else:
                         replace_box = ReplaceRow(
@@ -110,7 +115,8 @@ def create_dict_column(
                             parent=parent,
                             parent_widget=colNameRow,
                             after_widget=addValueBothRow,
-                            table_item=main_row
+                            table_item=main_row,
+                            adapter=adapter
                         )
                     link_to_prior = replace_box
                     parent.addTopLevelItem(replace_box)
@@ -122,7 +128,8 @@ def create_dict_column(
                             parent=parent,
                             parent_widget=colNameRow,
                             after_widget=addValueBothRow,
-                            table_item=main_row
+                            table_item=main_row,
+                            adapter=adapter
                         )
 
                 parent.addTopLevelItem(replace_box)
@@ -148,15 +155,16 @@ def create_dict_column(
             parent=main_row,
             tree_widget=parent,
             columns_names_source=columns_names_source,
-            after_widget=dict_pref_indxColumnDic)
-        colNameDbRow = ColumnNameDbRow(cur_dic_table_pref, colNameRow, parent, columns_in_receiver=columns_in_receiver)
-        colTypeRow = ColTypeRow(cur_dic_table_pref, colNameRow, tree_widget=parent)
-        cropEndRow = CropEndRow(cur_dic_table_pref, parent, colNameRow)
-        addValueEndRow = AddValueEndRow(cur_dic_table_pref, parent, colNameRow)
-        takeFromBeginRow = TakeFromBeginRow(cur_dic_table_pref, parent, colNameRow)
-        cropBeginRow = CropBeginRow(cur_dic_table_pref, parent, colNameRow)
-        addValueBeginRow = AddValueBeginRow(cur_dic_table_pref, parent, colNameRow)
-        addValueBothRow = AddValueBothRow(cur_dic_table_pref, parent, colNameRow)
+            after_widget=dict_pref_indxColumnDic,
+            adapter=adapter)
+        colNameDbRow = ColumnNameDbRow(cur_dic_table_pref, colNameRow, parent, columns_in_receiver=columns_in_receiver, adapter=adapter)
+        colTypeRow = ColTypeRow(cur_dic_table_pref, colNameRow, tree_widget=parent, adapter=adapter)
+        cropEndRow = CropEndRow(cur_dic_table_pref, parent, colNameRow, adapter)
+        addValueEndRow = AddValueEndRow(cur_dic_table_pref, parent, colNameRow, adapter)
+        takeFromBeginRow = TakeFromBeginRow(cur_dic_table_pref, parent, colNameRow, adapter)
+        cropBeginRow = CropBeginRow(cur_dic_table_pref, parent, colNameRow, adapter)
+        addValueBeginRow = AddValueBeginRow(cur_dic_table_pref, parent, colNameRow, adapter)
+        addValueBothRow = AddValueBothRow(cur_dic_table_pref, parent, colNameRow, adapter)
 
 
         replace_box = ReplaceRow(
@@ -165,7 +173,8 @@ def create_dict_column(
             parent=parent,
             parent_widget=colNameRow,
             after_widget=addValueBothRow,
-            table_item=main_row
+            table_item=main_row,
+            adapter= adapter
         )
 
         parent.addTopLevelItem(replace_box)
@@ -191,8 +200,8 @@ def create_dict_column(
 
 
 class MainDictTableName(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_dic_table_pref, parent, config, tables_in_receiver):
-        super().__init__(parent, ['table', ])
+    def __init__(self, cur_dic_table_pref, parent, config, tables_in_receiver, adapter):
+        super().__init__(parent, [adapter.take_translate('DictionaryEditor', 'table'), ])
         self.cur_dic_table_pref = cur_dic_table_pref
         list_combo_box_dictTableName = tables_in_receiver
         self.combo_box_dictTableName = QtWidgets.QComboBox()
@@ -210,8 +219,8 @@ class MainDictTableName(QtWidgets.QTreeWidgetItem):
 
 
 class IndxDbColumn(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_dic_table_pref, parent, tree_widget, config, columns_in_receiver):
-        super().__init__(parent, ['indxDbColumn', ])
+    def __init__(self, cur_dic_table_pref, parent, tree_widget, config, columns_in_receiver, adapter):
+        super().__init__(parent, [adapter.take_translate('DictionaryEditor', 'indxDbColumn'), ])
         list_indxDbColumn = [i[0] for i in columns_in_receiver]
         self.combo_box_indxDbColumn = QtWidgets.QComboBox()
         self.combo_box_indxDbColumn.addItems(list_indxDbColumn)
@@ -236,9 +245,10 @@ class IndxColumnDic(QtWidgets.QTreeWidgetItem):
             executor=None,
             target_table=None,
             cur=None,
-            loggerInst=None
+            loggerInst=None,
+            adapter=None
             ):
-        super().__init__(parent, ['indxColumnDic', ])
+        super().__init__(parent, [adapter.take_translate('DictionaryEditor', 'indxColumnDic'), ])
         self.dbtype = dbtype
         self.dbBase = dbBase
         self.connector = connector
@@ -275,7 +285,6 @@ class IndxColumnDic(QtWidgets.QTreeWidgetItem):
                 dbBase=self.dbBase,
                 connector=self.connector,
                 exec=self.executor,
-                # target_table=self.target_table,
                 cur=self.cur,
                 loggerInst=self.loggerInst
             )
@@ -288,8 +297,8 @@ class IndxColumnDic(QtWidgets.QTreeWidgetItem):
 
 
 class ColTypeRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, cur_dic_table_pref, parent, tree_widget):
-        super().__init__(parent, ['colType', ])
+    def __init__(self, cur_dic_table_pref, parent, tree_widget, adapter):
+        super().__init__(parent, [adapter.take_translate('SourceColumnsConfigEditor', 'colType'), ])
 
         list_of_types_dict_to_comboBox = {'String': 'str', 'Float': 'float', 'Integer': 'int', 'Date': 'date'}
         list_of_coltypes_in_comboBox = ['String', 'Float', 'Integer', 'Date']
@@ -307,9 +316,9 @@ class ColTypeRow(QtWidgets.QTreeWidgetItem):
 
 
 class ColumnNameRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property, parent, tree_widget, columns_names_source, after_widget=None):
+    def __init__(self, column_property, parent, tree_widget, columns_names_source, after_widget=None, adapter=None):
         super().__init__(parent, after_widget)
-        self.label = QtWidgets.QLabel('colName')
+        self.label = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'colName'))
         list_combo_box_dictTableName = columns_names_source
         self.combo_box = QtWidgets.QComboBox()
         self.combo_box.addItems(list_combo_box_dictTableName)
@@ -325,8 +334,8 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
 
 
 class ColumnNameDbRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property, parent, tree_widget, columns_in_receiver):
-        super().__init__(parent, ["colNameDb", ])
+    def __init__(self, column_property, parent, tree_widget, columns_in_receiver, adapter):
+        super().__init__(parent, [adapter.take_translate('SourceColumnsConfigEditor', 'colNameDb'), ])
         list_colname_in_db_dict = [i[0] for i in columns_in_receiver]
         self.combo_box_colnameDb = QtWidgets.QComboBox()
         self.combo_box_colnameDb.addItems(list_colname_in_db_dict)
@@ -336,10 +345,10 @@ class ColumnNameDbRow(QtWidgets.QTreeWidgetItem):
 
 
 class CropEndRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_cropEnd_check = QtWidgets.QCheckBox('cropEnd')
+        self.checkBox_widget_for_cropEnd_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'cropEnd'))
 
         self.spin_box_cropEnd = QtWidgets.QSpinBox()
         self.spin_box_cropEnd.setRange(0, 255)
@@ -368,10 +377,10 @@ class CropEndRow(QtWidgets.QTreeWidgetItem):
 
 
 class AddValueEndRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_addValueEnd_check = QtWidgets.QCheckBox('addValueEnd')
+        self.checkBox_widget_for_addValueEnd_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'addValueEnd'))
         self.line_edit_addValueEnd = QtWidgets.QLineEdit()
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_addValueEnd_check)
@@ -398,10 +407,10 @@ class AddValueEndRow(QtWidgets.QTreeWidgetItem):
 
 
 class TakeFromBeginRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_takeFromBegin_check = QtWidgets.QCheckBox('takeFromBegin')
+        self.checkBox_widget_for_takeFromBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'takeFromBegin'))
 
         self.spin_box_takeFromBegin = QtWidgets.QSpinBox()
         self.spin_box_takeFromBegin.setRange(0, 255)
@@ -430,10 +439,10 @@ class TakeFromBeginRow(QtWidgets.QTreeWidgetItem):
 
 
 class CropBeginRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_cropBegin_check = QtWidgets.QCheckBox('cropBegin')
+        self.checkBox_widget_for_cropBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'cropBegin'))
         self.spin_box_cropBegin = QtWidgets.QSpinBox()
         self.spin_box_cropBegin.setRange(0, 255)
 
@@ -461,10 +470,10 @@ class CropBeginRow(QtWidgets.QTreeWidgetItem):
 
 
 class AddValueBeginRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_addValueBegin_check = QtWidgets.QCheckBox('addValueBegin')
+        self.checkBox_widget_for_addValueBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'addValueBegin'))
 
         self.line_edit_addValueBegin = QtWidgets.QLineEdit()
 
@@ -492,23 +501,23 @@ class AddValueBeginRow(QtWidgets.QTreeWidgetItem):
 
 
 class AddValueBothRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
 
         self.widget_for_add_both_filter = QtWidgets.QWidget()
         hbox_layout_both_filter = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both_filter = QtWidgets.QLineEdit()
-        text_begin_for_addBegin_Both_filter = QtWidgets.QLabel('To begin')
+        text_begin_for_addBegin_Both_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'To_begin'))
         self.line_edit_addEnd_Both_filter = QtWidgets.QLineEdit()
-        text_end_for_addBegin_Both_filter = QtWidgets.QLabel('To end')
+        text_end_for_addBegin_Both_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'To_end'))
         hbox_layout_both_filter.addWidget(text_begin_for_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(self.line_edit_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(text_end_for_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(self.line_edit_addEnd_Both_filter)
         self.widget_for_add_both_filter.setLayout(hbox_layout_both_filter)
 
-        self.checkBox_widget_for_addValueBoth_check = QtWidgets.QCheckBox('addValueBoth')
+        self.checkBox_widget_for_addValueBoth_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'addValueBoth'))
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_addValueBoth_check)
         parent.setItemWidget(self, 1, self.widget_for_add_both_filter)
@@ -538,7 +547,7 @@ class AddValueBothRow(QtWidgets.QTreeWidgetItem):
 
 
 class ReplaceRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, after_widget=None, row: dict=None, table_item=None):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, after_widget=None, row: dict=None, table_item=None, adapter=None):
         super().__init__(parent_widget, after_widget)
         self.column_property = column_property
         self.table_item = table_item
@@ -546,16 +555,16 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
         self.widget_for_replace = QtWidgets.QWidget()
         hbox_layout_replace = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both = QtWidgets.QLineEdit()
-        text_begin_for_replace = QtWidgets.QLabel('Initial')
+        text_begin_for_replace = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'Initial'))
         self.line_edit_addEnd_Both = QtWidgets.QLineEdit()
-        text_end_for_replace = QtWidgets.QLabel('Final')
+        text_end_for_replace = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'Final'))
         hbox_layout_replace.addWidget(text_begin_for_replace)
         hbox_layout_replace.addWidget(self.line_edit_addBegin_Both)
         hbox_layout_replace.addWidget(text_end_for_replace)
         hbox_layout_replace.addWidget(self.line_edit_addEnd_Both)
         self.widget_for_replace.setLayout(hbox_layout_replace)
 
-        self.checkBox_widget_for_replace_check = QtWidgets.QCheckBox('replace')
+        self.checkBox_widget_for_replace_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'replace'))
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_replace_check)
         parent.setItemWidget(self, 1, self.widget_for_replace)

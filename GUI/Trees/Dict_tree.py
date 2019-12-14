@@ -19,10 +19,11 @@ class DictTree(QtWidgets.QTreeWidget):
             connector=None,
             executor=None,
             cur=None,
-            loggerInst=None
+            loggerInst=None,
+            adapter=None
     ):
         super().__init__(parent)
-
+        self.adapter=adapter
         self.parent = parent
         self.dbtype = dbtype
         self.target_table = target_table
@@ -39,8 +40,8 @@ class DictTree(QtWidgets.QTreeWidget):
         self.setColumnCount(2)
         self.config = config
         self.list_of_dict_pref = list_of_dict_pref
-        self.headerItem().setText(0, "Property")
-        self.headerItem().setText(1, "Value")
+        self.headerItem().setText(0, adapter.take_translate('SourceColumnsConfigEditor', 'PropertyNameCOLUMN'))
+        self.headerItem().setText(1, adapter.take_translate('SourceColumnsConfigEditor', 'ValueCOLUMN'))
 
         self.dict_pref = {
             'dictTableName': None,
@@ -115,13 +116,13 @@ class DictTree(QtWidgets.QTreeWidget):
 
     def delete_column(self):
         cur_table = list(
-            filter(lambda x: x[
-                                 'dictTableName'].combo_box_dictTableName.currentText() == self.currentItem().parent().combo_box_dictTableName.currentText(),
+            filter(lambda x: x['dictTableName'].combo_box_dictTableName.currentText() ==
+                             self.currentItem().parent().combo_box_dictTableName.currentText(),
                    self.list_of_dict_pref)
         )[0]['columns']
 
         if len(cur_table) == 1:
-            show_alarm_window(self,"You can't delete last element !!!")
+            show_alarm_window(self, "You can't delete last element !!!")
             return
 
         cur_line = list(
@@ -138,8 +139,8 @@ class DictTree(QtWidgets.QTreeWidget):
         dict_to_add = {}
 
         cur_table = list(
-            filter(lambda x: x[
-                                 'dictTableName'].combo_box_dictTableName.currentText() == self.currentItem().parent().combo_box_dictTableName.currentText(),
+            filter(lambda x: x['dictTableName'].combo_box_dictTableName.currentText() ==
+                             self.currentItem().parent().combo_box_dictTableName.currentText(),
                    self.list_of_dict_pref)
         )[0]['columns']
 
@@ -279,7 +280,8 @@ class DictTree(QtWidgets.QTreeWidget):
                                config=self.config,
                                validator=self.validator,
                                tables_in_receiver=self.tables_in_receiver,
-                               columns_names_source=self.columns_names_source
+                               columns_names_source=self.columns_names_source,
+                               adapter=self.adapter
                                )
         else:
             create_dict_column(pref=self.list_of_dict_pref,
@@ -296,6 +298,7 @@ class DictTree(QtWidgets.QTreeWidget):
                                executor=self.executor,
                                cur=self.cur,
                                loggerInst=self.loggerInst,
+                               adapter=self.adapter
                                )
 
 

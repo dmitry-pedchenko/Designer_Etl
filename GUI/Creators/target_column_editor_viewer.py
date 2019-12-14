@@ -2,23 +2,24 @@ from PyQt5 import QtWidgets, QtCore
 import sys
 
 
-def create_receiver_column(tree_table: QtWidgets.QTreeWidget, column_property: dict, list_of_cols: list):
+def create_receiver_column(tree_table: QtWidgets.QTreeWidget, column_property: dict, list_of_cols: list, adapter):
     tree_table.setColumnCount(2)
-    tree_table.setHeaderLabels(['Property Name', 'Value'])
+    tree_table.setHeaderLabels([adapter.take_translate('TargetColumnsConfigEditor', 'PropertyNameCOLUMN'),
+                                adapter.take_translate('TargetColumnsConfigEditor', 'ValueCOLUMN')])
     dict_of_links = {}
     #
     # create tree widget item
     #
 
-    colNameRow = ColumnnameReceiverRow(column_property, parent=tree_table)
-    fromExcelRow = FromExcelStateRow(tree_table, column_property, colNameRow)
-    fromDbStateRow = FromDbStateRow(tree_widget=tree_table, column_property=column_property, parent=colNameRow)
-    isAutoIncStateRow = IsAutoIncStateRow(tree_table, column_property, colNameRow)
-    isConcStateRow = IsConcStateRow(tree_table, column_property, colNameRow)
-    colTypeRow = ColTypeRow(tree_table, column_property, colNameRow)
-    isUpdateConditionRow = IsUpdateCondionRow(tree_table, column_property, colNameRow)
-    defaultValue = DefaultValueRow(column_property=column_property, parent=tree_table, parent_widget=colNameRow)
-    ifNullValue = IfNullRow(column_property=column_property, parent=tree_table, parent_widget=colNameRow)
+    colNameRow = ColumnnameReceiverRow(column_property, parent=tree_table, adapter=adapter)
+    fromExcelRow = FromExcelStateRow(tree_table, column_property, colNameRow, adapter=adapter)
+    fromDbStateRow = FromDbStateRow(tree_widget=tree_table, column_property=column_property, parent=colNameRow, adapter=adapter)
+    isAutoIncStateRow = IsAutoIncStateRow(tree_table, column_property, colNameRow, adapter)
+    isConcStateRow = IsConcStateRow(tree_table, column_property, colNameRow, adapter)
+    colTypeRow = ColTypeRow(tree_table, column_property, colNameRow, adapter)
+    isUpdateConditionRow = IsUpdateCondionRow(tree_table, column_property, colNameRow, adapter)
+    defaultValue = DefaultValueRow(column_property=column_property, parent=tree_table, parent_widget=colNameRow, adapter=adapter)
+    ifNullValue = IfNullRow(column_property=column_property, parent=tree_table, parent_widget=colNameRow, adapter=adapter)
 
 
     tree_table.addTopLevelItem(colNameRow)
@@ -87,15 +88,15 @@ def create_receiver_column(tree_table: QtWidgets.QTreeWidget, column_property: d
 
 
 class ColumnnameReceiverRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget = None):
-        super().__init__(parent, ["colName", column_property['colName']])
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget = None, adapter=None):
+        super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'colName'), column_property['colName']])
         self.name = column_property['colName']
         self.col_name = column_property['colName']
         self.column_property = column_property
 
 class FromExcelStateRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None):
-        super().__init__(parent, ['fromExcel',])
+    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None, adapter=None):
+        super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'fromExcel'),])
         list_dict_to_comboBox = {'True': 'true', 'False': 'false'}
         self.checkBox = QtWidgets.QCheckBox()
 
@@ -127,8 +128,8 @@ class FromExcelStateRow(QtWidgets.QTreeWidgetItem):
 
 
 class FromDbStateRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None):
-        super().__init__(parent, ['fromDb',])
+    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None, adapter=None):
+        super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'fromDb'),])
 
         list_dict_to_comboBox = {'True': 'true', 'False': 'false'}
         self.checkBox = QtWidgets.QCheckBox()
@@ -153,8 +154,8 @@ class FromDbStateRow(QtWidgets.QTreeWidgetItem):
             self.setDisabled(False)
 
 class IsAutoIncStateRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None):
-        super().__init__(parent, ['isAutoInc', ])
+    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None, adapter=None):
+        super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'isAutoInc'), ])
         list_dict_to_comboBox = {'True': 'true', 'False': 'false'}
         self.checkBox = QtWidgets.QCheckBox()
         state = list(filter(lambda x: list_dict_to_comboBox[x] == column_property['isAutoInc'],
@@ -179,8 +180,8 @@ class IsAutoIncStateRow(QtWidgets.QTreeWidgetItem):
 
 
 class IsConcStateRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None):
-        super().__init__(parent, ['isConc', ])
+    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None, adapter=None):
+        super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'isConc'), ])
         list_dict_to_comboBox = {'True': 'true', 'False': 'false'}
         self.checkBox = QtWidgets.QCheckBox()
         state = list(filter(lambda x: list_dict_to_comboBox[x] == column_property['isConc'],
@@ -205,8 +206,8 @@ class IsConcStateRow(QtWidgets.QTreeWidgetItem):
 
 
 class ColTypeRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None):
-        super().__init__(parent, ['colType', ])
+    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None, adapter=None):
+        super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'colType'), ])
         self.combo_box_colType = QtWidgets.QComboBox()
         list_dict_to_comboBox_colType = {'String': 'str', 'Integer': 'int'}
         list_in_comboBox_colType = ['String', 'Integer']
@@ -237,8 +238,8 @@ class ColTypeRow(QtWidgets.QTreeWidgetItem):
 
 
 class IsUpdateCondionRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None):
-        super().__init__(parent, ['isUpdateCondition', ])
+    def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None, adapter=None):
+        super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'isUpdateCondition'), ])
         list_dict_to_comboBox = {'True': 'true', 'False': 'false'}
         self.checkBox = QtWidgets.QCheckBox()
         state = list(filter(lambda x: list_dict_to_comboBox[x] == column_property['isUpdateCondition'],
@@ -263,10 +264,10 @@ class IsUpdateCondionRow(QtWidgets.QTreeWidgetItem):
 
 
 class DefaultValueRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_defaultValue_check = QtWidgets.QCheckBox('defaultValue')
+        self.checkBox_widget_for_defaultValue_check = QtWidgets.QCheckBox(adapter.take_translate('TargetColumnsConfigEditor', 'defaultValue'))
 
         self.line_edit_defeultValue = QtWidgets.QLineEdit()
 
@@ -286,10 +287,10 @@ class DefaultValueRow(QtWidgets.QTreeWidgetItem):
             self.setDisabled(False)
 
 class IfNullRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_ifNull_check = QtWidgets.QCheckBox('ifNull')
+        self.checkBox_widget_for_ifNull_check = QtWidgets.QCheckBox(adapter.take_translate('TargetColumnsConfigEditor', 'ifNull'))
         self.line_edit_ifNull = QtWidgets.QLineEdit()
         parent.setItemWidget(self, 0, self.checkBox_widget_for_ifNull_check)
         parent.setItemWidget(self, 1, self.line_edit_ifNull)

@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtCore
 import datetime
-from Windows.alarm_window import show_alarm_window
+from GUI.Windows.alarm_window import show_alarm_window
 
 
 def create_input_column(tree_table: QtWidgets.QTreeWidget,
@@ -8,10 +8,12 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
                         column_property: dict,
                         list_of_cols: list,
                         indx=None,
-                        source_columnes: list=None
+                        source_columnes: list=None,
+                        adapter=None
                         ):
     tree_table.setColumnCount(2)
-    tree_table.setHeaderLabels(['Property Name', 'Value'])
+    tree_table.setHeaderLabels([adapter.take_translate('SourceColumnsConfigEditor', 'PropertyNameCOLUMN'),
+                                adapter.take_translate('SourceColumnsConfigEditor', 'ValueCOLUMN')])
     dic = {}
     dic['replace_box'] = []
 
@@ -54,16 +56,18 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
     colName_box = ColumnNameRow(
         column_property=column_property,
         arr_of_db_columns=source_columnes,
-        tree_widget=tree_table)
-    colNameDb_box = QtWidgets.QTreeWidgetItem(colName_box, ['colNameDb', ])
-    colType_box = QtWidgets.QTreeWidgetItem(colName_box, ['colType', ])
-    isPK_box = QtWidgets.QTreeWidgetItem(colName_box, ['isPK', ])
-    cropEnd_box = CropEndRow(column_property, tree_table, parent_widget=colName_box)
-    addValueEnd_box = AddValueEndRow(column_property, tree_table, parent_widget=colName_box)
-    takeFromBegin_box = TakeFromBeginRow(column_property, tree_table, parent_widget=colName_box)
-    cropBegin_box = CropBeginRow(column_property, tree_table, parent_widget=colName_box)
-    addValueBegin_box = AddValueBeginRow(column_property, tree_table, parent_widget=colName_box)
-    addValueBoth_box = AddValueBothRow(column_property, tree_table, parent_widget=colName_box)
+        tree_widget=tree_table,
+        adapter=adapter
+    )
+    colNameDb_box = QtWidgets.QTreeWidgetItem(colName_box, [adapter.take_translate('SourceColumnsConfigEditor', 'colNameDb'), ])
+    colType_box = QtWidgets.QTreeWidgetItem(colName_box, [adapter.take_translate('SourceColumnsConfigEditor', 'colType'), ])
+    isPK_box = QtWidgets.QTreeWidgetItem(colName_box, [adapter.take_translate('SourceColumnsConfigEditor', 'isPk'), ])
+    cropEnd_box = CropEndRow(column_property, tree_table, parent_widget=colName_box, adapter=adapter)
+    addValueEnd_box = AddValueEndRow(column_property, tree_table, parent_widget=colName_box, adapter=adapter)
+    takeFromBegin_box = TakeFromBeginRow(column_property, tree_table, parent_widget=colName_box, adapter=adapter)
+    cropBegin_box = CropBeginRow(column_property, tree_table, parent_widget=colName_box, adapter=adapter)
+    addValueBegin_box = AddValueBeginRow(column_property, tree_table, parent_widget=colName_box, adapter=adapter)
+    addValueBoth_box = AddValueBothRow(column_property, tree_table, parent_widget=colName_box, adapter=adapter)
 
     if column_property['replace_mode'] == 'true':
         link_to_prior = None
@@ -74,7 +78,8 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
                     column_property=column_property,
                     parent=tree_table,
                     parent_widget=colName_box,
-                    after_widget=link_to_prior
+                    after_widget=link_to_prior,
+                    adapter=adapter
                 )
             else:
                 replace_box = ReplaceRow(
@@ -82,7 +87,8 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
                     column_property=column_property,
                     parent=tree_table,
                     parent_widget=colName_box,
-                    after_widget=addValueBoth_box
+                    after_widget=addValueBoth_box,
+                    adapter=adapter
                 )
             link_to_prior = replace_box
             tree_table.addTopLevelItem(replace_box)
@@ -94,14 +100,15 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
                 column_property=column_property,
                 parent=tree_table,
                 parent_widget=colName_box,
-                after_widget=addValueBoth_box
+                after_widget=addValueBoth_box,
+                adapter=adapter
             )
 
         tree_table.addTopLevelItem(replace_box)
         dic['replace_box'].append(replace_box)
 
-    filter_box = FilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox)
-    post_filter_box = PostFilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox)
+    filter_box = FilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox,adapter=adapter)
+    post_filter_box = PostFilterRow(column_property, tree_table, widget=combo_box_colType, parent_widget=colName_box, coltypes=list_of_coltypes_in_comboBox, adapter=adapter)
 
     if indx is not None:
         tree_table.insertTopLevelItem(indx, colName_box)
@@ -134,8 +141,8 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
 
 
 class ColumnNameRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property, arr_of_db_columns, tree_widget):
-        super().__init__(tree_widget, ["colName", ])
+    def __init__(self, column_property, arr_of_db_columns, tree_widget, adapter):
+        super().__init__(tree_widget, [adapter.take_translate('SourceColumnsConfigEditor', 'colName'), ])
         self.combo_box_name = QtWidgets.QComboBox()
         self.combo_box_name.addItems(arr_of_db_columns)
         self.combo_box_name.addItem('---')
@@ -147,19 +154,12 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
 
         tree_widget.setItemWidget(self, 1, self.combo_box_name)
 
-        # if column_property['colName']:
-        #     self.col_name = column_property['colName']
-        # else:
-        #     self.combo_box_name.addItem('---')
-        #
-        # self.column_property = column_property
-
 
 class CropEndRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_cropEnd_check = QtWidgets.QCheckBox('cropEnd')
+        self.checkBox_widget_for_cropEnd_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'cropEnd'))
 
         self.spin_box_cropEnd = QtWidgets.QSpinBox()
         self.spin_box_cropEnd.setRange(0, 255)
@@ -187,10 +187,10 @@ class CropEndRow(QtWidgets.QTreeWidgetItem):
 
 
 class AddValueEndRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_addValueEnd_check = QtWidgets.QCheckBox('addValueEnd')
+        self.checkBox_widget_for_addValueEnd_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'addValueEnd'))
 
         self.line_edit_addValueEnd = QtWidgets.QLineEdit()
 
@@ -217,10 +217,10 @@ class AddValueEndRow(QtWidgets.QTreeWidgetItem):
 
 
 class TakeFromBeginRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_takeFromBegin_check = QtWidgets.QCheckBox('takeFromBegin')
+        self.checkBox_widget_for_takeFromBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'takeFromBegin'))
 
         self.spin_box_takeFromBegin = QtWidgets.QSpinBox()
         self.spin_box_takeFromBegin.setRange(0, 255)
@@ -248,10 +248,10 @@ class TakeFromBeginRow(QtWidgets.QTreeWidgetItem):
 
 
 class CropBeginRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_cropBegin_check = QtWidgets.QCheckBox('cropBegin')
+        self.checkBox_widget_for_cropBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'cropBegin'))
         self.spin_box_cropBegin = QtWidgets.QSpinBox()
         self.spin_box_cropBegin.setRange(0, 255)
 
@@ -278,10 +278,10 @@ class CropBeginRow(QtWidgets.QTreeWidgetItem):
 
 
 class AddValueBeginRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
-        self.checkBox_widget_for_addValueBegin_check = QtWidgets.QCheckBox('addValueBegin')
+        self.checkBox_widget_for_addValueBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'addValueBegin'))
 
         self.line_edit_addValueBegin = QtWidgets.QLineEdit()
 
@@ -308,23 +308,23 @@ class AddValueBeginRow(QtWidgets.QTreeWidgetItem):
 
 
 class AddValueBothRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
 
         self.widget_for_add_both_filter = QtWidgets.QWidget()
         hbox_layout_both_filter = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both_filter = QtWidgets.QLineEdit()
-        text_begin_for_addBegin_Both_filter = QtWidgets.QLabel('To begin')
+        text_begin_for_addBegin_Both_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'To_begin'))
         self.line_edit_addEnd_Both_filter = QtWidgets.QLineEdit()
-        text_end_for_addBegin_Both_filter = QtWidgets.QLabel('To end')
+        text_end_for_addBegin_Both_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'To_end'))
         hbox_layout_both_filter.addWidget(text_begin_for_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(self.line_edit_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(text_end_for_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(self.line_edit_addEnd_Both_filter)
         self.widget_for_add_both_filter.setLayout(hbox_layout_both_filter)
 
-        self.checkBox_widget_for_addValueBoth_check = QtWidgets.QCheckBox('addValueBoth')
+        self.checkBox_widget_for_addValueBoth_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'addValueBoth'))
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_addValueBoth_check)
         parent.setItemWidget(self, 1, self.widget_for_add_both_filter)
@@ -353,23 +353,23 @@ class AddValueBothRow(QtWidgets.QTreeWidgetItem):
 
 
 class ReplaceRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, after_widget=None, row: dict=None):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, after_widget=None, row: dict=None, adapter=None):
         super().__init__(parent_widget, after_widget)
         self.column_property = column_property
         self.row = row
         self.widget_for_replace = QtWidgets.QWidget()
         hbox_layout_replace = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both = QtWidgets.QLineEdit()
-        text_begin_for_replace = QtWidgets.QLabel('Initial')
+        text_begin_for_replace = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'Initial'))
         self.line_edit_addEnd_Both = QtWidgets.QLineEdit()
-        text_end_for_replace = QtWidgets.QLabel('Final')
+        text_end_for_replace = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'Final'))
         hbox_layout_replace.addWidget(text_begin_for_replace)
         hbox_layout_replace.addWidget(self.line_edit_addBegin_Both)
         hbox_layout_replace.addWidget(text_end_for_replace)
         hbox_layout_replace.addWidget(self.line_edit_addEnd_Both)
         self.widget_for_replace.setLayout(hbox_layout_replace)
 
-        self.checkBox_widget_for_replace_check = QtWidgets.QCheckBox('replace')
+        self.checkBox_widget_for_replace_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'replace'))
 
         parent.setItemWidget(self, 0, self.checkBox_widget_for_replace_check)
         parent.setItemWidget(self, 1, self.widget_for_replace)
@@ -398,19 +398,19 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
 
 class FilterRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, widget: QtWidgets.QComboBox,
-                 coltypes: list):
+                 coltypes: list, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
         self.coltypes = coltypes
         self.parent = parent
-
-        self.checkBox_widget_for_filter_check = QtWidgets.QCheckBox('filter')
-        self.checkBox_widget_f_cropEnd_check = QtWidgets.QCheckBox('f_cropEnd')
-        self.checkBox_widget_f_addValueEnd_check = QtWidgets.QCheckBox('f_addValueEnd')
-        self.checkBox_widget_f_takeFromBegin_check = QtWidgets.QCheckBox('f_takeFromBegin')
-        self.checkBox_widget_f_cropBegin_check = QtWidgets.QCheckBox('f_cropBegin')
-        self.checkBox_widget_f_addValueBegin_check = QtWidgets.QCheckBox('f_addValueBegin')
-        self.checkBox_widget_f_addValueBoth_check = QtWidgets.QCheckBox('f_addValueBoth')
+        self.adapter = adapter
+        self.checkBox_widget_for_filter_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'filter'))
+        self.checkBox_widget_f_cropEnd_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'f_cropEnd'))
+        self.checkBox_widget_f_addValueEnd_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'f_addValueEnd'))
+        self.checkBox_widget_f_takeFromBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'f_takeFromBegin'))
+        self.checkBox_widget_f_cropBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'f_cropBegin'))
+        self.checkBox_widget_f_addValueBegin_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'f_addValueBegin'))
+        self.checkBox_widget_f_addValueBoth_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'f_addValueBoth'))
 
         self.spin_box_f_cropEnd = QtWidgets.QSpinBox()
         self.spin_box_f_cropEnd.setRange(0, 255)
@@ -428,9 +428,9 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         self.widget_for_add_both_filter = QtWidgets.QWidget()
         hbox_layout_both_filter = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both_filter = QtWidgets.QLineEdit()
-        text_begin_for_addBegin_Both_filter = QtWidgets.QLabel('To begin')
+        text_begin_for_addBegin_Both_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'To_begin'))
         self.line_edit_addEnd_Both_filter = QtWidgets.QLineEdit()
-        text_end_for_addBegin_Both_filter = QtWidgets.QLabel('To end')
+        text_end_for_addBegin_Both_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'To_end'))
         hbox_layout_both_filter.addWidget(text_begin_for_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(self.line_edit_addBegin_Both_filter)
         hbox_layout_both_filter.addWidget(text_end_for_addBegin_Both_filter)
@@ -443,7 +443,7 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         self.filter_box_sub_f_cropBegin = QtWidgets.QTreeWidgetItem(self, ['', ])
         self.filter_box_sub_f_addValueBegin = QtWidgets.QTreeWidgetItem(self, ['', ])
         self.filter_box_sub_f_addValueBoth = QtWidgets.QTreeWidgetItem(self, ['', ])
-        self.filter_box_sub_filter_state = QtWidgets.QTreeWidgetItem(self, ['filter', ])
+        self.filter_box_sub_filter_state = QtWidgets.QTreeWidgetItem(self, [adapter.take_translate('SourceColumnsConfigEditor', 'filter'), ])
 
         parent.addTopLevelItem(self.filter_box_sub_f_cropEnd)
         parent.addTopLevelItem(self.filter_box_sub_f_addValueEnd)
@@ -561,8 +561,8 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
 
             self.widget_for_filter = QtWidgets.QWidget()
             hbox_layout_filter = QtWidgets.QHBoxLayout()
-            text_begin_for_addBegin_filter = QtWidgets.QLabel('Condition')
-            text_end_for_addBegin_filter = QtWidgets.QLabel('Value')
+            text_begin_for_addBegin_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'Condition'))
+            text_end_for_addBegin_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'ValueCOLUMN'))
             hbox_layout_filter.addWidget(text_begin_for_addBegin_filter)
             hbox_layout_filter.addWidget(self.combo_box_filter_condition)
             hbox_layout_filter.addWidget(text_end_for_addBegin_filter)
@@ -617,8 +617,8 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
 
             self.widget_for_filter = QtWidgets.QWidget()
             hbox_layout_filter = QtWidgets.QHBoxLayout()
-            text_begin_for_addBegin_filter = QtWidgets.QLabel('Condition')
-            text_end_for_addBegin_filter = QtWidgets.QLabel('Value')
+            text_begin_for_addBegin_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'Condition'))
+            text_end_for_addBegin_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'ValueCOLUMN'))
             hbox_layout_filter.addWidget(text_begin_for_addBegin_filter)
             hbox_layout_filter.addWidget(self.combo_box_filter_condition)
             hbox_layout_filter.addWidget(text_end_for_addBegin_filter)
@@ -733,8 +733,8 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
         #
         self.widget_for_filter = QtWidgets.QWidget()
         hbox_layout_filter = QtWidgets.QHBoxLayout()
-        text_begin_for_addBegin_filter = QtWidgets.QLabel('Condition')
-        text_end_for_addBegin_filter = QtWidgets.QLabel('Value')
+        text_begin_for_addBegin_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'Condition'))
+        text_end_for_addBegin_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'ValueCOLUMN'))
         hbox_layout_filter.addWidget(text_begin_for_addBegin_filter)
         hbox_layout_filter.addWidget(self.combo_box_filter_condition)
         hbox_layout_filter.addWidget(text_end_for_addBegin_filter)
@@ -745,9 +745,10 @@ class FilterRow(QtWidgets.QTreeWidgetItem):
 
 
 class PostFilterRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, widget: QtWidgets.QComboBox, coltypes: list):
+    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, widget: QtWidgets.QComboBox, coltypes: list, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
+        self.adapter = adapter
         self.parent = parent
         self.coltypes = coltypes
         if self.column_property['colType'] != 'str':
@@ -781,15 +782,15 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
 
         self.widget_for_post_filter = QtWidgets.QWidget()
         hbox_layout_post_filter = QtWidgets.QHBoxLayout()
-        text_begin_for_addBegin_post_filter = QtWidgets.QLabel('Condition')
-        text_end_for_addBegin_post_filter = QtWidgets.QLabel('Value')
+        text_begin_for_addBegin_post_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'Condition'))
+        text_end_for_addBegin_post_filter = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'ValueCOLUMN'))
         hbox_layout_post_filter.addWidget(text_begin_for_addBegin_post_filter)
         hbox_layout_post_filter.addWidget(self.combo_box_post_filter_condition)
         hbox_layout_post_filter.addWidget(text_end_for_addBegin_post_filter)
         hbox_layout_post_filter.addWidget(self.line_edit_post_filter)
         self.widget_for_post_filter.setLayout(hbox_layout_post_filter)
 
-        self.checkBox_widget_for_post_filter_check = QtWidgets.QCheckBox('post_filter')
+        self.checkBox_widget_for_post_filter_check = QtWidgets.QCheckBox(adapter.take_translate('SourceColumnsConfigEditor', 'post_filter'))
 
         self.initialize()
 
@@ -859,8 +860,8 @@ class PostFilterRow(QtWidgets.QTreeWidgetItem):
 
         self.widget_for_post_filter = QtWidgets.QWidget()
         hbox_layout_post_filter = QtWidgets.QHBoxLayout()
-        text_begin_for_addBegin_post_filter = QtWidgets.QLabel('Condition')
-        text_end_for_addBegin_post_filter = QtWidgets.QLabel('Value')
+        text_begin_for_addBegin_post_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'Condition'))
+        text_end_for_addBegin_post_filter = QtWidgets.QLabel(self.adapter.take_translate('SourceColumnsConfigEditor', 'ValueCOLUMN'))
         hbox_layout_post_filter.addWidget(text_begin_for_addBegin_post_filter)
         hbox_layout_post_filter.addWidget(self.combo_box_post_filter_condition)
         hbox_layout_post_filter.addWidget(text_end_for_addBegin_post_filter)

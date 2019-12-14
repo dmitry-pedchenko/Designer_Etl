@@ -33,11 +33,25 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.setupUi(self)
         # translate
         self.ui.label_dbtype.setText(adapter.take_translate('pref_window', 'dbtype'))
+        self.ui.label_dbHost.setText(adapter.take_translate('pref_window', 'dbHost'))
+        self.ui.label_dbUser.setText(adapter.take_translate('pref_window', 'dbUser'))
+        self.ui.label_dbPass.setText(adapter.take_translate('pref_window', 'dbPass'))
+        self.ui.label_dbBase.setText(adapter.take_translate('pref_window', 'dbBase'))
+        self.ui.label_dbScheme.setText(adapter.take_translate('pref_window', 'dbScheme'))
+        self.ui.label_dbPort.setText(adapter.take_translate('pref_window', 'dbPort'))
+        self.ui.label_loadMode.setText(adapter.take_translate('pref_window', 'Load_Mode'))
+        self.ui.checkBox_Dictionary.setText(adapter.take_translate('pref_window', 'Dictionary'))
+        self.ui.label_source.setText(adapter.take_translate('pref_window', 'Source_excel_file_name'))
+        self.ui.label_receiver.setText(adapter.take_translate('pref_window', 'Target_table_name'))
+        self.ui.checkBox_checkMode.setText(adapter.take_translate('pref_window', 'Check_mode'))
+        self.ui.label_check_mode.setText(adapter.take_translate('pref_window', 'Check_table_name'))
+        self.ui.checkBox_both.setText(adapter.take_translate('pref_window', 'Both'))
         # translate
 
         self.treeWidget_linked_columns = TreeWidgetLinkedColumns(widget_sighal=self.ui.excelFileName)
         self.ui.tree_widget_box.addWidget(self.treeWidget_linked_columns)
-        self.treeWidget_linked_columns.setHeaderLabels(['Linked Columns', 'Target columns'])
+        self.treeWidget_linked_columns.setHeaderLabels([adapter.take_translate('pref_window', 'LinkedColumnsCOLUMN'),
+                                                        adapter.take_translate('pref_window', 'TargetColumnsCOLUMN')])
         self.treeWidget_linked_columns.setColumnCount(2)
 
         self.comboBox_list_source_excel = comboBox_list_source_excel(
@@ -257,14 +271,14 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['checkBox_Dictionary'] = self.ui.checkBox_Dictionary.isChecked()
         self.pref['checkBox_both'] = self.ui.checkBox_both.isChecked()
 
-        # self.ui.lineEdit_dbtype.setReadOnly(True)
+        self.ui.lineEdit_dbtype.setDisabled(True)
         # self.ui.lineEdit_dbhost.setReadOnly(True)
         # self.ui.lineEdit_dbuser.setReadOnly(True)
         # self.ui.lineEdit_dbpass.setReadOnly(True)
         # self.ui.lineEdit_dbbase.setReadOnly(True)
         # self.ui.lineEdit_dbport.setReadOnly(True)
-        # self.ui.comboBox_dbSchema.setReadOnly(True)
-        # self.ui.target_table_name.setReadOnly(True)
+        self.ui.comboBox_dbSchema.setDisabled(True)
+        self.ui.target_table_name.setDisabled(True)
 
 
 

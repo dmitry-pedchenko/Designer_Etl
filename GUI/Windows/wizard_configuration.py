@@ -22,17 +22,15 @@ import xml.etree.ElementTree as et
 
 
 class WizardConfig(QtWidgets.QWizard):
-    def __init__(self, parent):
+    def __init__(self, parent, adapter):
         super().__init__(parent=parent)
 
-        self.setPage(RoadMapConfiguration.db_parameters_and_check_mode, Page1(self))
-        self.setPage(RoadMapConfiguration.target_table_and_db_schema, Page2(self))
-        self.setPage(RoadMapConfiguration.source_columns, Page3(self))
-        self.setPage(RoadMapConfiguration.receiver_columns, Page4(self))
-        self.setPage(RoadMapConfiguration.dictionary, Page5(self))
-        self.setPage(RoadMapConfiguration.final_page, Page6(self))
-        # self.setPage(RoadMapConfiguration.DictColumnsParameters, Page7(self))
-        # self.setPage(RoadMapConfiguration.DictTables, Page8(self))
+        self.setPage(RoadMapConfiguration.db_parameters_and_check_mode, Page1(self, adapter=adapter))
+        self.setPage(RoadMapConfiguration.target_table_and_db_schema, Page2(self, adapter=adapter))
+        self.setPage(RoadMapConfiguration.source_columns, Page3(self, adapter=adapter))
+        self.setPage(RoadMapConfiguration.receiver_columns, Page4(self, adapter=adapter))
+        self.setPage(RoadMapConfiguration.dictionary, Page5(self, adapter=adapter))
+        self.setPage(RoadMapConfiguration.final_page, Page6(self, adapter=adapter))
 
         self.resize(900, 550)
 
@@ -52,14 +50,27 @@ class WizardConfig(QtWidgets.QWizard):
 
 
 class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
         self.loggerInst = Logger.Log_info.getInstance(pathToConfigXML='GUI', configs_list=['GUI'])
 
         self.pref = {'col_to_check': []}
         self.setupUi(self)
-        self.change_flag = False
+        self.adapter=adapter
+        self.label_dbtype.setText(adapter.take_translate('pref_window', 'dbtype'))
+        self.label_dbHost.setText(adapter.take_translate('pref_window', 'dbHost'))
+        self.label_dbUser.setText(adapter.take_translate('pref_window', 'dbUser'))
+        self.label_dbPass.setText(adapter.take_translate('pref_window', 'dbPass'))
+        self.label_dbBase.setText(adapter.take_translate('pref_window', 'dbBase'))
+        self.label_dbPort.setText(adapter.take_translate('pref_window', 'dbPort'))
+        self.label_loadMode.setText(adapter.take_translate('pref_window', 'Load_Mode'))
+        self.checkBox_Dictionary.setText(adapter.take_translate('pref_window', 'Dictionary'))
+        self.label_source.setText(adapter.take_translate('pref_window', 'Source_excel_file_name'))
+        self.checkBox_checkMode.setText(adapter.take_translate('pref_window', 'Check_mode'))
+        self.label_check_mode.setText(adapter.take_translate('pref_window', 'Check_table_name'))
+        self.checkBox_both.setText(adapter.take_translate('pref_window', 'Both'))
 
+        self.change_flag = False
         self.open_excel_file = QtWidgets.QToolButton(self.horizontalLayoutWidget_3)
         self.open_excel_file.setObjectName("open_excel_file")
         self.horizontalLayout_3.insertWidget(0, self.open_excel_file)
@@ -69,13 +80,13 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
 
         self.df_compare = None
 
-
         self.lineEdit_dbtype.addItems(['mysql', 'mssql'])
         self.comboBox_chose_loadMode.addItems(['insert', 'update'])
 
-        self.treeWidget_linked_columns = TreeWidgetLinkedColumns(widget_sighal=self.excelFileName, pref_dict=self.pref)
+        self.treeWidget_linked_columns = TreeWidgetLinkedColumns(widget_sighal=self.excelFileName, pref_dict=self.pref, adapter=self.adapter)
         self.tree_widget_box.addWidget(self.treeWidget_linked_columns)
-        self.treeWidget_linked_columns.setHeaderLabels(['Linked Columns', 'Target columns'])
+        self.treeWidget_linked_columns.setHeaderLabels([adapter.take_translate('pref_window', 'LinkedColumnsCOLUMN'),
+                                                        adapter.take_translate('pref_window', 'TargetColumnsCOLUMN')])
         self.treeWidget_linked_columns.setColumnCount(2)
 
         self.comboBox_list_source_excel = comboBox_list_for_Page2(
@@ -123,13 +134,14 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         self.lineEdit_dbuser.textEdited.connect(self.set_flag)
         self.lineEdit_dbbase.textEdited.connect(self.set_flag)
 
-    #
+    # delete, this for test
         self.lineEdit_dbhost.setText('localhost')
         self.lineEdit_dbpass.setText('P@$$w0rd')
         self.lineEdit_dbport.setText('3306')
         self.lineEdit_dbuser.setText('root')
         self.lineEdit_dbbase.setText('designer_etl')
     #
+
     def set_flag(self):
         self.change_flag = True
 
@@ -158,17 +170,23 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         if self.df_compare:
             target_column = [i for i in self.df_compare.parse(self.comboBox_set_list_checked.currentIndex()).columns.values]
         else:
-            show_alarm_window(self, "Choose a file !!!")
+            show_alarm_window(self, "Choose a link file !!!")
             return
 
-        source_column = [i for i in self.df.parse(self.comboBox_list_source_excel.currentIndex()).columns.values]
+        try:
+            source_column = [i for i in self.df.parse(self.comboBox_list_source_excel.currentIndex()).columns.values]
+        except:
+            show_alarm_window(self, "Choose a source file !!!")
+            return
+
 
         row_check = LinkedColumns(
             tree_widget=self.treeWidget_linked_columns,
             parent=self.treeWidget_linked_columns,
             target_columns=target_column,
             source_columns=source_column,
-            current_column=None)
+            current_column=None,
+            adapter=self.adapter)
         self.treeWidget_linked_columns.addTopLevelItem(row_check)
 
         self.pref['col_to_check'].append(row_check)
@@ -355,10 +373,14 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
 
 
 class Page2(QtWidgets.QWizardPage, form_wizard_page_2.Ui_Form):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
         self.setupUi(self)
         self.adjustSize()
+        self.adapter=adapter
+
+        self.label.setText(adapter.take_translate('pref_window', 'dbScheme'))
+        self.label_receiver.setText(adapter.take_translate('pref_window', 'Target_table_name'))
 
         self.comboBox_dbSchema = comboBox_list_for_Page3(self.verticalLayoutWidget)
         self.comboBox_dbSchema.setObjectName("comboBox_dbSchema")
@@ -381,10 +403,13 @@ class Page2(QtWidgets.QWizardPage, form_wizard_page_2.Ui_Form):
 
 
 class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
         self.setupUi(self)
 
+        self.label.setText(adapter.take_translate('Wizard', 'Page3Label'))
+
+        self.adapter = adapter
         self.dict_pref = {
             'dictTableName': None,
             'indxDbColumn': None,
@@ -407,7 +432,7 @@ class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
 
         self.list_of_source_cols_links = []
 
-        self.treeWidget_of_Source = Source_tree.Source_tree()
+        self.treeWidget_of_Source = Source_tree.Source_tree(self.adapter)
         self.horizontalLayout.addWidget(self.treeWidget_of_Source)
         self.treeWidget_of_Source.actionDuplicateColumn.triggered.connect(self.addColumnField)
         self.treeWidget_of_Source.actionDuplicateReplace.triggered.connect(self.duplicateReplace)
@@ -500,7 +525,8 @@ class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
             column_property=self.dict_pref,
             list_of_cols=self.list_of_source_cols_links,
             indx=self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row(),
-            source_columnes=self.columns_in_source
+            source_columnes=self.columns_in_source,
+            adapter=self.adapter
             )
 
 
@@ -520,12 +546,14 @@ class Page4(QtWidgets.QWizardPage, form_wizard_page_4.Ui_Form):
         'fromDb': 'false'
     }
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.treeWidget_of_Receiver = Receiver_tree.Receiver_tree()
+        self.adapter = adapter
+        self.label.setText(adapter.take_translate('Wizard', 'Page4Label'))
+        self.treeWidget_of_Receiver = Receiver_tree.Receiver_tree(self.adapter)
         self.horizontalLayout.addWidget(self.treeWidget_of_Receiver)
-
+        self.adapter = adapter
         self.list_of_receiver_cols_links = []
 
 
@@ -538,7 +566,8 @@ class Page4(QtWidgets.QWizardPage, form_wizard_page_4.Ui_Form):
             target_column_editor_viewer.create_receiver_column(
                 tree_table=self.treeWidget_of_Receiver,
                 column_property=col_prop,
-                list_of_cols=self.list_of_receiver_cols_links
+                list_of_cols=self.list_of_receiver_cols_links,
+                adapter=self.adapter
             )
 
     def clear(self):
@@ -557,9 +586,11 @@ class Page4(QtWidgets.QWizardPage, form_wizard_page_4.Ui_Form):
             return RoadMapConfiguration.final_page
 
 class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
         self.setupUi(self)
+        self.adapter=adapter
+        self.label.setText(adapter.take_translate('Wizard', 'Page5Label'))
         self.list_of_dict_pref = []
         self.config_dict = {}
         self.validator = Validate_res.Validate
@@ -592,7 +623,8 @@ class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
                 connector=self.wizard().page(0).con,
                 executor=Validate_res.Validate.executor,
                 cur=self.wizard().page(0).con.cursor,
-                loggerInst=self.wizard().page(0).loggerInst
+                loggerInst=self.wizard().page(0).loggerInst,
+                adapter=self.adapter
             )
 
         self.horizontalLayout.addWidget(self.tree_dict)
@@ -609,12 +641,12 @@ class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
 
 
 
-
 class Page6(QtWidgets.QWizardPage, form_wizard_page_6.Ui_Form):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
         self.setupUi(self)
         self.parent = parent
+        self.label.setText(adapter.take_translate('Wizard', 'Page6Label'))
 
     def initializePage(self) -> None:
         self.obj = ObjectToCreateXML(
@@ -625,7 +657,6 @@ class Page6(QtWidgets.QWizardPage, form_wizard_page_6.Ui_Form):
             ,list_of_receiver_cols_links=self.wizard().page(3).list_of_receiver_cols_links
             ,pref_gui=self.wizard().page(0)
         )
-
 
         self.create_xml_save = CreateXML(self.obj)
         self.create_xml_save.started.connect(lambda: self.wizard().parent().ui.statusbar.showMessage('Creating XML...'))
@@ -650,22 +681,17 @@ class Page6(QtWidgets.QWizardPage, form_wizard_page_6.Ui_Form):
         return False
 
 
-
-
 class RoadMapConfiguration(QtWidgets.QWizard):
-
     db_parameters_and_check_mode = 0
     target_table_and_db_schema = 1
     source_columns = 2
     receiver_columns = 3
     dictionary = 4
     final_page = 5
-    # DictColumnsParameters = 6
-    # DictTables = 7
 
 
 class TreeWidgetLinkedColumns(QtWidgets.QTreeWidget):
-    def __init__(self, parent=None, widget_sighal=None, pref_dict=None):
+    def __init__(self, parent=None, widget_sighal=None, pref_dict=None, adapter=None):
         super().__init__(parent)
 
         self.pref = pref_dict
@@ -759,7 +785,7 @@ class ev_filt_of_Page3(QtCore.QObject):
 
 
 class LinkedColumns(QtWidgets.QTreeWidgetItem):
-    def __init__(self, tree_widget: QtWidgets.QTreeWidget, current_column, parent, target_columns, source_columns):
+    def __init__(self, tree_widget: QtWidgets.QTreeWidget, current_column, parent, target_columns, source_columns, adapter):
         super().__init__(parent, ['', ])
 
         self.combo_box_source_links = QtWidgets.QComboBox()

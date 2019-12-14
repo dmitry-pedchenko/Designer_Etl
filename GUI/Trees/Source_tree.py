@@ -2,9 +2,9 @@ from PyQt5 import QtWidgets, QtGui
 
 
 class Source_tree(QtWidgets.QTreeWidget):
-    def __init__(self):
+    def __init__(self, adapter):
         super().__init__()
-        self.headerItem().setText(0, "Source rows")
+        self.headerItem().setText(0, f"{adapter.take_translate('SourceColumnsConfigEditor', 'SourceRows')}")
 
         self.context_menu_duplicate_row = QtWidgets.QMenu()
         self.actionDuplicateColumn = QtWidgets.QAction()

@@ -8,9 +8,16 @@ from GUI.Windows import alarm_window
 
 
 class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
         self.setupUi(self)
+
+        self.radioButton.setText(f"{adapter.take_translate('EasyLoader', 'TestMode')}")
+        self.radioButton_2.setText(f"{adapter.take_translate('EasyLoader', 'LoadMode')}")
+        self.label.setText(f"{adapter.take_translate('EasyLoader', 'ConfigName')}")
+        self.pushButton_logs.setText(f"{adapter.take_translate('EasyLoader', 'LogsFolder')}")
+        self.pushButton_start.setText(f"{adapter.take_translate('EasyLoader', 'Start')}")
+
         self.text_edit_log = QtWidgets.QTextEdit(self.Log)
         self.text_edit_log.setGeometry(QtCore.QRect(0, 0, 811, 245))
         self.text_edit_log.setReadOnly(True)

@@ -44,7 +44,7 @@ class Ui_Form(object):
         self.Log.setObjectName("Log")
         self.toolBox.addItem(self.Log, "")
         self.verticalLayoutWidget_2 = QtWidgets.QWidget(Form)
-        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(440, 10, 291, 141))
+        self.verticalLayoutWidget_2.setGeometry(QtCore.QRect(440, 10, 371, 141))
         self.verticalLayoutWidget_2.setObjectName("verticalLayoutWidget_2")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_2)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)

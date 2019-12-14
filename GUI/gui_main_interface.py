@@ -17,6 +17,7 @@ from GUI.Windows.error_window import show_error_window
 from GUI.DAO.connection_db import CreateConnection
 from GUI.Windows import easy_loader, gui_prefernces_controller, wizard_configuration
 from GUI.System.LanguageAdaptor import Adapter
+from GUI.gui_qt import db_connect_editor
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -66,10 +67,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSave.setDisabled(True)
         self.ui.actionSave_as.setDisabled(True)
 
-        # self.ui.actionLoader.setDisabled(True)
         self.ui.actionConfig_Editor.setDisabled(True)
         self.ui.actionDictionary.setDisabled(True)
-        # self.ui.actionEditor.setDisabled(True)
         self.connection_tread = CreateConnection(self)
 
         self.tabWidget = QtWidgets.QTabWidget(self.ui.centralwidget)
@@ -144,8 +143,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_widget_config_editor = QtWidgets.QWidget()
             self.splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
             self.splitter.setChildrenCollapsible(False)
-            self.treeWidget_of_Source = Source_tree.Source_tree()
-            self.treeWidget_of_Receiver = Receiver_tree.Receiver_tree()
+            self.treeWidget_of_Source = Source_tree.Source_tree(self.adapter)
+            self.treeWidget_of_Receiver = Receiver_tree.Receiver_tree(adapter=self.adapter)
             self.splitter.addWidget(self.treeWidget_of_Source)
             self.splitter.addWidget(self.treeWidget_of_Receiver)
             self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -169,7 +168,8 @@ class MainWindow(QtWidgets.QMainWindow):
                                                 validator=self.validator,
                                                 tables_in_receiver=self.tables_in_receiver,
                                                 columns_names_source=self.columns_in_source,
-                                                window_pref=self.pref_gui
+                                                window_pref=self.pref_gui,
+                                                adapter=self.adapter
                                                 )
             hlayout = QtWidgets.QHBoxLayout()
             hlayout.addWidget(self.tree_dict)
@@ -183,7 +183,8 @@ class MainWindow(QtWidgets.QMainWindow):
                                        config=self.config_dict,
                                        validator=self.validator,
                                        tables_in_receiver=self.tables_in_receiver,
-                                       columns_names_source=self.columns_in_source
+                                       columns_names_source=self.columns_in_source,
+                                       adapter=self.adapter
                                        )
 
         self.tabWidget.addTab(self.tab_widget_dictionary, 'Dictionary Editor')
@@ -192,7 +193,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.tab_widget_loader:
             pass
         else:
-            self.tab_widget_loader = easy_loader.EasyLoader()
+            self.tab_widget_loader = easy_loader.EasyLoader(adapter=self.adapter)
 
         self.tabWidget.addTab(self.tab_widget_loader, 'Loader')
 
@@ -203,6 +204,16 @@ class MainWindow(QtWidgets.QMainWindow):
             self.tab_widget_editor = QtWidgets.QWidget()
             self.tab_widget_editor.ui = db_connect_editor.Ui_Form()
             self.tab_widget_editor.ui.setupUi(self.tab_widget_editor)
+
+            self.tab_widget_editor.ui.label_dbtype.setText(self.adapter.take_translate('pref_window', 'dbtype'))
+            self.tab_widget_editor.ui.label_dbHost.setText(self.adapter.take_translate('pref_window', 'dbHost'))
+            self.tab_widget_editor.ui.label_dbUser.setText(self.adapter.take_translate('pref_window', 'dbUser'))
+            self.tab_widget_editor.ui.label_dbPass.setText(self.adapter.take_translate('pref_window', 'dbPass'))
+            self.tab_widget_editor.ui.label_dbBase.setText(self.adapter.take_translate('pref_window', 'dbBase'))
+            self.tab_widget_editor.ui.dbSchema_2.setText(self.adapter.take_translate('pref_window', 'dbScheme'))
+            self.tab_widget_editor.ui.label_dbPort.setText(self.adapter.take_translate('pref_window', 'dbPort'))
+            self.tab_widget_editor.ui.label_loadMode.setText(self.adapter.take_translate('pref_window', 'Load_Mode'))
+            self.tab_widget_editor.ui.label_receiver.setText(self.adapter.take_translate('pref_window', 'Target_table_name'))
 
             self.tab_widget_editor.ui.pushButton_Open.clicked.connect(self.select_config_file)
             self.tab_widget_editor.ui.pushButton_Save.clicked.connect(self.save_edit_config)
@@ -467,7 +478,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.treeWidget_of_Source.currentItem().parent().takeChild(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
 
     def show_wizrd(self):
-        self.wizard = wizard_configuration.WizardConfig(self)
+        self.wizard = wizard_configuration.WizardConfig(self, adapter=self.adapter)
         self.wizard.setWindowModality(QtCore.Qt.ApplicationModal)
         self.wizard.show()
 
@@ -561,17 +572,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
 
         for col in self.config_dict['excelColumns']:
-            source_column_editor_viewer.create_input_column(self.treeWidget_of_Source,
-                                                            self.colnames_of_receiver,
-                                                            col,
+            source_column_editor_viewer.create_input_column(tree_table=self.treeWidget_of_Source,
+                                                            db_colnames=self.colnames_of_receiver,
+                                                            column_property=col,
                                                             list_of_cols=self.list_of_source_cols_links,
-                                                            source_columnes=self.columns_in_source
+                                                            source_columnes=self.columns_in_source,
+                                                            adapter=self.adapter
                                                             )
         for col in self.config_dict['dbColumns']:
             target_column_editor_viewer.create_receiver_column(
                 tree_table=self.treeWidget_of_Receiver,
                 column_property=col,
-                list_of_cols=self.list_of_receiver_cols_links
+                list_of_cols=self.list_of_receiver_cols_links,
+                adapter=self.adapter
             )
 
         self.show_pref()
@@ -590,14 +603,16 @@ class MainWindow(QtWidgets.QMainWindow):
             column_property=self.dict_pref,
             list_of_cols=self.list_of_source_cols_links,
             indx=self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row(),
-            source_columnes=self.columns_in_source
+            source_columnes=self.columns_in_source,
+            adapter=self.adapter
             )
 
     def duplicateReplace(self):
         replace = source_column_editor_viewer.ReplaceRow(column_property=self.dict_pref,
                                                          parent=self.treeWidget_of_Source,
                                                          parent_widget=self.treeWidget_of_Source.currentItem().parent(),
-                                                         after_widget=self.treeWidget_of_Source.currentItem())
+                                                         after_widget=self.treeWidget_of_Source.currentItem(),
+                                                         adapter=self.adapter)
 
         self.treeWidget_of_Source.addTopLevelItem(replace)
         list(filter(lambda x: x['colName'].combo_box_name.currentText() ==

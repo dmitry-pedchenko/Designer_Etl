@@ -9,17 +9,80 @@
             <dbScheme>Схема</dbScheme>
             <dbPort>Порт</dbPort>
             <Load_Mode>Тип загрузки</Load_Mode>
-            <Source_excel_file_name>Имя источника</Source_excel_file_name>
+            <Source_excel_file_name>Имя источника:</Source_excel_file_name>
             <Target_table_name>Имя целевой таблицы</Target_table_name>
             <Check_mode>Сверка файлов</Check_mode>
-            <Check_table_name>Имя файла сверки</Check_table_name>
+            <Check_table_name>Имя файла сверки:</Check_table_name>
             <Both>Оба</Both>
             <Dictionary>Со словарём</Dictionary>
-            <LinkedColumns>Столбцы источника</LinkedColumns>
-            <TargetColumns>Столбцы в сверочном файле</TargetColumns>
+            <LinkedColumnsCOLUMN>Поля источника</LinkedColumnsCOLUMN>
+            <TargetColumnsCOLUMN>Поля в сверочном файле</TargetColumnsCOLUMN>
         </pref_window>
+        <SourceColumnsConfigEditor>
+            <SourceRows>Имя поля в источнике</SourceRows>
+            <PropertyNameCOLUMN>Свойство источника</PropertyNameCOLUMN>
+            <ValueCOLUMN>Значение</ValueCOLUMN>
+            <colName>Имя поля в источнике</colName>
+            <colNameDb>Имя поля в базе данных</colNameDb>
+            <colType>Тип</colType>
+            <isPk>Ключ</isPk>
+            <cropEnd>Отбросить в начале</cropEnd>
+            <addValueEnd>Добавить в конце</addValueEnd>
+            <takeFromBegin>Взять с начала</takeFromBegin>
+            <cropBegin>Отбросить с конца</cropBegin>
+            <addValueBegin>Добавить в начало</addValueBegin>
+            <addValueBoth>Добавить</addValueBoth>
+            <To_begin>В начало</To_begin>
+            <To_end>В конец</To_end>
+            <replace>Замена</replace>
+            <Initial>Исходное</Initial>
+            <Final>Замена</Final>
+            <filter>Фильтрация</filter>
+            <f_cropEnd>Отбросить в начале</f_cropEnd>
+            <f_addValueEnd>Добавить в конце</f_addValueEnd>
+            <f_takeFromBegin>Взять с начала</f_takeFromBegin>
+            <f_cropBegin>Отбросить с конца</f_cropBegin>
+            <f_addValueBegin>Добавить в начало</f_addValueBegin>
+            <f_addValueBoth>Добавить</f_addValueBoth>
+            <Condition>Условие</Condition>
+            <post_filter>Постфильтр</post_filter>
+        </SourceColumnsConfigEditor>
+        <TargetColumnsConfigEditor>
+            <PropertyNameCOLUMN>Свойство в приёмнике</PropertyNameCOLUMN>
+            <ValueCOLUMN>Значение</ValueCOLUMN>
+            <colName>Имя поля в приёмнике</colName>
+            <fromExcel>Из Excel файла</fromExcel>
+            <fromDb>Из базы данных</fromDb>
+            <isAutoInc>Автоинкремент</isAutoInc>
+            <isConc>Составное</isConc>
+            <colType>Тип поля</colType>
+            <isUpdateCondition>Участвует в UPDATE условии</isUpdateCondition>
+            <defaultValue>Значение по умолчанию</defaultValue>
+            <ifNull>Значение при отсутствии</ifNull>
+            <Target_rows>Target rows</Target_rows>
+        </TargetColumnsConfigEditor>
+        <DictionaryEditor>
+            <PropertyCOLUMN>Свойство</PropertyCOLUMN>
+            <ValueCOLUMN>Значение</ValueCOLUMN>
+            <table>Таблица словаря</table>
+            <indxDbColumn>Индекс в целевой таблице</indxDbColumn>
+            <indxColumnDic>Индекс в словаре</indxColumnDic>
+        </DictionaryEditor>
+        <EasyLoader>
+            <TestMode>Режим тестирования</TestMode>
+            <LoadMode>Режим загрузки</LoadMode>
+            <ConfigName>Имя файла конфигурации:</ConfigName>
+            <LogsFolder>Папка логов</LogsFolder>
+            <Start>Начать загрузку</Start>
+        </EasyLoader>
+        <Wizard>
+            <Page3Label>Поля в источнике</Page3Label>
+            <Page4Label>Поля в целевой таблице</Page4Label>
+            <Page5Label>Поля в словаре</Page5Label>
+            <Page6Label>Конфигурация:</Page6Label>
+        </Wizard>
     </rus>
-    <system>
+    <sys>
         <pref_window>
             <dbtype>dbtype</dbtype>
             <dbHost>dbHost</dbHost>
@@ -35,9 +98,71 @@
             <Check_table_name>Check_table_name</Check_table_name>
             <Both>Both</Both>
             <Dictionary>Dictionary</Dictionary>
-            <LinkedColumns>LinkedColumns</LinkedColumns>
-            <TargetColumns>TargetColumns</TargetColumns>
+            <LinkedColumnsCOLUMN>LinkedColumns</LinkedColumnsCOLUMN>
+            <TargetColumnsCOLUMN>TargetColumns</TargetColumnsCOLUMN>
         </pref_window>
-    </system>
-
+        <SourceColumnsConfigEditor>
+            <SourceRows>Source rows</SourceRows>
+            <PropertyNameCOLUMN>Property Name</PropertyNameCOLUMN>
+            <ValueCOLUMN>Value</ValueCOLUMN>
+            <colName>colName</colName>
+            <colNameDb>colNameDb</colNameDb>
+            <colType>colType</colType>
+            <isPk>isPk</isPk>
+            <cropEnd>cropEnd</cropEnd>
+            <addValueEnd>addValueEnd</addValueEnd>
+            <takeFromBegin>takeFromBegin</takeFromBegin>
+            <cropBegin>cropBegin</cropBegin>
+            <addValueBegin>addValueBegin</addValueBegin>
+            <addValueBoth>addValueBoth</addValueBoth>
+            <To_begin>To begin</To_begin>
+            <To_end>To end</To_end>
+            <replace>replace</replace>
+            <Initial>Initial</Initial>
+            <Final>Final</Final>
+            <filter>filter</filter>
+            <f_cropEnd>f_cropEnd</f_cropEnd>
+            <f_addValueEnd>f_addValueEnd</f_addValueEnd>
+            <f_takeFromBegin>f_takeFromBegin</f_takeFromBegin>
+            <f_cropBegin>f_cropBegin</f_cropBegin>
+            <f_addValueBegin>f_addValueBegin</f_addValueBegin>
+            <f_addValueBoth>f_addValueBoth</f_addValueBoth>
+            <Condition>Condition</Condition>
+            <post_filter>post_filter</post_filter>
+        </SourceColumnsConfigEditor>
+        <TargetColumnsConfigEditor>
+            <PropertyNameCOLUMN>Property Name</PropertyNameCOLUMN>
+            <ValueCOLUMN>Value</ValueCOLUMN>
+            <colName>ColName</colName>
+            <fromExcel>fromExcel</fromExcel>
+            <fromDb>fromDb</fromDb>
+            <isAutoInc>isAutoInc</isAutoInc>
+            <isConc>isConc</isConc>
+            <colType>colType</colType>
+            <isUpdateCondition>isUpdateCondition</isUpdateCondition>
+            <defaultValue>defaultValue</defaultValue>
+            <ifNull>ifNull</ifNull>
+            <Target_rows>Поля в приёмнике</Target_rows>
+        </TargetColumnsConfigEditor>
+        <DictionaryEditor>
+            <PropertyCOLUMN>Property</PropertyCOLUMN>
+            <ValueCOLUMN>Value</ValueCOLUMN>
+            <table>table</table>
+            <indxDbColumn>indxDbColumn</indxDbColumn>
+            <indxColumnDic>indxColumnDic</indxColumnDic>
+        </DictionaryEditor>
+        <EasyLoader>
+            <TestMode>Test Mode</TestMode>
+            <LoadMode>Load Mode</LoadMode>
+            <ConfigName>Config name</ConfigName>
+            <LogsFolder>Log folder</LogsFolder>
+            <Start>Load</Start>
+        </EasyLoader>
+        <Wizard>
+            <Page3Label>Source columns</Page3Label>
+            <Page4Label>Receiver columns</Page4Label>
+            <Page5Label>Dictionary columns</Page5Label>
+            <Page6Label>Config XML</Page6Label>
+        </Wizard>
+    </sys>
 </languages>
