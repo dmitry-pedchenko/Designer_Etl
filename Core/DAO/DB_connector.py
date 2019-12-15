@@ -7,7 +7,7 @@ class Connection:
     connection_arr = []
 
     @classmethod
-    def get_instance(cls, log):
+    def get_instance(cls, log=None):
         if not cls.__instance:
             cls.__instance = Connection(log)
         return cls.__instance
@@ -62,6 +62,7 @@ class Connection:
                 self.conn.close()
                 for con in self.connection_arr:
                     con['conn'].close()
+                self.connection_arr = []
                 self.log.raiseInfo(3)
             except:
                 self.log.raiseError(19)
@@ -72,7 +73,7 @@ class Connection:
     def get_cur(self):
         return self.cursor
 
-    def test_conn(self, attempt):
+    def test_conn(self, attempt=3):
         query = """SELECT 1"""
         has_try = False
         counter_attempt = 0
@@ -81,8 +82,8 @@ class Connection:
                 self.exec(query)
                 has_try = True
             except Exception as e:
+                counter_attempt += 1
                 if counter_attempt <= attempt:
-                    counter_attempt += 1
                     self.log.raiseInfo(15, e.args[0])
                     self.log.raiseInfo(16, counter_attempt)
                     self.log.raiseInfo(14, 120)

@@ -45,6 +45,24 @@ pip install mysql-connector-python
 pip install xlrd
 ```
 
+Если возникают пробоемы с установкой pymssql на MAC OS
+
+В терминале из директории /Applications/Utilities/ пишем
+
+```
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+затем 
+
+```
+brew install freetds
+brew link --force freetds
+pip install pymssql
+```
+
+Это должно решить проблему
+
 ---
 [:arrow_up:Оглавление](#Оглавление)
 ## Информация о структуре проекта

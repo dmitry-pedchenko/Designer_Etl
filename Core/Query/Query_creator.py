@@ -1,6 +1,7 @@
-from Validate import Row_transformation_helper as helper
-from DAO.DAO_DataFrame import Dic_DF as df
-from Validate.Filter import filter_arr
+from Core.Validate import Row_transformation_helper as helper
+from Core.DAO.DAO_DataFrame import Dic_DF as df
+from Core.Validate.Filter import filter_arr
+
 
 class Query:
     def __init__(self, dbService, log, opts, connector):

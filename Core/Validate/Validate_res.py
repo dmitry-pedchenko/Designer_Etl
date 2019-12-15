@@ -13,6 +13,9 @@ class Validate:
         if self.dbService.dictionary['checkMode_value'] == 'true':
             self.df_link = dbService.dataFrame_link
 
+    def __str__(self):
+        return "validate_instance"
+
     def exec(self, query):
         try:
             self.cur.execute(query)
@@ -21,14 +24,110 @@ class Validate:
             self.log.raiseError(20, e.args[1])
             self.connector.closeConnect()
 
+    @staticmethod
+    def executor(query, cur, loggerInst, connector):
+        try:
+            cur.execute(query)
+            return cur.fetchall()
+        except Exception as e:
+            loggerInst.raiseError(20, e.args[1])
+            connector.closeConnect()
+
+    @staticmethod
+    def queryForColumns_edit(dbtype: str, target_table: str, db_base: str, connector, executor, cur, loggerInst):
+        query = ''
+        # print(connector)
+        if dbtype == 'mssql':
+            query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{target_table}'); """
+        if dbtype == 'mysql':
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{db_base}' AND TABLE_NAME = '{target_table}';"""
+        connector.test_conn(3)
+        return executor(query, cur, loggerInst, connector)
+
+    @staticmethod
+    def queryForTableInDbList_edit(connector, dbtype, executor, cur, loggerInst):
+        query = ''
+        if dbtype == 'mssql':
+            query = f""" SELECT TABLE_NAME 
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE table_type='BASE TABLE' """
+
+        if dbtype == 'mysql':
+            query = f""" SELECT TABLE_NAME 
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE table_type='BASE TABLE' """
+
+        connector.test_conn(3)
+        return executor(query, cur, loggerInst, connector)
+
+    @staticmethod
+    def queryForSchemasInDb_edit(dbtype, connector, executor, cur, loggerInst):
+        query = ''
+        if dbtype == 'mssql':
+            query = f""" SELECT * FROM sys.schemas"""
+        if dbtype == 'mysql':
+            query = f""" select schema_name as database_name
+                            from information_schema.schemata
+                            order by schema_name;"""
+        connector.test_conn(3)
+        return executor(query, cur, loggerInst, connector)
+
+
     def queryForColumns(self):
         query = ''
         if self.dbService.dictionary['dbtype'] == 'mssql':
             query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{self.dic["exportTableName_value"]}'); """
         if self.dbService.dictionary['dbtype'] == 'mysql':
-            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{self.dic["exportTableName_value"]}';"""
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{self.dic["exportTableName_value_text"]}';"""
         self.connector.test_conn(3)
         return self.exec(query)
+
+    def queryForColumnsInDict(self, dict_table_name):
+        query = ''
+        if self.dbService.dictionary['dbtype'] == 'mssql':
+            query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{dict_table_name}'); """
+        if self.dbService.dictionary['dbtype'] == 'mysql':
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.dbService.dictionary['dbBase']}' AND TABLE_NAME = '{dict_table_name}';"""
+        self.connector.test_conn(3)
+        return self.exec(query)
+
+    @staticmethod
+    def queryForColumnsInDict_edit(dict_table_name, dbtype, dbBase, connector, exec, cur, loggerInst):
+        query = ''
+        if dbtype == 'mssql':
+            query = f""" SELECT name FROM syscolumns c WHERE c.id = OBJECT_ID('{dict_table_name}'); """
+        if dbtype == 'mysql':
+            query = f"""SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{dbBase}' AND TABLE_NAME = '{dict_table_name}';"""
+        connector.test_conn(3)
+        return exec(query, cur, loggerInst, connector)
+
+    def queryForTableInDbList(self):
+        query = ''
+        if self.dbService.dictionary['dbtype'] == 'mssql':
+            query = f""" SELECT TABLE_NAME 
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE table_type='BASE TABLE' """
+
+        if self.dbService.dictionary['dbtype'] == 'mysql':
+            query = f""" SELECT TABLE_NAME 
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE table_type='BASE TABLE' """
+
+        self.connector.test_conn(3)
+        return self.exec(query)
+
+    def queryForSchemasInDb(self):
+        query = ''
+        if self.dbService.dictionary['dbtype'] == 'mssql':
+            query = f""" SELECT * FROM sys.schemas"""
+        if self.dbService.dictionary['dbtype'] == 'mysql':
+            query = f""" select schema_name as database_name
+                            from information_schema.schemata
+                            order by schema_name;"""
+        self.connector.test_conn(3)
+        return self.exec(query)
+
+
 
 
     def validate(self):

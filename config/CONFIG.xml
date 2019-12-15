@@ -6,6 +6,7 @@
     <dbUser></dbUser> <!-- user -->
     <dbPass></dbPass> <!-- password -->
     <dbBase></dbBase> <!-- database name -->
+    <dbSchema></dbSchema> <!-- Schema in db -->
     <dbPort></dbPort> <!-- port -->
     <loadMode></loadMode> <!-- insert / update -->
     <dict></dict> <!-- true/ false -->
@@ -113,7 +114,7 @@
 
                             <column>
                                 <colName></colName> <!-- column name in excel -->
-                                <colNameDb></colNameDb> <!-- colum name in db -->
+                                <colNameDb></colNameDb> <!-- column name in dictionary table in db -->
                                 <colType></colType> <!-- str / int / float / date -->
                                 <cropEnd mode="false"></cropEnd> <!-- <cropEnd mode="true/ false">value</cropEnd> -->
                                 <addValueEnd mode="false"></addValueEnd> <!-- <addValueEnd mode="true/ false">value</addValueEnd> -->
@@ -186,3 +187,4 @@
 </main>
 
 <!-- -->
+

@@ -37,9 +37,9 @@ class Transformation_helper:
         if rowProperties.get("addValueBoth_mode") == 'true':
             self.value = self.addValueBoth(self.value, rowProperties.get("addValueBoth").split(',')[0],
                                                         rowProperties.get("addValueBoth").split(',')[1])
+
         if rowProperties.get("replace_mode") == 'true':
             self.value = self.replace(self.value, rowProperties.get("replaceValArr"))
-
         if dbProperties:
             if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
                 self.value = dbProperties.get("ifNull")
