@@ -132,14 +132,6 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         self.lineEdit_dbuser.textEdited.connect(self.set_flag)
         self.lineEdit_dbbase.textEdited.connect(self.set_flag)
 
-    # delete, this for test
-        self.lineEdit_dbhost.setText('localhost')
-        self.lineEdit_dbpass.setText('P@$$w0rd')
-        self.lineEdit_dbport.setText('3306')
-        self.lineEdit_dbuser.setText('root')
-        self.lineEdit_dbbase.setText('designer_etl')
-    #
-
     def set_flag(self):
         self.change_flag = True
 

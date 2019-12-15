@@ -604,6 +604,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.actionDictionary.setChecked(True)
             self.ui.actionDictionary.triggered.emit(1)
 
+        self.setCursor(QtCore.Qt.ArrowCursor)
+
         self.ui.actionSave.setDisabled(False)
         self.ui.actionSave_as.setDisabled(False)
 
