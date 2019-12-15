@@ -95,19 +95,19 @@ class DictTree(QtWidgets.QTreeWidget):
     def contextMenuEvent(self, event: QtGui.QContextMenuEvent) -> None:
         if self.currentItem():
             try:
-                if self.currentItem().text(0) == 'table':
+                if self.currentItem().objectName == 'table':
                     self.context_menu_duplicate_row.exec(event.globalPos())
             except:
                 pass
 
             try:
-                if self.currentItem().label.text() == 'colName':
+                if self.currentItem().objectName == 'colName':
                     self.context_menu_duplicate_column.exec(event.globalPos())
             except:
                 pass
 
             try:
-                if self.currentItem().checkBox_widget_for_replace_check.text() == 'replace':
+                if self.currentItem().objectName == 'replace':
                     self.context_menu_duplicate_replace.exec(event.globalPos())
             except:
                 pass
@@ -144,12 +144,19 @@ class DictTree(QtWidgets.QTreeWidget):
                    self.list_of_dict_pref)
         )[0]['columns']
 
+        for column in cur_table:
+            if column['colNameRow'].combo_box.currentText() == '---':
+                show_alarm_window(self, "Select column name !!!")
+                return
+
+
         new_colName = dict_column_editor_viewer.ColumnNameRow(
             column_property=self.dict_pref,
             parent=self.currentItem().parent(),
             tree_widget=self,
             columns_names_source=self.columns_names_source,
             after_widget=self.currentItem(),
+            adapter=self.adapter
         )
         self.addTopLevelItem(new_colName)
 
@@ -158,7 +165,8 @@ class DictTree(QtWidgets.QTreeWidget):
                 column_property=self.dict_pref,
                 parent=new_colName,
                 tree_widget=self,
-                columns_in_receiver=self.validator.queryForColumns())
+                columns_in_receiver=self.validator.queryForColumns(),
+                adapter=self.adapter)
         else:
             colNameDbRow = dict_column_editor_viewer.ColumnNameDbRow(
                 column_property=self.dict_pref,
@@ -171,43 +179,51 @@ class DictTree(QtWidgets.QTreeWidget):
                     connector=self.connector,
                     executor=self.executor,
                     cur=self.cur,
-                    loggerInst=self.loggerInst
-                ))
+                    loggerInst=self.loggerInst,
+                ),
+                adapter=self.adapter)
 
         colTypeRow = dict_column_editor_viewer.ColTypeRow(
             cur_dic_table_pref=self.dict_pref,
             parent=new_colName,
-            tree_widget=self)
+            tree_widget=self,
+        adapter=self.adapter)
 
         cropEndRow = dict_column_editor_viewer.CropEndRow(
             column_property=self.dict_pref,
             parent=self,
-            parent_widget=new_colName)
+            parent_widget=new_colName,
+            adapter=self.adapter)
 
         addValueEndRow = dict_column_editor_viewer.AddValueEndRow(
             column_property=self.dict_pref,
             parent=self,
-            parent_widget=new_colName )
+            parent_widget=new_colName,
+            adapter=self.adapter)
 
         takeFromBeginRow = dict_column_editor_viewer.TakeFromBeginRow(
             column_property=self.dict_pref,
             parent=self,
-            parent_widget=new_colName)
+            parent_widget=new_colName,
+            adapter=self.adapter)
 
         cropBeginRow = dict_column_editor_viewer.CropBeginRow(
             column_property=self.dict_pref,
             parent=self,
-            parent_widget=new_colName)
+            parent_widget=new_colName,
+            adapter=self.adapter)
 
         addValueBeginRow = dict_column_editor_viewer.AddValueBeginRow(
             column_property=self.dict_pref,
             parent=self,
-            parent_widget=new_colName)
+            parent_widget=new_colName,
+            adapter=self.adapter)
 
         addValueBothRow = dict_column_editor_viewer.AddValueBothRow(
             column_property=self.dict_pref,
             parent=self,
-            parent_widget=new_colName)
+            parent_widget=new_colName,
+            adapter=self.adapter)
 
         replace_box = dict_column_editor_viewer.ReplaceRow(
             row=None,
@@ -215,7 +231,8 @@ class DictTree(QtWidgets.QTreeWidget):
             parent=self,
             parent_widget=new_colName,
             after_widget=addValueBothRow,
-            table_item=None
+            table_item=None,
+            adapter=self.adapter
         )
 
         dict_to_add['replace_box'] = []
@@ -238,7 +255,8 @@ class DictTree(QtWidgets.QTreeWidget):
             parent=self,
             parent_widget=self.currentItem().parent(),
             after_widget=self.currentItem(),
-            table_item=self.currentItem().parent().parent()
+            table_item=self.currentItem().parent().parent(),
+            adapter=self.adapter
         )
 
         self.addTopLevelItem(replace)
@@ -273,6 +291,10 @@ class DictTree(QtWidgets.QTreeWidget):
             self.indexFromItem(self.currentItem()).row())
 
     def add_table_dict(self):
+        for table in self.list_of_dict_pref:
+            if table['dictTableName'].combo_box_dictTableName.currentText() == '---':
+                show_alarm_window(self, "Select table name !!!")
+                return
         if not isinstance(self.validator, type):
             create_dict_column(pref=self.list_of_dict_pref,
                                parent=self,

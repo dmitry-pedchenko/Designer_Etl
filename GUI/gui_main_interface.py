@@ -462,7 +462,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.list_of_source_cols_links.remove(element)
             self.treeWidget_of_Source.takeTopLevelItem(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
         else:
-            show_alarm_window(self,"You can't delete last element !!!")
+            show_alarm_window(self, "You can't delete last element !!!")
             return
 
     def deleteReplace(self):
@@ -597,6 +597,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSave_as.setDisabled(False)
 
     def addColumnField(self):
+        for column in self.list_of_source_cols_links:
+            if column['colName'].combo_box_name.currentText() == '---':
+                show_alarm_window(self, "Select column name !!!")
+                return
         source_column_editor_viewer.create_input_column(
             tree_table=self.treeWidget_of_Source,
             db_colnames=self.colnames_of_receiver,
@@ -689,8 +693,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def error_at_create_xml(self, message):
         show_alarm_window(self, message)
         self.ui.statusbar.showMessage(f'Creating XML failed !')
-
-
 
 
 if __name__ == '__main__':

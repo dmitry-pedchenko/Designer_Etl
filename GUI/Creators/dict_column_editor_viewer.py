@@ -203,6 +203,7 @@ class MainDictTableName(QtWidgets.QTreeWidgetItem):
     def __init__(self, cur_dic_table_pref, parent, config, tables_in_receiver, adapter):
         super().__init__(parent, [adapter.take_translate('DictionaryEditor', 'table'), ])
         self.cur_dic_table_pref = cur_dic_table_pref
+        self.objectName = 'table'
         list_combo_box_dictTableName = tables_in_receiver
         self.combo_box_dictTableName = QtWidgets.QComboBox()
         self.combo_box_dictTableName.addItems(sorted(list_combo_box_dictTableName))
@@ -322,7 +323,7 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
         list_combo_box_dictTableName = columns_names_source
         self.combo_box = QtWidgets.QComboBox()
         self.combo_box.addItems(list_combo_box_dictTableName)
-
+        self.objectName = 'colName'
         if column_property['colName']:
             self.combo_box.setCurrentIndex(list_combo_box_dictTableName.index(column_property['colName']))
         else:
@@ -547,11 +548,21 @@ class AddValueBothRow(QtWidgets.QTreeWidgetItem):
 
 
 class ReplaceRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, after_widget=None, row: dict=None, table_item=None, adapter=None):
+    def __init__(
+            self,
+            column_property: dict,
+            parent: QtWidgets.QTreeWidget,
+            parent_widget,
+            after_widget=None,
+            row: dict=None,
+            table_item=None,
+            adapter=None
+    ):
         super().__init__(parent_widget, after_widget)
         self.column_property = column_property
         self.table_item = table_item
         self.row = row
+        self.objectName = 'replace'
         self.widget_for_replace = QtWidgets.QWidget()
         hbox_layout_replace = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both = QtWidgets.QLineEdit()

@@ -144,8 +144,10 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property, arr_of_db_columns, tree_widget, adapter):
         super().__init__(tree_widget, [adapter.take_translate('SourceColumnsConfigEditor', 'colName'), ])
         self.combo_box_name = QtWidgets.QComboBox()
+        self.tree_widget = tree_widget
         self.combo_box_name.addItems(arr_of_db_columns)
         self.combo_box_name.addItem('---')
+        self.objectName = "colName"
 
         if column_property['colName']:
             self.combo_box_name.setCurrentIndex(arr_of_db_columns.index(column_property['colName']))
@@ -357,6 +359,7 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
         super().__init__(parent_widget, after_widget)
         self.column_property = column_property
         self.row = row
+        self.objectName = 'replace'
         self.widget_for_replace = QtWidgets.QWidget()
         hbox_layout_replace = QtWidgets.QHBoxLayout()
         self.line_edit_addBegin_Both = QtWidgets.QLineEdit()
@@ -378,7 +381,7 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
 
     def initialize(self):
         if self.row:
-            if self.column_property['replace_mode'] != 'false':
+            if self.column_property['replace_mode'] == 'true':
                 self.line_edit_addBegin_Both.setText(self.row['replaceValue'])
                 self.line_edit_addEnd_Both.setText(self.row['replaceToValue'])
                 self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Checked)
@@ -386,6 +389,10 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
                 self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Unchecked)
                 self.line_edit_addBegin_Both.setDisabled(True)
                 self.line_edit_addEnd_Both.setDisabled(True)
+        else:
+            self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Unchecked)
+            self.line_edit_addBegin_Both.setDisabled(True)
+            self.line_edit_addEnd_Both.setDisabled(True)
 
     def state_change(self):
         if self.checkBox_widget_for_replace_check.isChecked():

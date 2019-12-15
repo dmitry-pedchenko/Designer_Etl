@@ -28,11 +28,11 @@ class Source_tree(QtWidgets.QTreeWidget):
                 self.context_menu_duplicate_row.exec(event.globalPos())
                 return
 
-            if self.currentItem().text(0) == 'colName':
+            if self.currentItem().objectName == 'colName':
                 self.context_menu_duplicate_row.exec(event.globalPos())
                 return
 
-            if self.currentItem().checkBox_widget_for_replace_check.text() == 'replace':
+            if self.currentItem().objectName == 'replace':
                 self.context_menu_duplicate_replace.exec(event.globalPos())
                 return
         except:
