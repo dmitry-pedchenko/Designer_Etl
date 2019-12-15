@@ -19,7 +19,7 @@
             <TargetColumnsCOLUMN>Поля в сверочном файле</TargetColumnsCOLUMN>
         </pref_window>
         <SourceColumnsConfigEditor>
-            <SourceRows>Имя поля в источнике</SourceRows>
+            <SourceRows>Поля в источнике</SourceRows>
             <PropertyNameCOLUMN>Свойство источника</PropertyNameCOLUMN>
             <ValueCOLUMN>Значение</ValueCOLUMN>
             <colName>Имя поля в источнике</colName>
@@ -59,7 +59,7 @@
             <isUpdateCondition>Участвует в UPDATE условии</isUpdateCondition>
             <defaultValue>Значение по умолчанию</defaultValue>
             <ifNull>Значение при отсутствии</ifNull>
-            <Target_rows>Target rows</Target_rows>
+            <Target_rows>Поля в целевой таблице</Target_rows>
         </TargetColumnsConfigEditor>
         <DictionaryEditor>
             <PropertyCOLUMN>Свойство</PropertyCOLUMN>

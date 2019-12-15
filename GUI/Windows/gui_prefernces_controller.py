@@ -107,7 +107,7 @@ class Pref_Window(QtWidgets.QWidget):
 
     def open_excel_compare_folder(self):
 
-        path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
+        path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), 'Source'),
                                                           filter='*.xlsx')
         path = os.path.basename(path_name[0])
 
@@ -123,7 +123,7 @@ class Pref_Window(QtWidgets.QWidget):
 
                 if result == QtWidgets.QMessageBox.Yes:
                     self.ui.compare_file.setText(path)
-                    pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+                    pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'),
                                                path)
                     self.df_compare = pd.ExcelFile(pathToExcel)
                     self.comboBox_set_list_checked.clear()
@@ -132,7 +132,7 @@ class Pref_Window(QtWidgets.QWidget):
                     self.comboBox_set_list_checked.currentIndexChanged.emit(0)
             else:
                 self.ui.compare_file.setText(path)
-                pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+                pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'),
                                            path)
                 self.df_compare = pd.ExcelFile(pathToExcel)
                 self.comboBox_set_list_checked.clear()
@@ -168,7 +168,7 @@ class Pref_Window(QtWidgets.QWidget):
 
         path = self.config_dict["pathToLinkFile"]
         self.ui.compare_file.setText(path)
-        pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+        pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'),
                                    path)
         df_temp = pd.ExcelFile(pathToExcel)
         self.df_compare = None
@@ -225,7 +225,7 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Checked)
             self.create_links_columns()
 
-            pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+            pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'),
                                        self.config_dict['pathToLinkFile'])
             self.df_compare = pd.ExcelFile(pathToExcel)
 
@@ -433,7 +433,7 @@ class Pref_Window(QtWidgets.QWidget):
 
     def open_excel_folder(self):
 
-        path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
+        path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), 'Source'),
                                                           filter='*.xlsx')
         path = os.path.basename(path_name[0])
         if path:
@@ -448,7 +448,7 @@ class Pref_Window(QtWidgets.QWidget):
 
                 if result == QtWidgets.QMessageBox.Yes:
                     self.ui.excelFileName.setText(path)
-                    pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), path)
+                    pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'), path)
                     self.df = pd.ExcelFile(pathToExcel)
                     self.comboBox_list_source_excel.clear()
                     self.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])
@@ -456,7 +456,7 @@ class Pref_Window(QtWidgets.QWidget):
                     self.comboBox_list_source_excel.currentIndexChanged.emit(0)
             else:
                 self.ui.excelFileName.setText(path)
-                pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), path)
+                pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'), path)
                 self.df = pd.ExcelFile(pathToExcel)
                 self.comboBox_list_source_excel.clear()
                 self.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])

@@ -7,7 +7,7 @@ def do_XML_parse(pathToFile, log, opts=None):
     importDict = {}  # словарь для каждой колонки
     colArrayDB = []  # массив с колонками в базе
 
-    pathToFile = os.path.join(os.path.join(os.getcwd(), '..', 'config'), pathToFile)
+    pathToFile = os.path.join(os.path.join(os.getcwd(), 'config'), pathToFile)
 
     try:
         root = et.parse(pathToFile).getroot()

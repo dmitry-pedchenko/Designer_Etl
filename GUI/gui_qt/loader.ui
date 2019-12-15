@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>999</width>
-    <height>534</height>
+    <height>673</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,9 +16,9 @@
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>152</x>
+     <x>122</x>
      <y>12</y>
-     <width>281</width>
+     <width>311</width>
      <height>101</height>
     </rect>
    </property>
@@ -65,10 +65,10 @@
   <widget class="QToolBox" name="toolBox">
    <property name="geometry">
     <rect>
-     <x>90</x>
-     <y>177</y>
-     <width>811</width>
-     <height>321</height>
+     <x>20</x>
+     <y>173</y>
+     <width>961</width>
+     <height>477</height>
     </rect>
    </property>
    <property name="currentIndex">
@@ -79,8 +79,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>811</width>
-      <height>245</height>
+      <width>961</width>
+      <height>401</height>
      </rect>
     </property>
     <attribute name="label">
@@ -92,8 +92,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>811</width>
-      <height>245</height>
+      <width>961</width>
+      <height>401</height>
      </rect>
     </property>
     <attribute name="label">
@@ -106,7 +106,7 @@
     <rect>
      <x>440</x>
      <y>10</y>
-     <width>371</width>
+     <width>481</width>
      <height>141</height>
     </rect>
    </property>

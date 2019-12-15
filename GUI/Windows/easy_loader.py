@@ -19,16 +19,16 @@ class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
         self.pushButton_start.setText(f"{adapter.take_translate('EasyLoader', 'Start')}")
 
         self.text_edit_log = QtWidgets.QTextEdit(self.Log)
-        self.text_edit_log.setGeometry(QtCore.QRect(0, 0, 811, 245))
+        self.text_edit_log.setGeometry(QtCore.QRect(0, 0, 961, 401))
         self.text_edit_log.setReadOnly(True)
         self.text_edit_debug = QtWidgets.QTextEdit(self.Debug)
-        self.text_edit_debug.setGeometry(QtCore.QRect(0, 0, 811, 245))
+        self.text_edit_debug.setGeometry(QtCore.QRect(0, 0, 961, 401))
         self.text_edit_debug.setReadOnly(True)
 
         currentPath = os.getcwd()
-        self.log_path = os.path.join(currentPath, '..', 'log')
+        self.log_path = os.path.join(currentPath, 'log')
 
-        for i in os.listdir(os.path.join(currentPath, '..', 'config')):
+        for i in os.listdir(os.path.join(currentPath, 'config')):
             self.comboBox.addItem(i)
 
         self.pushButton_logs.clicked.connect(self.open_logs)

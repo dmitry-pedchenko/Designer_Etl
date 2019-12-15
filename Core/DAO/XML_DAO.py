@@ -11,9 +11,9 @@ class XmlParser:
         except Exception as e:
             log.raiseError(1, e)
 
-        pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), self.dictionary["importXml_path_value"])
+        pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'), self.dictionary["importXml_path_value"])
         if self.dictionary['checkMode_value'] == 'true':
-            pathToExcel_link = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), self.dictionary["pathToLinkFile"])
+            pathToExcel_link = os.path.join(os.path.join(os.getcwd(), 'Source'), self.dictionary["pathToLinkFile"])
 
         arrOfColTypesInExcel = {}
 

@@ -1,5 +1,4 @@
 from PyQt5 import QtCore, QtWidgets, QtGui
-import sys
 import GUI.gui_qt.form_wizard_page_1 as form_wizard_page_1
 import GUI.gui_qt.form_wizard_page_2 as form_wizard_page_2
 import GUI.gui_qt.form_wizard_page_3 as form_wizard_page_3
@@ -20,7 +19,6 @@ from GUI.DAO.create_xml import CreateXML
 import xml.etree.ElementTree as et
 
 
-
 class WizardConfig(QtWidgets.QWizard):
     def __init__(self, parent, adapter):
         super().__init__(parent=parent)
@@ -32,7 +30,7 @@ class WizardConfig(QtWidgets.QWizard):
         self.setPage(RoadMapConfiguration.dictionary, Page5(self, adapter=adapter))
         self.setPage(RoadMapConfiguration.final_page, Page6(self, adapter=adapter))
 
-        self.resize(900, 550)
+        self.resize(900, 700)
 
     def closeEvent(self, e):
         answer = QtWidgets.QMessageBox.question(self,
@@ -159,7 +157,6 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
         while self.treeWidget_linked_columns.topLevelItemCount() > 0:
             self.treeWidget_linked_columns.takeTopLevelItem(0)
 
-
     def add_asterisc_label_receiver(self):
         while self.treeWidget_linked_columns.topLevelItemCount() > 0:
             self.treeWidget_linked_columns.takeTopLevelItem(0)
@@ -198,7 +195,7 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
 
     def open_excel_folder(self):
 
-        path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
+        path_name = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), 'Source'),
                                                           filter='*.xlsx')
         path = os.path.basename(path_name[0])
         if path:
@@ -215,7 +212,7 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
 
                 if result == QtWidgets.QMessageBox.Yes:
                     self.excelFileName.setText(path)
-                    pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), path)
+                    pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'), path)
                     self.df = pd.ExcelFile(pathToExcel)
                     self.comboBox_list_source_excel.clear()
                     self.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])
@@ -223,7 +220,7 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
                     self.comboBox_list_source_excel.currentIndexChanged.emit(0)
             else:
                 self.excelFileName.setText(path)
-                pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'), path)
+                pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'), path)
                 self.df = pd.ExcelFile(pathToExcel)
                 self.comboBox_list_source_excel.clear()
                 self.comboBox_list_source_excel.addItems([i for i in self.df.sheet_names])
@@ -232,7 +229,7 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
 
     def open_excel_compare_folder(self):
 
-        path_name_compare_excel = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), '..', 'Source'),
+        path_name_compare_excel = QtWidgets.QFileDialog.getOpenFileName(directory=os.path.join(os.getcwd(), 'Source'),
                                                           filter='*.xlsx')
         path_compare_excel = os.path.basename(path_name_compare_excel[0])
 
@@ -250,7 +247,7 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
 
                 if result == QtWidgets.QMessageBox.Yes:
                     self.compare_file.setText(path_compare_excel)
-                    pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+                    pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'),
                                                path_compare_excel)
                     self.df_compare = pd.ExcelFile(pathToExcel)
                     self.comboBox_set_list_checked.clear()
@@ -259,7 +256,7 @@ class Page1(QtWidgets.QWizardPage, form_wizard_page_1.Ui_Form):
                     self.comboBox_set_list_checked.currentIndexChanged.emit(0)
             else:
                 self.compare_file.setText(path_compare_excel)
-                pathToExcel = os.path.join(os.path.join(os.getcwd(), '..', 'Source'),
+                pathToExcel = os.path.join(os.path.join(os.getcwd(), 'Source'),
                                            path_compare_excel)
                 self.df_compare = pd.ExcelFile(pathToExcel)
                 self.comboBox_set_list_checked.clear()
@@ -401,7 +398,6 @@ class Page2(QtWidgets.QWizardPage, form_wizard_page_2.Ui_Form):
             return True
 
 
-
 class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
     def __init__(self, parent=None, adapter=None):
         super().__init__(parent)
@@ -486,7 +482,8 @@ class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
         replace = source_column_editor_viewer.ReplaceRow(column_property=self.dict_pref,
                                                          parent=self.treeWidget_of_Source,
                                                          parent_widget=self.treeWidget_of_Source.currentItem().parent(),
-                                                         after_widget=self.treeWidget_of_Source.currentItem())
+                                                         after_widget=self.treeWidget_of_Source.currentItem(),
+                                                         adapter=self.adapter)
 
         self.treeWidget_of_Source.addTopLevelItem(replace)
         list(filter(lambda x: x['colName'].combo_box_name.currentText() ==
@@ -657,7 +654,6 @@ class Page6(QtWidgets.QWizardPage, form_wizard_page_6.Ui_Form):
             ,list_of_receiver_cols_links=self.wizard().page(3).list_of_receiver_cols_links
             ,pref_gui=self.wizard().page(0)
         )
-
         self.create_xml_save = CreateXML(self.obj)
         self.create_xml_save.started.connect(lambda: self.wizard().parent().ui.statusbar.showMessage('Creating XML...'))
         self.create_xml_save.message.connect(self.print_xml)
@@ -674,7 +670,7 @@ class Page6(QtWidgets.QWizardPage, form_wizard_page_6.Ui_Form):
 
     def validatePage(self) -> bool:
         path_to_save = QtWidgets.QFileDialog.getSaveFileName(
-            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+            directory=os.path.join(os.getcwd(), 'config'), filter='*.xml')
         if path_to_save[0] != '':
             self.wizard().parent().write_as_xml(self.tree, self.root, path=path_to_save[0])
             return True
@@ -730,7 +726,6 @@ class comboBox_list_for_Page3(QtWidgets.QComboBox):
         super().__init__(parent)
 
 
-
 class ev_filt(QtCore.QObject):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -755,7 +750,6 @@ class ev_filt(QtCore.QObject):
                 return False
         else:
             return QtCore.QObject.eventFilter(self, a0, a1)
-
 
 
 class ev_filt_of_Page3(QtCore.QObject):
@@ -801,6 +795,7 @@ class LinkedColumns(QtWidgets.QTreeWidgetItem):
         tree_widget.setItemWidget(self, 0, self.combo_box_source_links)
         tree_widget.setItemWidget(self, 1, self.combo_box_target_links)
 
+
 class ObjectToCreateXML:
     def __init__(self,
                  pref,
@@ -829,8 +824,4 @@ class ObjectToCreateXML:
                     id                          {id(self)}
                     """
 
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
-    w = WizardConfig(app)
-    w.show()
-    sys.exit(app.exec())
+

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>665</width>
+    <width>809</width>
     <height>432</height>
    </rect>
   </property>
@@ -18,8 +18,8 @@
     <rect>
      <x>350</x>
      <y>10</y>
-     <width>291</width>
-     <height>321</height>
+     <width>451</width>
+     <height>411</height>
     </rect>
    </property>
    <property name="frameShape">
@@ -33,7 +33,7 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>271</width>
+      <width>431</width>
       <height>41</height>
      </rect>
     </property>
@@ -52,7 +52,7 @@
      <rect>
       <x>10</x>
       <y>160</y>
-      <width>271</width>
+      <width>431</width>
       <height>41</height>
      </rect>
     </property>
@@ -78,7 +78,7 @@
      <rect>
       <x>10</x>
       <y>80</y>
-      <width>191</width>
+      <width>431</width>
       <height>31</height>
      </rect>
     </property>
@@ -95,10 +95,10 @@
    <widget class="QCheckBox" name="checkBox_both">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>130</y>
+      <x>360</x>
+      <y>119</y>
       <width>86</width>
-      <height>20</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="text">
@@ -110,8 +110,8 @@
      <rect>
       <x>10</x>
       <y>210</y>
-      <width>271</width>
-      <height>101</height>
+      <width>431</width>
+      <height>191</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="tree_widget_box"/>
@@ -140,7 +140,7 @@
      <rect>
       <x>10</x>
       <y>130</y>
-      <width>171</width>
+      <width>271</width>
       <height>21</height>
      </rect>
     </property>
@@ -359,7 +359,7 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>121</width>
+      <width>251</width>
       <height>31</height>
      </rect>
     </property>

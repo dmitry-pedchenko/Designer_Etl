@@ -1,9 +1,11 @@
 from PyQt5 import QtWidgets, QtCore
 import sys
+import os
+sys.path.append((os.getcwd()))
 from PyQt5.QtCore import pyqtSlot
 from GUI.gui_qt import main_window
 from GUI.Creators import source_column_editor_viewer, target_column_editor_viewer
-import os
+
 from Core.Parser.XML_parser import do_XML_parse as xml_parse
 from Core.Logger import Logger
 from GUI.Trees import Receiver_tree, Dict_tree, Source_tree
@@ -18,6 +20,14 @@ from GUI.DAO.connection_db import CreateConnection
 from GUI.Windows import easy_loader, gui_prefernces_controller, wizard_configuration
 from GUI.System.LanguageAdaptor import Adapter
 from GUI.gui_qt import db_connect_editor
+
+if getattr(sys, 'frozen', False):
+    # we are running in a bundle
+    frozen = 'ever so'
+    bundle_dir = sys._MEIPASS
+else:
+    # we are running in a normal Python environment
+    bundle_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -244,7 +254,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_as_edit_config(self):
         path_to_save = QtWidgets.QFileDialog.getSaveFileName(
-            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+            directory=os.path.join(os.getcwd(), 'config'), filter='*.xml')
         if path_to_save[0] != '':
             self.tab_widget_editor.path_to_save = path_to_save[0]
             self.tab_widget_editor.root.find(
@@ -282,7 +292,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def select_config_file(self):
 
         path_name_config = QtWidgets.QFileDialog.getOpenFileName(
-            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+            directory=os.path.join(os.getcwd(), 'config'), filter='*.xml')
         path = os.path.basename(path_name_config[0])
 
 
@@ -513,7 +523,7 @@ class MainWindow(QtWidgets.QMainWindow):
     @pyqtSlot(object)
     def created_connection(self, conn):
         self.ui.statusbar.showMessage(f"Connected to {self.config_dict['dbHost']}: {self.config_dict['dbBase']}")
-        self.setCursor(QtCore.Qt.ArrowCursor)
+        # self.setCursor(QtCore.Qt.ArrowCursor)
 
         self.ui.menuHello.setDisabled(False)
         self.ui.menuSystem.setDisabled(False)
@@ -528,13 +538,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.menuSystem.setDisabled(False)
 
         show_error_window(self, err)
+        self.connection_tread.terminate()
+        self.setCursor(QtCore.Qt.ArrowCursor)
         self.close_project_data()
-
-
+        self.ui.statusbar.showMessage(f'Connection failed.')
 
     def show_open_config(self):
         path_name_config = QtWidgets.QFileDialog.getOpenFileName(
-            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+            directory=os.path.join(os.getcwd(), 'config'), filter='*.xml')
         path = os.path.basename(path_name_config[0])
 
         if path:
@@ -642,7 +653,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def save_as_configuration(self):
         path_to_save = QtWidgets.QFileDialog.getSaveFileName(
-            directory=os.path.join(os.getcwd(), '..', 'config'), filter='*.xml')
+            directory=os.path.join(os.getcwd(), 'config'), filter='*.xml')
         if path_to_save[0] != '':
             self.path_to_save = path_to_save
             self.create_xml_save_as = CreateXML(self)
