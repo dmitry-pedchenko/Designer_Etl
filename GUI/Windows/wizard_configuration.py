@@ -13,6 +13,7 @@ import Core.DAO.DB_connector as db_con
 from Core.Logger import Logger
 from Core.Validate import Validate_res
 from GUI.Windows.alarm_window import show_alarm_window
+from GUI.Windows.error_window import show_error_window
 from GUI.Creators import source_column_editor_viewer, target_column_editor_viewer
 import copy
 from GUI.DAO.create_xml import CreateXML
@@ -366,7 +367,7 @@ class Page2(QtWidgets.QWizardPage, form_wizard_page_2.Ui_Form):
         super().__init__(parent)
         self.setupUi(self)
         self.adjustSize()
-        self.adapter=adapter
+        self.adapter = adapter
 
         self.label.setText(adapter.take_translate('pref_window', 'dbScheme'))
         self.label_receiver.setText(adapter.take_translate('pref_window', 'Target_table_name'))
@@ -463,7 +464,9 @@ class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
 
     def deleteColumn(self):
         if len(self.list_of_source_cols_links) > 1:
-            element = list(filter(lambda x: x['colName'].combo_box_name.currentText() == self.treeWidget_of_Source.currentItem().combo_box_name.currentText(), self.list_of_source_cols_links))[0]
+            element = list(filter(lambda x: x['colName'].unique_name ==
+                                            self.treeWidget_of_Source.currentItem().unique_name,
+                                  self.list_of_source_cols_links))[0]
             self.list_of_source_cols_links.remove(element)
             self.treeWidget_of_Source.takeTopLevelItem(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
         else:
@@ -508,6 +511,10 @@ class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
 
 
     def addColumnField(self):
+        for column in self.list_of_source_cols_links:
+            if column['colName'].combo_box_name.currentText() == '---':
+                show_alarm_window(self, "Select column name !!!")
+                return
         source_column_editor_viewer.create_input_column(
             tree_table=self.treeWidget_of_Source,
             db_colnames=self.colnames_in_receiver,
@@ -517,6 +524,23 @@ class Page3(QtWidgets.QWizardPage, form_wizard_page_3.Ui_Form):
             source_columnes=self.columns_in_source,
             adapter=self.adapter
             )
+    def validatePage(self) -> bool:
+        if not self.list_of_source_cols_links:
+            show_error_window(self, f"Create Source column !!!")
+            return False
+
+        for source_cols in self.list_of_source_cols_links:
+            if source_cols['colName'].combo_box_name.currentText() == '---':
+                show_error_window(self, f"Name of Source column equals '---' !!!")
+                return False
+            if source_cols['colType'].currentText() == '---':
+                show_error_window(self, f"Column type in Source column <{source_cols['colName'].combo_box_name.currentText()}> equals '---' !!!")
+                return False
+            if source_cols['colNameDb'].currentText() == '---':
+                show_error_window(self, f"Name of receiver column in Source column <{source_cols['colName'].combo_box_name.currentText()}> equals '---' !!!")
+                return False
+
+        return True
 
 
 
@@ -627,6 +651,33 @@ class Page5(QtWidgets.QWizardPage, form_wizard_page_5.Ui_Form):
         self.wizard().page(1).target_table_name.currentIndexChanged.connect(self.clear)
         self.wizard().page(0).excelFileName.textChanged.connect(self.clear)
         self.wizard().page(0).comboBox_list_source_excel.currentIndexChanged.connect(self.clear)
+
+    def validatePage(self) -> bool:
+        if not self.list_of_dict_pref:
+            show_error_window(self, f"Create dictionary table !!!")
+            return False
+        for dict in self.list_of_dict_pref:
+            if dict['dictTableName'].combo_box_dictTableName.currentText() == '---':
+                show_error_window(self, f"Name of Dict table equals '---' !!!")
+                return False
+            if dict['indxColumnDic'].combo_box_indxColumnDic.currentText() == '---':
+                show_error_window(self,
+                                  f"Name of index column in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                return False
+            for col in dict['columns']:
+                if col['colNameRow'].combo_box.currentText() == '---':
+                    show_error_window(self,
+                                      f"Name of Source column in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                    return False
+                if col['colTypeRow'].combo_box_colType.currentText() == '---':
+                    show_error_window(self,
+                                      f"Column type in Source column <{col['colName'].combo_box_name.currentText()}> in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                    return False
+                if col['colNameDbRow'].combo_box_colnameDb.currentText() == '---':
+                    show_error_window(self,
+                                      f"Name of receiver column in Source column <{col['colName'].combo_box_name.currentText()}> in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                    return False
+        return True
 
 
 

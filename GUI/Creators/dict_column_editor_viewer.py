@@ -200,6 +200,7 @@ def create_dict_column(
 
 
 class MainDictTableName(QtWidgets.QTreeWidgetItem):
+    iterator = 0
     def __init__(self, cur_dic_table_pref, parent, config, tables_in_receiver, adapter):
         super().__init__(parent, [adapter.take_translate('DictionaryEditor', 'table'), ])
         self.cur_dic_table_pref = cur_dic_table_pref
@@ -208,6 +209,8 @@ class MainDictTableName(QtWidgets.QTreeWidgetItem):
         self.combo_box_dictTableName = QtWidgets.QComboBox()
         self.combo_box_dictTableName.addItems(sorted(list_combo_box_dictTableName))
         self.combo_box_dictTableName.addItem('---')
+        self.unique_name = f"{MainDictTableName}_{MainDictTableName.iterator}"
+        MainDictTableName.iterator = MainDictTableName.iterator + 1
 
         if cur_dic_table_pref['dictTableName']:
             self.combo_box_dictTableName.setCurrentIndex(sorted(list_combo_box_dictTableName).index(cur_dic_table_pref['dictTableName']))
@@ -317,6 +320,7 @@ class ColTypeRow(QtWidgets.QTreeWidgetItem):
 
 
 class ColumnNameRow(QtWidgets.QTreeWidgetItem):
+    iterator = 0
     def __init__(self, column_property, parent, tree_widget, columns_names_source, after_widget=None, adapter=None):
         super().__init__(parent, after_widget)
         self.label = QtWidgets.QLabel(adapter.take_translate('SourceColumnsConfigEditor', 'colName'))
@@ -324,6 +328,8 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
         self.combo_box = QtWidgets.QComboBox()
         self.combo_box.addItems(list_combo_box_dictTableName)
         self.objectName = 'colName'
+        self.unique_name = f"{ColumnNameRow}_{ColumnNameRow.iterator}"
+        ColumnNameRow.iterator = ColumnNameRow.iterator + 1
         if column_property['colName']:
             self.combo_box.setCurrentIndex(list_combo_box_dictTableName.index(column_property['colName']))
         else:

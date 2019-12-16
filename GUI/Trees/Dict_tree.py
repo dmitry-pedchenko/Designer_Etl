@@ -126,7 +126,7 @@ class DictTree(QtWidgets.QTreeWidget):
             return
 
         cur_line = list(
-            filter(lambda x: x['colNameRow'].combo_box.currentText() == self.currentItem().combo_box.currentText(),
+            filter(lambda x: x['colNameRow'].unique_name == self.currentItem().unique_name,
                     cur_table))[0]
 
         cur_table.remove(cur_line)
@@ -327,7 +327,7 @@ class DictTree(QtWidgets.QTreeWidget):
     def delete_table_dict(self):
         if len(self.list_of_dict_pref) > 1:
             cur_column = list(
-                filter(lambda x: x['dictTableName'].combo_box_dictTableName.currentText() == self.currentItem().combo_box_dictTableName.currentText(),
+                filter(lambda x: x['dictTableName'].unique_name == self.currentItem().unique_name,
                        self.list_of_dict_pref)
             )[0]
         else:

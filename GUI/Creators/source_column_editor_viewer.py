@@ -39,9 +39,6 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
     else:
         raise SystemError('Unknown state')
 
-
-    #
-    # create tree widget item
     if column_property['colNameDb']:
         combo_box_dbName.setCurrentIndex(db_colnames.index(column_property['colNameDb']))
     else:
@@ -119,8 +116,6 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
     tree_table.setItemWidget(colType_box, 1, combo_box_colType)
     tree_table.setItemWidget(isPK_box, 1, combo_box_isPk)
 
-
-
     dic['colName'] = colName_box
     dic['isPK'] = combo_box_isPk
     dic['colType'] = combo_box_colType
@@ -141,6 +136,7 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
 
 
 class ColumnNameRow(QtWidgets.QTreeWidgetItem):
+    iterator=0
     def __init__(self, column_property, arr_of_db_columns, tree_widget, adapter):
         super().__init__(tree_widget, [adapter.take_translate('SourceColumnsConfigEditor', 'colName'), ])
         self.combo_box_name = QtWidgets.QComboBox()
@@ -148,6 +144,8 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
         self.combo_box_name.addItems(arr_of_db_columns)
         self.combo_box_name.addItem('---')
         self.objectName = "colName"
+        self.unique_name = f"{ColumnNameRow}_{ColumnNameRow.iterator}"
+        ColumnNameRow.iterator = ColumnNameRow.iterator + 1
 
         if column_property['colName']:
             self.combo_box_name.setCurrentIndex(arr_of_db_columns.index(column_property['colName']))

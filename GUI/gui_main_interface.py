@@ -466,8 +466,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def deleteColumn(self):
         if len(self.list_of_source_cols_links) > 1:
-            element = list(filter(lambda x: x['colName'].combo_box_name.currentText() ==
-                                            self.treeWidget_of_Source.currentItem().combo_box_name.currentText(),
+            element = list(filter(lambda x: x['colName'].unique_name ==
+                                            self.treeWidget_of_Source.currentItem().unique_name,
                                   self.list_of_source_cols_links))[0]
             self.list_of_source_cols_links.remove(element)
             self.treeWidget_of_Source.takeTopLevelItem(self.treeWidget_of_Source.indexFromItem(self.treeWidget_of_Source.currentItem()).row())
@@ -637,6 +637,39 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.list_of_source_cols_links))[0]['replace_box'].append(replace)
 
     def save_configuration(self):
+        for source_cols in self.list_of_source_cols_links:
+            if source_cols['colName'].combo_box_name.currentText() == '---':
+                show_error_window(self, f"Name of Source column equals '---' !!!")
+                return
+            if source_cols['colType'].currentText() == '---':
+                show_error_window(self, f"Column type in Source column <{source_cols['colName'].combo_box_name.currentText()}> equals '---' !!!")
+                return
+            if source_cols['colNameDb'].currentText() == '---':
+                show_error_window(self, f"Name of receiver column in Source column <{source_cols['colName'].combo_box_name.currentText()}> equals '---' !!!")
+                return
+
+        if self.ui.actionDictionary.isChecked():
+            for dict in self.list_of_dict_pref:
+                if dict['dictTableName'].combo_box_dictTableName.currentText() == '---':
+                    show_error_window(self, f"Name of Dict table equals '---' !!!")
+                    return
+                if dict['indxColumnDic'].combo_box_indxColumnDic.currentText() == '---':
+                    show_error_window(self, f"Name of index column in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                    return
+                for col in dict['columns']:
+                    if col['colNameRow'].combo_box.currentText() == '---':
+                        show_error_window(self, f"Name of Source column in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                        return
+                    if col['colTypeRow'].combo_box_colType.currentText() == '---':
+                        show_error_window(self,
+                                          f"Column type in Source column <{col['colName'].combo_box_name.currentText()}> in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                        return
+                    if col['colNameDbRow'].combo_box_colnameDb.currentText() == '---':
+                        show_error_window(self,
+                                          f"Name of receiver column in Source column <{col['colName'].combo_box_name.currentText()}> in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                        return
+
+
 
         result = QtWidgets.QMessageBox.question(self,
                                                 f"Save file ?",
@@ -654,6 +687,36 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def save_as_configuration(self):
+        for source_cols in self.list_of_source_cols_links:
+            if source_cols['colName'].combo_box_name.currentText() == '---':
+                show_error_window(self, f"Name of Source column equals '---' !!!")
+                return
+            if source_cols['colType'].currentText() == '---':
+                show_error_window(self, f"Column type in Source column {source_cols['colName'].combo_box_name.currentText()} equals '---' !!!")
+                return
+            if source_cols['colNameDb'].currentText() == '---':
+                show_error_window(self, f"Name of receiver column in Source column {source_cols['colName'].combo_box_name.currentText()} equals '---' !!!")
+                return
+        if self.ui.actionDictionary.isChecked():
+            for dict in self.list_of_dict_pref:
+                if dict['dictTableName'].combo_box_dictTableName.currentText() == '---':
+                    show_error_window(self, f"Name of Dict table equals '---' !!!")
+                    return
+                if dict['indxColumnDic'].combo_box_indxColumnDic.currentText() == '---':
+                    show_error_window(self, f"Name of index column in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                    return
+                for col in dict['columns']:
+                    if col['colNameRow'].combo_box.currentText() == '---':
+                        show_error_window(self, f"Name of Source column in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                        return
+                    if col['colTypeRow'].combo_box_colType.currentText() == '---':
+                        show_error_window(self,
+                                          f"Column type in Source column <{col['colName'].combo_box_name.currentText()}> in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                        return
+                    if col['colNameDbRow'].combo_box_colnameDb.currentText() == '---':
+                        show_error_window(self,
+                                          f"Name of receiver column in Source column <{col['colName'].combo_box_name.currentText()}> in Dictionary table <'{dict['dictTableName'].combo_box_dictTableName.currentText()}'> equals '---' !!!")
+                        return
         path_to_save = QtWidgets.QFileDialog.getSaveFileName(
             directory=os.path.join(os.getcwd(), 'config'), filter='*.xml')
         if path_to_save[0] != '':
