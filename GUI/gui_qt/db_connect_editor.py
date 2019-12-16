@@ -13,9 +13,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(877, 432)
+        Form.resize(1051, 432)
         self.frame = QtWidgets.QFrame(Form)
-        self.frame.setGeometry(QtCore.QRect(210, 20, 371, 401))
+        self.frame.setGeometry(QtCore.QRect(340, 20, 371, 401))
         self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setObjectName("frame")
@@ -150,13 +150,13 @@ class Ui_Form(object):
         self.horizontalLayout_4.addLayout(self.horizontalLayout_14)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.pushButton_Open = QtWidgets.QPushButton(Form)
-        self.pushButton_Open.setGeometry(QtCore.QRect(640, 20, 112, 32))
+        self.pushButton_Open.setGeometry(QtCore.QRect(770, 20, 112, 32))
         self.pushButton_Open.setObjectName("pushButton_Open")
         self.pushButton_Save = QtWidgets.QPushButton(Form)
-        self.pushButton_Save.setGeometry(QtCore.QRect(640, 60, 112, 32))
+        self.pushButton_Save.setGeometry(QtCore.QRect(770, 60, 112, 32))
         self.pushButton_Save.setObjectName("pushButton_Save")
         self.pushButton_SaveAs = QtWidgets.QPushButton(Form)
-        self.pushButton_SaveAs.setGeometry(QtCore.QRect(640, 100, 112, 32))
+        self.pushButton_SaveAs.setGeometry(QtCore.QRect(770, 100, 112, 32))
         self.pushButton_SaveAs.setObjectName("pushButton_SaveAs")
 
         self.retranslateUi(Form)
