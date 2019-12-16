@@ -5,6 +5,7 @@ import platform
 import subprocess
 from Core.Main_excel_parser import MainLoader
 from GUI.Windows import alarm_window
+from GUI.Windows.alarm_window import show_alarm_window
 
 
 class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
@@ -33,6 +34,8 @@ class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
 
         for i in os.listdir(os.path.join(currentPath, 'config')):
             self.comboBox.addItem(i)
+        self.comboBox.addItem('---')
+        self.comboBox.setCurrentText('---')
 
         self.pushButton_logs.clicked.connect(self.open_logs)
         self.radioButton.toggled.connect(self.check1)
@@ -63,10 +66,14 @@ class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
             subprocess.Popen(["xdg-open", path])
 
     def on_start(self, config_path, mode):
+        if self.comboBox.currentText() == '---':
+            show_alarm_window(self, 'Select configuration file !!!')
+            return
+
         self.text_edit_debug.clear()
         self.text_edit_log.clear()
 
-        self.loader = MainLoader(path=config_path, mode=mode,parent=self)
+        self.loader = MainLoader(path=config_path, mode=mode, parent=self)
         self.loader.pyqt_signal_debug.connect(self.write_debug)
         self.loader.pyqt_signal_log.connect(self.write_log)
         self.loader.pyqt_signal_error.connect(self.show_message)

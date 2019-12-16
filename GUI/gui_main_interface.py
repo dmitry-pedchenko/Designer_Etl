@@ -563,6 +563,7 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as e:
                 show_error_window(self, e)
                 self.close_project_data()
+                self.setCursor(QtCore.Qt.ArrowCursor)
                 return
 
             self.connection_tread.start()

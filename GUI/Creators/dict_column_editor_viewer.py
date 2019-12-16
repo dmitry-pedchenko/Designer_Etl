@@ -86,7 +86,21 @@ def create_dict_column(
                 after_widget=dict_pref_indxColumnDic,
                 adapter=adapter
             )
-            colNameDbRow = ColumnNameDbRow(row, colNameRow, parent, columns_in_receiver=columns_in_receiver, adapter=adapter)
+            colNameDbRow = ColumnNameDbRow(
+                                    row,
+                                    colNameRow,
+                                    parent,
+                                    columns_in_receiver=columns_in_db_dict,
+                                    adapter=adapter,
+                                    table_name=main_row.combo_box_dictTableName,
+                                    validator=validator,
+                                    dbtype=dbtype,
+                                    db_base=db_base,
+                                    connector=connector,
+                                    executor=executor,
+                                    cur=cur,
+                                    loggerInst=loggerInst
+            )
             colTypeRow = ColTypeRow(row, colNameRow, tree_widget=parent, adapter=adapter)
             cropEndRow = CropEndRow(row, parent, colNameRow, adapter)
             addValueEndRow = AddValueEndRow(row, parent, colNameRow, adapter)
@@ -157,7 +171,20 @@ def create_dict_column(
             columns_names_source=columns_names_source,
             after_widget=dict_pref_indxColumnDic,
             adapter=adapter)
-        colNameDbRow = ColumnNameDbRow(cur_dic_table_pref, colNameRow, parent, columns_in_receiver=columns_in_receiver, adapter=adapter)
+        colNameDbRow = ColumnNameDbRow(
+            cur_dic_table_pref,
+            colNameRow,
+            parent,
+            columns_in_receiver=columns_in_db_dict,
+            adapter=adapter,
+            table_name=main_row.combo_box_dictTableName,
+            validator=validator,
+            dbtype=dbtype,
+            db_base=db_base,
+            connector=connector,
+            executor=executor,
+            cur=cur,
+            loggerInst=loggerInst)
         colTypeRow = ColTypeRow(cur_dic_table_pref, colNameRow, tree_widget=parent, adapter=adapter)
         cropEndRow = CropEndRow(cur_dic_table_pref, parent, colNameRow, adapter)
         addValueEndRow = AddValueEndRow(cur_dic_table_pref, parent, colNameRow, adapter)
@@ -341,14 +368,64 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
 
 
 class ColumnNameDbRow(QtWidgets.QTreeWidgetItem):
-    def __init__(self, column_property, parent, tree_widget, columns_in_receiver, adapter):
+    def __init__(self,
+                 column_property,
+                 parent,
+                 tree_widget,
+                 columns_in_receiver,
+                 adapter,
+                 table_name,
+                 validator,
+                 dbtype,
+                 db_base,
+                 connector,
+                 executor,
+                 cur,
+                 loggerInst
+                 ):
         super().__init__(parent, [adapter.take_translate('SourceColumnsConfigEditor', 'colNameDb'), ])
-        list_colname_in_db_dict = [i[0] for i in columns_in_receiver]
+
         self.combo_box_colnameDb = QtWidgets.QComboBox()
-        self.combo_box_colnameDb.addItems(list_colname_in_db_dict)
+        self.validator = validator
+        self.dbtype = dbtype
+        self.dbBase = db_base
+        self.connector = connector
+        self.executor = executor
+        self.cur = cur
+        self.loggerInst = loggerInst
+        self.table_name=table_name
+        if columns_in_receiver:
+            list_colname_in_db_dict = [i[0] for i in columns_in_receiver]
+            self.combo_box_colnameDb.addItems(list_colname_in_db_dict)
+
         if column_property['colNameDb']:
             self.combo_box_colnameDb.setCurrentIndex(list_colname_in_db_dict.index(column_property['colNameDb']))
+        else:
+            self.combo_box_colnameDb.addItem('---')
+            self.combo_box_colnameDb.setCurrentText('---')
         tree_widget.setItemWidget(self, 1, self.combo_box_colnameDb)
+
+        self.table_name.currentTextChanged.connect(self.cur_table_change)
+
+    def cur_table_change(self, name):
+        if not isinstance(self.validator, type):
+            col_names_in_db_dict = self.validator.queryForColumnsInDict(f'{name}')
+        else:
+            col_names_in_db_dict = self.validator.queryForColumnsInDict_edit(
+                dict_table_name=f"{name}",
+                dbtype=self.dbtype,
+                dbBase=self.dbBase,
+                connector=self.connector,
+                exec=self.executor,
+                cur=self.cur,
+                loggerInst=self.loggerInst
+            )
+
+        list_indxColumnDic = [i[0] for i in col_names_in_db_dict]
+
+        while self.combo_box_colnameDb.count() > 0:
+            self.combo_box_colnameDb.removeItem(0)
+        self.combo_box_colnameDb.addItems(list_indxColumnDic)
 
 
 class CropEndRow(QtWidgets.QTreeWidgetItem):

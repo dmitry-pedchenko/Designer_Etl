@@ -3,6 +3,7 @@ from GUI.Creators.dict_column_editor_viewer import create_dict_column
 from GUI.Creators import dict_column_editor_viewer
 from GUI.Windows.alarm_window import show_alarm_window
 
+
 class DictTree(QtWidgets.QTreeWidget):
     def __init__(
             self,
@@ -133,9 +134,12 @@ class DictTree(QtWidgets.QTreeWidget):
 
         self.currentItem().parent().takeChild(self.indexFromItem(self.currentItem()).row())
 
-
-
     def add_column(self):
+
+        if not self.itemWidget(self.currentItem().parent(), 1).currentText():
+            show_alarm_window(self, 'Select a table !!!')
+            return
+
         dict_to_add = {}
 
         cur_table = list(
@@ -148,7 +152,6 @@ class DictTree(QtWidgets.QTreeWidget):
             if column['colNameRow'].combo_box.currentText() == '---':
                 show_alarm_window(self, "Select column name !!!")
                 return
-
 
         new_colName = dict_column_editor_viewer.ColumnNameRow(
             column_property=self.dict_pref,
@@ -166,7 +169,16 @@ class DictTree(QtWidgets.QTreeWidget):
                 parent=new_colName,
                 tree_widget=self,
                 columns_in_receiver=self.validator.queryForColumns(),
-                adapter=self.adapter)
+                adapter=self.adapter,
+                table_name=self.itemWidget(self.currentItem().parent(), 1),
+                validator=self.validator,
+                dbtype=self.dbtype,
+                db_base=self.db_base,
+                connector=self.connector,
+                executor=self.executor,
+                cur=self.cur,
+                loggerInst=self.loggerInst
+            )
         else:
             colNameDbRow = dict_column_editor_viewer.ColumnNameDbRow(
                 column_property=self.dict_pref,
@@ -174,14 +186,23 @@ class DictTree(QtWidgets.QTreeWidget):
                 tree_widget=self,
                 columns_in_receiver=self.validator.queryForColumns_edit(
                     dbtype=self.dbtype,
-                    target_table=self.target_table,
+                    target_table=self.itemWidget(self.currentItem().parent(), 1).currentText(),
                     db_base=self.db_base,
                     connector=self.connector,
                     executor=self.executor,
                     cur=self.cur,
                     loggerInst=self.loggerInst,
                 ),
-                adapter=self.adapter)
+                adapter=self.adapter,
+                table_name=self.itemWidget(self.currentItem().parent(), 1),
+                validator=self.validator,
+                dbtype=self.dbtype,
+                db_base=self.db_base,
+                connector=self.connector,
+                executor=self.executor,
+                cur=self.cur,
+                loggerInst=self.loggerInst
+                )
 
         colTypeRow = dict_column_editor_viewer.ColTypeRow(
             cur_dic_table_pref=self.dict_pref,
@@ -323,7 +344,6 @@ class DictTree(QtWidgets.QTreeWidget):
                                adapter=self.adapter
                                )
 
-
     def delete_table_dict(self):
         if len(self.list_of_dict_pref) > 1:
             cur_column = list(
@@ -335,12 +355,3 @@ class DictTree(QtWidgets.QTreeWidget):
             return
         self.list_of_dict_pref.remove(cur_column)
         self.takeTopLevelItem(self.indexFromItem(self.currentItem()).row())
-
-
-
-
-
-
-
-
-
