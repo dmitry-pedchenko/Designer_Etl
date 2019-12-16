@@ -41,7 +41,15 @@ class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
         self.radioButton.toggled.connect(self.check1)
         self.radioButton_2.toggled.connect(self.check2)
         self.comboBox.activated.connect(self.on_combox)
-        self.pushButton_start.clicked.connect(lambda: self.on_start(config_path=self.config_path, mode=self.mode))
+        self.pushButton_start.clicked.connect(self.pre_on_start)
+
+    def pre_on_start(self):
+        if self.comboBox.currentText() == '---':
+            show_alarm_window(self, 'Select configuration file !!!')
+            return
+        else:
+            self.on_start(config_path=self.config_path, mode=self.mode)
+
 
     def on_combox(self):
         self.config_path = self.comboBox.currentText()
@@ -66,10 +74,6 @@ class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
             subprocess.Popen(["xdg-open", path])
 
     def on_start(self, config_path, mode):
-        if self.comboBox.currentText() == '---':
-            show_alarm_window(self, 'Select configuration file !!!')
-            return
-
         self.text_edit_debug.clear()
         self.text_edit_log.clear()
 
