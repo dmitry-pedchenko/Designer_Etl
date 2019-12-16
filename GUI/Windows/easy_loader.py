@@ -21,9 +21,12 @@ class EasyLoader(QtWidgets.QWidget, loader.Ui_Form):
         self.text_edit_log = QtWidgets.QTextEdit(self.Log)
         self.text_edit_log.setGeometry(QtCore.QRect(0, 0, 961, 401))
         self.text_edit_log.setReadOnly(True)
+        self.text_edit_log.setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
         self.text_edit_debug = QtWidgets.QTextEdit(self.Debug)
         self.text_edit_debug.setGeometry(QtCore.QRect(0, 0, 961, 401))
         self.text_edit_debug.setReadOnly(True)
+        self.text_edit_debug.setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
+
 
         currentPath = os.getcwd()
         self.log_path = os.path.join(currentPath, 'log')

@@ -31,7 +31,7 @@ class WizardConfig(QtWidgets.QWizard):
         self.setPage(RoadMapConfiguration.dictionary, Page5(self, adapter=adapter))
         self.setPage(RoadMapConfiguration.final_page, Page6(self, adapter=adapter))
 
-        self.resize(900, 700)
+        self.resize(978, 700)
 
     def closeEvent(self, e):
         answer = QtWidgets.QMessageBox.question(self,
