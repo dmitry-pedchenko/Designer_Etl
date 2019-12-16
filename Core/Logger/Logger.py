@@ -181,7 +181,7 @@ class Log_info():
         self.err_str = t.substitute(num=errNum, message=message_temp)
         self.logger.error(t.substitute(num=errNum, message=message_temp))
 
-        if os.path.basename(sys.argv[0]) != 'gui_main_interface.py':
+        if os.path.basename(sys.argv[0]) != 'gui_main_interface.py':  # 'gui_main_interface.exe' if for Windows
             raise SystemExit(1)
         else:
             if self.signal_debug:
