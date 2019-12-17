@@ -6,7 +6,7 @@ from Core.Logger import Logger
 from Core.Validate import Validate_res
 from Core.Query import Query_creator as qc
 from Core.DAO import XML_DAO as xpc
-from Core.Parser.Opt_parser import Opts
+from Core.Parser.Opt_parser import Opts as Opt
 from Core.DAO.DB_connector import Connection as con
 from PyQt5 import QtCore
 
@@ -21,8 +21,8 @@ class Args:
 
 
 class MainLoader(QtCore.QThread):
-    pyqt_signal_debug = QtCore.pyqtSignal(object)
-    pyqt_signal_log = QtCore.pyqtSignal(object)
+    pyqt_signal_debug = QtCore.pyqtSignal(str)
+    pyqt_signal_log = QtCore.pyqtSignal(str)
     pyqt_signal_error = QtCore.pyqtSignal(str)
 
     def __init__(self, path, mode, parent=None):
@@ -31,43 +31,62 @@ class MainLoader(QtCore.QThread):
         self.opts = Opts(mode)
 
     def run(self):
-        # opts = Opts()
-
         connector = None
 
         for pathToConfigXML in self.path:
-            loggerInst = Logger.Log_info(
-                pathToConfigXML,
-                self.path,
-                signal_debug=self.pyqt_signal_debug,
-                signal_log=self.pyqt_signal_log
-            )
-            loggerInst.set_config(pathToConfigXML)
-            loggerInst.raiseInfo(4)
-            dbService = xpc.XmlParser(pathToConfigXML, loggerInst, self.opts)
+            try:
+                loggerInst = Logger.Log_info(
+                    pathToConfigXML,
+                    self.path,
+                    signal_debug=self.pyqt_signal_debug,
+                    signal_log=self.pyqt_signal_log,
+                    signal_error=self.pyqt_signal_error
+                )
+                loggerInst.set_config(pathToConfigXML)
+                loggerInst.raiseInfo(4)
+                dbService = xpc.XmlParser(pathToConfigXML, loggerInst, self.opts)
 
-            connector = con.get_instance(loggerInst)
-            connector.connectToTheDB(
-                                     dbService.dictionary["dbHost"],
-                                     dbService.dictionary["dbUser"],
-                                     dbService.dictionary["dbPass"],
-                                     dbService.dictionary["dbBase"],
-                                     dbService.dictionary["dbPort"],
-                                     dbService.dictionary["dbtype"])
+                connector = con.get_instance(loggerInst)
+            except Exception as e:
+                self.pyqt_signal_error.emit(e.args[0])
+                return
+            try:
+                connector.connectToTheDB(
+                                         dbService.dictionary["dbHost"],
+                                         dbService.dictionary["dbUser"],
+                                         dbService.dictionary["dbPass"],
+                                         dbService.dictionary["dbBase"],
+                                         dbService.dictionary["dbPort"],
+                                         dbService.dictionary["dbtype"])
+            except Exception as e:
+                self.pyqt_signal_error.emit(e.args[0])
+                return
 
             validator = Validate_res.Validate(dbService, loggerInst, self.opts, connector)
-            validator.validate()
+
+            try:
+                validator.validate()
+            except Exception as e:
+                self.pyqt_signal_error.emit(e.args[0])
+                return
 
             if dbService.dictionary['checkMode_value'] == 'true':
                 connector.closeConnect()
                 loggerInst.raiseInfo(7)
                 break
 
-            queryService = qc.Query(dbService, loggerInst, self.opts, connector)
+            try:
+                queryService = qc.Query(dbService, loggerInst, self.opts, connector)
+            except Exception as e:
+                self.pyqt_signal_error.emit(e.args[0])
+                return
+
+
             try:
                 queryService.execAllQueries()
             except Exception as e:
-                self.pyqt_signal_error.emit(f'Error at execution:\n{e}')
+                self.pyqt_signal_error.emit(f'Error at execution. Please check column configurations.\n---\n{e}')
+                return
             loggerInst.raiseInfo(7)
 
         if connector:
@@ -76,7 +95,7 @@ class MainLoader(QtCore.QThread):
 
 if __name__ == '__main__':
 
-    opts = Opts()
+    opts = Opt()
 
     connector = None
 

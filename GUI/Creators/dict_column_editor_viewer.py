@@ -676,6 +676,10 @@ class ReplaceRow(QtWidgets.QTreeWidgetItem):
                     self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Unchecked)
                     self.line_edit_addBegin_Both.setDisabled(True)
                     self.line_edit_addEnd_Both.setDisabled(True)
+            else:
+                self.checkBox_widget_for_replace_check.setCheckState(QtCore.Qt.Unchecked)
+                self.line_edit_addBegin_Both.setDisabled(True)
+                self.line_edit_addEnd_Both.setDisabled(True)
 
     def state_change(self):
         if self.checkBox_widget_for_replace_check.isChecked():

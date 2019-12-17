@@ -19,7 +19,7 @@
      <x>122</x>
      <y>12</y>
      <width>311</width>
-     <height>101</height>
+     <height>141</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -36,7 +36,7 @@
            <x>10</x>
            <y>30</y>
            <width>268</width>
-           <height>20</height>
+           <height>41</height>
           </rect>
          </property>
          <property name="text">
@@ -47,9 +47,9 @@
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>60</y>
+           <y>80</y>
            <width>268</width>
-           <height>20</height>
+           <height>51</height>
           </rect>
          </property>
          <property name="text">

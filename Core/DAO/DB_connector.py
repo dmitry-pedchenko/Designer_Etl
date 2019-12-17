@@ -22,8 +22,9 @@ class Connection:
                     self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
                     self.cursor = self.conn.cursor()
                     self.connection_arr.append({'dbtype': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
-                except:
+                except Exception:
                     self.log.raiseError(18, host, dbname, user, port)
+                    return
 
             if dbtype == 'mysql':
                 try:
@@ -31,8 +32,9 @@ class Connection:
                                                         database=dbname)
                     self.cursor = self.conn.cursor()
                     self.connection_arr.append({'dbtype': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
-                except:
+                except Exception:
                     self.log.raiseError(18, host, dbname, user, port)
+                    return
         else:
             if dbtype in [x['dbtype'] for x in self.connection_arr]:
                 self.conn = list(filter(lambda x: x['dbtype'] == dbtype ,self.connection_arr))[0]['conn']
@@ -43,8 +45,9 @@ class Connection:
                         self.conn = p.connect(host=host, port=port, user=user, password=password, database=dbname)
                         self.cursor = self.conn.cursor()
                         self.connection_arr.append({'dbtype': 'mssql', 'conn': self.conn, 'cursor': self.cursor})
-                    except:
+                    except Exception:
                         self.log.raiseError(18, host, dbname, user, port)
+                        return
 
                 if dbtype == 'mysql':
                     try:
@@ -52,8 +55,9 @@ class Connection:
                                                             database=dbname)
                         self.cursor = self.conn.cursor()
                         self.connection_arr.append({'dbtype': 'mysql', 'conn': self.conn, 'cursor': self.cursor})
-                    except:
+                    except Exception:
                         self.log.raiseError(18, host, dbname, user, port)
+                        return
         self.log.raiseInfo(2, host, port, dbname)
 
     def closeConnect(self):

@@ -12,9 +12,9 @@ class Log_info():
     debug_stat_dict = {}  # список дебага в формате сообщение : количество сообщений
 
     @classmethod
-    def getInstance(cls, pathToConfigXML=None, configs_list=None, signal_debug=None, signal_log=None):
+    def getInstance(cls, pathToConfigXML=None, configs_list=None, signal_debug=None, signal_log=None, signal_error=None):
         if not cls.__instance:
-            cls.__instance = Log_info(pathToConfigXML, configs_list, signal_debug, signal_log)
+            cls.__instance = Log_info(pathToConfigXML, configs_list, signal_debug, signal_log, signal_error)
         return cls.__instance
 
     def set_config(self, pathToConfigXML):
@@ -23,12 +23,12 @@ class Log_info():
         elif self.__config != pathToConfigXML:
             self.__config = pathToConfigXML
 
-    def __init__(self, pathToConfigXML, configs_list, signal_debug=None, signal_log=None):
-        # super().__init__(self)
+    def __init__(self, pathToConfigXML, configs_list, signal_debug=None, signal_log=None, signal_error=None):
         self.getLogger(configs_list)
         self.set_config(pathToConfigXML)
         self.signal_debug = signal_debug
         self.signal_log = signal_log
+        self.signal_error = signal_error
 
     def getLogger(self, configs_list):
         currentPath = os.getcwd()
@@ -181,11 +181,13 @@ class Log_info():
         self.err_str = t.substitute(num=errNum, message=message_temp)
         self.logger.error(t.substitute(num=errNum, message=message_temp))
 
-        if os.path.basename(sys.argv[0]) != 'gui_main_interface.py':  # 'gui_main_interface.exe' if for Windows
+        if os.path.basename(sys.argv[0]) != 'gui_main_interface.exe':  # 'gui_main_interface.exe' if for Windows
             raise SystemExit(1)
         else:
-            if self.signal_debug:
+            if self.signal_error:
+                # self.signal_error.emit(t.substitute(num=errNum, message=message_temp))
                 self.signal_debug.emit(t.substitute(num=errNum, message=message_temp))
+                self.signal_log.emit(t.substitute(num=errNum, message=message_temp))
             raise ThrowExc(t.substitute(num=errNum, message=message_temp))
 
     def raiseInfo(self, info_num, *message):

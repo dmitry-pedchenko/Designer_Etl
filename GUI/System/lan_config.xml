@@ -74,6 +74,8 @@
             <ConfigName>Имя файла конфигурации:</ConfigName>
             <LogsFolder>Папка логов</LogsFolder>
             <Start>Начать загрузку</Start>
+            <Test>Начать тестирование</Test>
+
         </EasyLoader>
         <Wizard>
             <Page3Label>Поля в источнике</Page3Label>
@@ -157,6 +159,7 @@
             <ConfigName>Config name</ConfigName>
             <LogsFolder>Log folder</LogsFolder>
             <Start>Load</Start>
+            <Test>Test</Test>
         </EasyLoader>
         <Wizard>
             <Page3Label>Source columns</Page3Label>

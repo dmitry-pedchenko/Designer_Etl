@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 import os
 sys.path.append((os.getcwd()))
@@ -549,16 +549,16 @@ class MainWindow(QtWidgets.QMainWindow):
         path = os.path.basename(path_name_config[0])
 
         if path:
-            self.path_name_config = path_name_config
-            self.path = path
-            self.close_project_data()
-            self.setWindowTitle(f"Easy Loader [{self.path}]")
-            self.ui.actionConfig_Editor.setChecked(True)
-            self.ui.actionConfig_Editor.triggered.emit(1)
-            self.loggerInst = Logger.Log_info.getInstance(self.path, self.path)
-            self.loggerInst.set_config(self.path)
-
             try:
+                self.path_name_config = path_name_config
+                self.path = path
+                self.close_project_data()
+                self.setWindowTitle(f"Easy Loader [{self.path}]")
+                self.ui.actionConfig_Editor.setChecked(True)
+                self.ui.actionConfig_Editor.triggered.emit(1)
+                self.loggerInst = Logger.Log_info.getInstance(self.path, self.path)
+                self.loggerInst.set_config(self.path)
+
                 self.config_dict = xml_parse(self.path, self.loggerInst)
             except Exception as e:
                 show_error_window(self, e)
@@ -575,29 +575,46 @@ class MainWindow(QtWidgets.QMainWindow):
             show_error_window(self, f"Can't parse Excel file\n{e} !!!")
             self.close_project_data()
             return
+        try:
+            self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=self.connector)
+            self.columns_in_db = self.validator.queryForColumns()
+            self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
+            self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
+            self.tables_in_receiver = [i[0] for i in self.validator.queryForTableInDbList()]
+            self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
+        except Exception as e:
+            show_error_window(self, f"{e}")
+            self.close_project_data()
+            return
 
-        self.validator = Validate_res.Validate(self.dbService, self.loggerInst, opts=None, connector=self.connector)
-        self.columns_in_db = self.validator.queryForColumns()
-        self.columns_in_source = [i for i in self.dbService.dataFrame.columns.values]
-        self.colnames_of_receiver = [i[0] for i in self.columns_in_db]
-        self.tables_in_receiver = [i[0] for i in self.validator.queryForTableInDbList()]
-        self.schemas_in_db = [i[0] for i in self.validator.queryForSchemasInDb()]
+        try:
+            for col in self.config_dict['excelColumns']:
+                source_column_editor_viewer.create_input_column(tree_table=self.treeWidget_of_Source,
+                                                                db_colnames=self.colnames_of_receiver,
+                                                                column_property=col,
+                                                                list_of_cols=self.list_of_source_cols_links,
+                                                                source_columnes=self.columns_in_source,
+                                                                adapter=self.adapter
+                                                                )
+        except Exception:
+            show_error_window(self, 'Error at creating input columns.')
+            self.close_project_data()
+            self.setCursor(QtCore.Qt.ArrowCursor)
+            return
 
-        for col in self.config_dict['excelColumns']:
-            source_column_editor_viewer.create_input_column(tree_table=self.treeWidget_of_Source,
-                                                            db_colnames=self.colnames_of_receiver,
-                                                            column_property=col,
-                                                            list_of_cols=self.list_of_source_cols_links,
-                                                            source_columnes=self.columns_in_source,
-                                                            adapter=self.adapter
-                                                            )
-        for col in self.config_dict['dbColumns']:
-            target_column_editor_viewer.create_receiver_column(
-                tree_table=self.treeWidget_of_Receiver,
-                column_property=col,
-                list_of_cols=self.list_of_receiver_cols_links,
-                adapter=self.adapter
-            )
+        try:
+            for col in self.config_dict['dbColumns']:
+                target_column_editor_viewer.create_receiver_column(
+                    tree_table=self.treeWidget_of_Receiver,
+                    column_property=col,
+                    list_of_cols=self.list_of_receiver_cols_links,
+                    adapter=self.adapter
+                )
+        except Exception:
+            show_error_window(self, 'Error at creating receiver columns.')
+            self.close_project_data()
+            self.setCursor(QtCore.Qt.ArrowCursor)
+            return
 
         self.show_pref()
 
