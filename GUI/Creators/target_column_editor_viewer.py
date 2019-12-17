@@ -235,8 +235,6 @@ class ColTypeRow(QtWidgets.QTreeWidgetItem):
             self.setDisabled(False)
 
 
-
-
 class IsUpdateCondionRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, tree_widget: QtWidgets.QTreeWidget, column_property, parent=None, adapter=None):
         super().__init__(parent, [adapter.take_translate('TargetColumnsConfigEditor', 'isUpdateCondition'), ])
@@ -271,8 +269,12 @@ class DefaultValueRow(QtWidgets.QTreeWidgetItem):
 
         self.line_edit_defeultValue = QtWidgets.QLineEdit()
 
+        self.initialize()
+
         parent.setItemWidget(self, 0, self.checkBox_widget_for_defaultValue_check)
         parent.setItemWidget(self, 1, self.line_edit_defeultValue)
+        self.checkBox_widget_for_defaultValue_check.stateChanged.connect(self.state_change)
+
 
 
     def uncheck_checkbox(self, state):
@@ -286,14 +288,33 @@ class DefaultValueRow(QtWidgets.QTreeWidgetItem):
             self.line_edit_defeultValue.setDisabled(False)
             self.setDisabled(False)
 
+    def initialize(self):
+        if self.column_property['defaultValue_mode'] != 'false':
+            self.line_edit_defeultValue.setText(self.column_property['ifNull'])
+            self.checkBox_widget_for_defaultValue_check.setCheckState(QtCore.Qt.Checked)
+        else:
+            self.checkBox_widget_for_defaultValue_check.setCheckState(QtCore.Qt.Unchecked)
+            self.line_edit_defeultValue.setDisabled(True)
+
+    def state_change(self):
+        if self.checkBox_widget_for_defaultValue_check.isChecked():
+            self.line_edit_defeultValue.setDisabled(False)
+        else:
+            self.line_edit_defeultValue.setDisabled(True)
+
+
 class IfNullRow(QtWidgets.QTreeWidgetItem):
     def __init__(self, column_property: dict, parent: QtWidgets.QTreeWidget, parent_widget, adapter):
         super().__init__(parent_widget, ['', ])
         self.column_property = column_property
         self.checkBox_widget_for_ifNull_check = QtWidgets.QCheckBox(adapter.take_translate('TargetColumnsConfigEditor', 'ifNull'))
         self.line_edit_ifNull = QtWidgets.QLineEdit()
+
+        self.initialize()
+
         parent.setItemWidget(self, 0, self.checkBox_widget_for_ifNull_check)
         parent.setItemWidget(self, 1, self.line_edit_ifNull)
+        self.checkBox_widget_for_ifNull_check.stateChanged.connect(self.state_change)
 
     def uncheck_checkbox(self, state):
         if state:
@@ -306,7 +327,16 @@ class IfNullRow(QtWidgets.QTreeWidgetItem):
             self.line_edit_ifNull.setDisabled(False)
             self.setDisabled(False)
 
+    def initialize(self):
+        if self.column_property['ifNull_mode'] != 'false':
+            self.line_edit_ifNull.setText(self.column_property['ifNull'])
+            self.checkBox_widget_for_ifNull_check.setCheckState(QtCore.Qt.Checked)
+        else:
+            self.checkBox_widget_for_ifNull_check.setCheckState(QtCore.Qt.Unchecked)
+            self.line_edit_ifNull.setDisabled(True)
 
-
-if __name__ == '__main__':
-    app = QtWidgets.QApplication(sys.argv)
+    def state_change(self):
+        if self.checkBox_widget_for_ifNull_check.isChecked():
+            self.line_edit_ifNull.setDisabled(False)
+        else:
+            self.line_edit_ifNull.setDisabled(True)
