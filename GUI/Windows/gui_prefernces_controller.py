@@ -31,7 +31,6 @@ class Pref_Window(QtWidgets.QWidget):
         self.config_dict = config_dict
         self.ui = form_preferences.Ui_Form()
         self.ui.setupUi(self)
-        # translate
         self.ui.label_dbtype.setText(adapter.take_translate('pref_window', 'dbtype'))
         self.ui.label_dbHost.setText(adapter.take_translate('pref_window', 'dbHost'))
         self.ui.label_dbUser.setText(adapter.take_translate('pref_window', 'dbUser'))
@@ -46,7 +45,6 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.checkBox_checkMode.setText(adapter.take_translate('pref_window', 'Check_mode'))
         self.ui.label_check_mode.setText(adapter.take_translate('pref_window', 'Check_table_name'))
         self.ui.checkBox_both.setText(adapter.take_translate('pref_window', 'Both'))
-        # translate
 
         self.treeWidget_linked_columns = TreeWidgetLinkedColumns(widget_sighal=self.ui.excelFileName)
         self.ui.tree_widget_box.addWidget(self.treeWidget_linked_columns)
@@ -102,8 +100,6 @@ class Pref_Window(QtWidgets.QWidget):
         self.treeWidget_linked_columns.actionAddColumn.triggered.connect(self.add_link_col)
         self.treeWidget_linked_columns.actionDeleteColumn.triggered.connect(self.delete_link_col)
         self.ui.open_excel_compare_file.clicked.connect(self.open_excel_compare_folder)
-
-
 
     def open_excel_compare_folder(self):
 
@@ -172,7 +168,7 @@ class Pref_Window(QtWidgets.QWidget):
                                    path)
         df_temp = pd.ExcelFile(pathToExcel)
         self.df_compare = None
-        self.df_compare = df_temp.parse(self.config_dict['linkedFileSheetNumber'] + 1)
+        self.df_compare = df_temp.parse(self.config_dict['linkedFileSheetNumber'])
 
         if self.df_compare is not None:
             target_column = [i for i in self.df_compare.columns.values]
@@ -200,7 +196,6 @@ class Pref_Window(QtWidgets.QWidget):
             self.treeWidget_linked_columns.addTopLevelItem(row_check)
         self.pref['col_to_check'] = arr_of_col
 
-
     def initialize(self):
         self.ui.lineEdit_dbtype.setCurrentText(self.config_dict['dbtype'])
         self.ui.lineEdit_dbport.setText(self.config_dict['dbPort'])
@@ -210,7 +205,6 @@ class Pref_Window(QtWidgets.QWidget):
         self.ui.lineEdit_dbhost.setText(self.config_dict['dbHost'])
         self.ui.excelFileName.setText(self.config_dict['importXml_path_value'])
         self.ui.comboBox_chose_loadMode.setCurrentText(self.config_dict['loadMode'])
-        # if self.config_dict['checkMode_value'] == 'false':
         self.ui.target_table_name.addItems(sorted(self.tables_in_db))
         self.ui.target_table_name.setCurrentIndex(sorted(self.tables_in_db).index(self.config_dict['exportTableName_value_text']))
 
@@ -232,6 +226,8 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.compare_file.setText(self.config_dict['pathToLinkFile'])
             self.comboBox_list_source_excel.addItems([i for i in self.dbService.df.sheet_names])
             self.comboBox_list_source_excel.setCurrentIndex(int(self.config_dict['linkedFileSheetNumber']))
+            if self.config_dict['if_both'] == 'true':
+                self.ui.checkBox_both.setCheckState(QtCore.Qt.Checked)
 
         else:
             self.ui.checkBox_checkMode.setCheckState(QtCore.Qt.Unchecked)
@@ -272,16 +268,8 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['checkBox_both'] = self.ui.checkBox_both.isChecked()
 
         self.ui.lineEdit_dbtype.setDisabled(True)
-        # self.ui.lineEdit_dbhost.setReadOnly(True)
-        # self.ui.lineEdit_dbuser.setReadOnly(True)
-        # self.ui.lineEdit_dbpass.setReadOnly(True)
-        # self.ui.lineEdit_dbbase.setReadOnly(True)
-        # self.ui.lineEdit_dbport.setReadOnly(True)
         self.ui.comboBox_dbSchema.setDisabled(True)
         self.ui.target_table_name.setDisabled(True)
-
-
-
 
     def add_asterisc_checkBox_Dictionary(self):
         if self.ui.checkBox_Dictionary.text()[0] != '*':
@@ -367,9 +355,7 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_source.setText(f"*{self.ui.label_source.text()}")
             self.ui.label_source.adjustSize()
 
-
     def save_db_pref(self):
-
         if self.ui.label_dbtype.text()[0] == '*':
             self.ui.label_dbtype.setText(f"{self.ui.label_dbtype.text()[1:]}")
             self.ui.label_dbtype.adjustSize()
@@ -405,7 +391,6 @@ class Pref_Window(QtWidgets.QWidget):
             self.ui.label_source.setText(f"{self.ui.label_source.text()[1:]}")
             self.ui.label_source.adjustSize()
 
-
         if self.ui.checkBox_Dictionary.isChecked():
             self.main_gui.ui.actionDictionary.setChecked(True)
             self.main_gui.ui.actionDictionary.triggered.emit(1)
@@ -429,7 +414,7 @@ class Pref_Window(QtWidgets.QWidget):
         self.pref['compare_file'] = self.ui.compare_file.text()
         self.pref['comboBox_set_list_checked'] = self.comboBox_set_list_checked.currentText()
         self.pref['checkBox_Dictionary'] = self.ui.checkBox_Dictionary.isChecked()
-        self.pref['checkBox_both'] = self.ui.checkBox_both.isChecked()
+        self.pref['checkBox_both'] = f'{self.ui.checkBox_both.isChecked()}'.lower()
 
     def open_excel_folder(self):
 
