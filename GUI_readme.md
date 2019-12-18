@@ -137,3 +137,22 @@ MSSQL будет выполнена загрузка в три таблицы `T
 Таблицы `Table_1` и `Table_2` связаны с таблицей `Table` полями `Table_1.id` `Table_2.id` с полями
 `Table.id_1` `Table.id_2` посредством внешних ключей 
 
+В качестве источника имеется два Excel файла 
+
+`loc_test_dic.xlsx`
+<image src="readme/Load/loc_test_dic.png">
+
+`Book.xlsx`
+<image src="readme/Load/book.png">
+
+Файл `Book.xlsx` служит для демонстрации операции сравнения двух файлов.
+
+[:arrow_up:Оглавление](#Оглавление)
+## Открытие файла конфигурации
+
+
+
+
+
+
+
