@@ -832,8 +832,17 @@ class LinkedColumns(QtWidgets.QTreeWidgetItem):
         self.combo_box_target_links.addItems(target_columns)
 
         if current_column: # если есть колонка из которой создается
-            self.combo_box_source_links.setCurrentIndex(source_columns.index(current_column['colNameInSource']))
-            self.combo_box_target_links.setCurrentIndex(target_columns.index(current_column['linkedColName']))
+            try:
+                self.combo_box_source_links.setCurrentIndex(source_columns.index(current_column['colNameInSource']))
+            except:
+                self.combo_box_source_links.addItem('---')
+                self.combo_box_source_links.setCurrentText('---')
+            try:
+                self.combo_box_target_links.setCurrentIndex(target_columns.index(current_column['linkedColName']))
+            except:
+                self.combo_box_target_links.addItem('---')
+                self.combo_box_target_links.setCurrentText('---')
+
 
         tree_widget.setItemWidget(self, 0, self.combo_box_source_links)
         tree_widget.setItemWidget(self, 1, self.combo_box_target_links)

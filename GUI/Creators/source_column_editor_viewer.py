@@ -40,7 +40,11 @@ def create_input_column(tree_table: QtWidgets.QTreeWidget,
         raise SystemError('Unknown state')
 
     if column_property['colNameDb']:
-        combo_box_dbName.setCurrentIndex(db_colnames.index(column_property['colNameDb']))
+        try:
+            combo_box_dbName.setCurrentIndex(db_colnames.index(column_property['colNameDb']))
+        except:
+            combo_box_dbName.addItem('---')
+            combo_box_dbName.setCurrentText('---')
     else:
         combo_box_dbName.addItem('---')
         combo_box_dbName.setCurrentText('---')
@@ -148,7 +152,10 @@ class ColumnNameRow(QtWidgets.QTreeWidgetItem):
         ColumnNameRow.iterator = ColumnNameRow.iterator + 1
 
         if column_property['colName']:
-            self.combo_box_name.setCurrentIndex(arr_of_db_columns.index(column_property['colName']))
+            try:
+                self.combo_box_name.setCurrentIndex(arr_of_db_columns.index(column_property['colName']))
+            except:
+                self.combo_box_name.setCurrentText('---')
         else:
             self.combo_box_name.setCurrentText('---')
 
