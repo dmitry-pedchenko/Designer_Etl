@@ -108,7 +108,7 @@ pyinstaller --noconsole --onefile --icon=icon.ico GUI/gui_main_interface.py
 <image src="readme/open/dir.png">
 
 
-Скачать уже собранный пакет можно по следующей <a href="https://drive.google.com/open?id=1GjOsarnXSuNWU5HI3GgS6LxWOl0IM_5B">ссылке</a>
+Скачать уже собранный пакет можно по следующей <a href="https://drive.google.com/open?id=1idB0Xea_GP29ggsBYVUabpLzn0Vpy9lh">ссылке</a>
 
 [:arrow_up:Оглавление](#Оглавление)
 ## Изменение языка системы
