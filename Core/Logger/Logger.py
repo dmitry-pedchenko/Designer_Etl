@@ -185,7 +185,6 @@ class Log_info():
             raise SystemExit(1)
         else:
             if self.signal_error:
-                # self.signal_error.emit(t.substitute(num=errNum, message=message_temp))
                 self.signal_debug.emit(t.substitute(num=errNum, message=message_temp))
                 self.signal_log.emit(t.substitute(num=errNum, message=message_temp))
             raise ThrowExc(t.substitute(num=errNum, message=message_temp))

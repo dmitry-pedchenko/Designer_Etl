@@ -14,12 +14,12 @@ def arr_of_filters(str_type, log) -> dict:
         }
     elif str_type == 'date':
         arr_of_filters = {
-            '=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") == datetime.datetime.strptime(str(y), "%d.%m.%Y"),
-            '>': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") > datetime.datetime.strptime(str(y), "%d.%m.%Y"),
-            '>=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") >= datetime.datetime.strptime(str(y), "%d.%m.%Y"),
-            '<': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") < datetime.datetime.strptime(str(y), "%d.%m.%Y"),
-            '<=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") <= datetime.datetime.strptime(str(y), "%d.%m.%Y"),
-            '!=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") != datetime.datetime.strptime(str(y), "%d.%m.%Y")
+            '=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") == datetime.datetime.strptime(str(y), "%Y.%m.%d"),
+            '>': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") > datetime.datetime.strptime(str(y), "%Y.%m.%d"),
+            '>=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") >= datetime.datetime.strptime(str(y), "%Y.%m.%d"),
+            '<': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") < datetime.datetime.strptime(str(y), "%Y.%m.%d"),
+            '<=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") <= datetime.datetime.strptime(str(y), "%Y.%m.%d"),
+            '!=': lambda x, y: datetime.datetime.strptime(str(x), "%Y%m%d") != datetime.datetime.strptime(str(y), "%Y.%m.%d")
         }
     else:
         log.raiseInfo(44, f'Unknown data type of the column <{str_type}>')

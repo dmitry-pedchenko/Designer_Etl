@@ -523,7 +523,6 @@ class MainWindow(QtWidgets.QMainWindow):
     @pyqtSlot(object)
     def created_connection(self, conn):
         self.ui.statusbar.showMessage(f"Connected to {self.config_dict['dbHost']}: {self.config_dict['dbBase']}")
-        # self.setCursor(QtCore.Qt.ArrowCursor)
 
         self.ui.menuHello.setDisabled(False)
         self.ui.menuSystem.setDisabled(False)
