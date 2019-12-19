@@ -231,7 +231,7 @@ class Ui_Form(object):
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_3.setObjectName("frame_3")
         self.horizontalLayoutWidget_2 = QtWidgets.QWidget(self.frame_3)
-        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(10, 0, 121, 31))
+        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(10, 0, 261, 31))
         self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
         self.horizontalLayout_12 = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget_2)
         self.horizontalLayout_12.setContentsMargins(0, 0, 0, 0)
