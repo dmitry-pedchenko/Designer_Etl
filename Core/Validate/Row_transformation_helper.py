@@ -24,6 +24,9 @@ class Transformation_helper:
 
     def checkAndTransform(self, dbProperties = None, rowProperties = None, value = None, str_type = None):
         self.value = value
+
+        if rowProperties.get("replace_mode") == 'true':
+            self.value = self.replace(self.value, rowProperties.get("replaceValArr"))
         if rowProperties.get("cropEnd_mode") == 'true':
             self.value = self.cropEnd(self.value, rowProperties.get("cropEnd"))
         if rowProperties.get("cropBegin_mode") == 'true':
@@ -38,8 +41,7 @@ class Transformation_helper:
             self.value = self.addValueBoth(self.value, rowProperties.get("addValueBoth").split(',')[0],
                                                         rowProperties.get("addValueBoth").split(',')[1])
 
-        if rowProperties.get("replace_mode") == 'true':
-            self.value = self.replace(self.value, rowProperties.get("replaceValArr"))
+
         if dbProperties:
             if dbProperties.get("ifNull_mode") == 'true' and value == 'null':
                 self.value = dbProperties.get("ifNull")

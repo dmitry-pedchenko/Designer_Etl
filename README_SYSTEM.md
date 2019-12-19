@@ -892,7 +892,7 @@ true или false в зависимости от нужного режима з�
 ##### Порядок выполнения преобразования
 
 Если включить все теги `cropEnd addValueEnd takeFromBegin cropBegin addValueBegin addValueBoth replace` то они все обработают полученную строку
-Порядок выполнения операций обработки: cropEnd, cropBegin, addValueEnd, takeFromBegin, addValueBegin, addValueBoth, replace
+Порядок выполнения операций обработки: replace, cropEnd, cropBegin, addValueEnd, takeFromBegin, addValueBegin, addValueBoth
 
 ##### Примечание
 

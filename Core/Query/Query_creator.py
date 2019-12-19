@@ -163,11 +163,12 @@ class Query:
                     else:  # если несколько полей в источнике идут в одно поле в приемнике
                         if columnProperty.get("colType") == 'str':  #
                             string = ''
-                            for col in dicOfColVals.get(columnProperty["colName"]):
-                                string += "{}".format(hp.checkAndTransform(columnProperty,
-                                                                           curColumnExcelEqualsDbColumn[0],
-                                                                           col,
-                                                                           str_type=curColumnExcelEqualsDbColumn[0]['colType']))
+                            for number, col in enumerate(dicOfColVals.get(columnProperty["colName"])):
+                                columnProperty_for_conc = list(filter(lambda x: x['colNameDb'] == columnProperty["colName"], self.dic["excelColumns"]))[number]
+                                string += "{}".format(hp.checkAndTransform(rowProperties=columnProperty_for_conc,
+                                                                           dbProperties=columnProperty,
+                                                                           value=col,
+                                                                           str_type=columnProperty_for_conc['colType']))
                             string = f"'{string}'"
                             dicOfValsToInsert[columnProperty["colName"]] = string
                         else:
