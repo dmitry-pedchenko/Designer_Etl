@@ -44,6 +44,15 @@ pip install pymssql
 pip install mysql-connector-python
 pip install xlrd
 ```
+Версии пакетов на которых тестировалась система:
+
+```
+pandas 0.25.1
+pymssql 2.1.4
+mysql-connector-python 8.0.17
+xlrd 1.2.0
+```
+
 
 Если возникают пробоемы с установкой pymssql на MAC OS
 
