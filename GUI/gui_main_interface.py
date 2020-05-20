@@ -1,3 +1,13 @@
+"""
+    Description:
+        Основной модуль для оконного приложения
+    Attributes:
+        MainWindow клаcс содержащий основоное окно приложения
+    Example:
+        python gui_main_interface.py
+"""
+
+
 from PyQt5 import QtWidgets, QtCore, QtGui
 import sys
 import os
